@@ -122,9 +122,9 @@ class Request:
 
                 request.data = urllib.parse.urlencode(data)
             elif self.plugin.get_dict_value(headers, 'content-type').startswith('application/json') and data:
-                request.data = urllib.parse.urlencode(data)
+                request.data = real_json.dumps(data).encode('utf-8')
             elif json:
-                request.data = urllib.parse.urlencode(json)
+                request.data = real_json.dumps(json).encode('utf-8')
             else:
                 if not isinstance(data, basestring):
                     data = str(data)
