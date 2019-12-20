@@ -81,9 +81,9 @@ class Tiles:
                 sport = self.sport['Title']
             time_ = self.start[11:][:5]
             if self.type == 'Live':
-                self.item['title'] = '[COLOR red]{0}[/COLOR] [COLOR dimgray]{1}[/COLOR] {2} [COLOR dimgray]{3}[/COLOR]'.format(time_, sport, self.title, competition)
+                self.item['title'] = '[COLOR red]{0}[/COLOR] [COLOR blue]{1}[/COLOR] {2} [COLOR blue]{3}[/COLOR]'.format(time_, sport, self.title, competition)
             else:
-                self.item['title'] = '{0} [COLOR dimgray]{1}[/COLOR] {2} [COLOR dimgray]{3}[/COLOR]'.format(time_, sport, self.title, competition)
+                self.item['title'] = '{0} [COLOR blue]{1}[/COLOR] {2} [COLOR blue]{3}[/COLOR]'.format(time_, sport, self.title, competition)
         elif (self.type == 'ComingUp' or 'Scheduled' in i.get('Id', '')) or (self.type == 'Highlights' or self.type == 'Condensed'):
             if self.type == 'ComingUp':
                 day = self.plugin.days(self.type, self.now, self.start)
