@@ -62,7 +62,7 @@ class Client:
             self.plugin.log('resource = {0}'.format(resource))
 
             if resource.get('found') == False:
-                rail_data = self.railFromCache(id_, params)
+                rail_data = self.railFromCache(id_, rail.get('Params', params))
                 self.plugin.log("rail_data = {0}".format(rail_data))
                 title = rail_data.get('Title', rail.get('Id'))
             else:
