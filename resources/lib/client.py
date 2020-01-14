@@ -63,8 +63,8 @@ class Client:
 
             if resource.get('found') == False:
                 rail_data = self.railFromCache(id_, rail.get('Params', params))
-                self.plugin.log("rail_data = {0}".format(rail_data))
-                title = rail_data.get('Title', rail.get('Id'))
+                self.plugin.log('rail_data = {0}'.format(rail_data))
+                title = rail_data.get('Title', rail.get('Id')) if isinstance(rail_data, dict) else rail.get('Id')
             else:
                 title = resource.get('text')
             rail['Title'] = title
