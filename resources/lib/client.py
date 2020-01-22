@@ -203,7 +203,7 @@ class Client:
             self.setToken(data['AuthToken'], data.get('Result', 'RefreshAccessTokenError'))
 
 
-    def startUp(self):
+    def initRegion(self):
         self.POST_DATA = {
             'LandingPageKey': 'generic',
             'Languages': '{0}, {1}'.format(self.plugin.gui_language(), self.LANGUAGE),
@@ -218,6 +218,11 @@ class Client:
             self.COUNTRY = region['Country']
             self.LANGUAGE = region['Language']
             self.setLanguage(data['SupportedLanguages'])
+
+        return region
+
+
+    def startUp(self, region):
         if region.get('isAllowed', False):
             if self.TOKEN:
                 self.refreshToken()
@@ -225,7 +230,7 @@ class Client:
                 self.signIn()
         else:
             self.TOKEN = ''
-            self.plugin.log('[{0}] version: {1} region: {2}'.format(self.plugin.addon_id, self.plugin.addon_version, str(region)))
+            self.plugin.log('[{0}] version: {1} region: {2}'.format(self.plugin.addon_id, self.plugin.addon_version, region))
             self.plugin.dialog_ok(self.plugin.get_resource('error_2003_notAvailableInCountry').get('text'))
 
 

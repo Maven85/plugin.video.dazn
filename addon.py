@@ -52,10 +52,11 @@ def router(paramstring):
 
 if __name__ == '__main__':
     if plugin.startup or not client.TOKEN:
+        region = client.initRegion()
         playable = plugin.start_is_helper()
         client.DEVICE_ID = plugin.uniq_id()
         if client.DEVICE_ID and playable:
-            client.startUp()
+            client.startUp(region)
             if client.TOKEN:
                 plugin.set_setting('startup', 'false')
                 client.userProfile()

@@ -171,8 +171,7 @@ class Common:
     def uniq_id(self):
         device_id = ''
         mac_addr = xbmc.getInfoLabel('Network.MacAddress')
-        if not py2_encode(':') in mac_addr:
-            mac_addr = xbmc.getInfoLabel('Network.MacAddress')
+
         # hack response busy
         i = 0
         while not py2_encode(':') in mac_addr and i < 3:
