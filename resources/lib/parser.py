@@ -2,11 +2,11 @@
 
 from __future__ import unicode_literals
 
+from .context import Context
 from .items import Items
+from .playback import Playback
 from .rails import Rails
 from .tiles import Tiles
-from .playback import Playback
-from .context import Context
 
 
 class Parser:

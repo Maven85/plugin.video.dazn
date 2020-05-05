@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
+from six.moves.urllib.parse import parse_qs
 
 import sys
-from six.moves.urllib.parse import parse_qs
+
+import xbmcaddon
+
 from resources.lib.common import Common
 from resources.lib.client import Client
 from resources.lib.parser import Parser
@@ -12,6 +15,7 @@ handle_ = int(sys.argv[1])
 url_ = sys.argv[0]
 
 plugin = Common(
+    addon=xbmcaddon.Addon(),
     addon_handle=handle_,
     addon_url=url_
 )

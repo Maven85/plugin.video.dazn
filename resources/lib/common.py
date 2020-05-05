@@ -2,41 +2,39 @@
 
 from __future__ import unicode_literals
 from kodi_six.utils import py2_encode, py2_decode
-
-import base64
-import datetime
-import hashlib
-import json
-import os
-import string
-import time
 from six.moves.urllib.parse import urlencode
-import uuid
+
+from base64 import b64decode
+from datetime import date, datetime, timedelta
+from hashlib import md5
+from inputstreamhelper import Helper
+from json import dump, load, loads
+from os.path import join
+from string import capwords
+from time import mktime, sleep, strptime
+from uuid import UUID
+
 import xbmc
 import xbmcaddon
 import xbmcgui
 import xbmcvfs
-import _strptime
-from inputstreamhelper import Helper
 
-try:
-    import StorageServer
-except:
-    import storageserverdummy as StorageServer
+from .singleton import Singleton
 
 
-class Common:
+class Common(Singleton):
 
 
-    def __init__(self, addon_handle=None, addon_url=None):
+    def __init__(self, addon=None, addon_handle=None, addon_url=None):
         self.api_base = 'https://isl.dazn.com/misl/'
         self.time_format = '%Y-%m-%dT%H:%M:%SZ'
         self.date_format = '%Y-%m-%d'
         self.portability_list = ['AT', 'DE', 'IT', 'ES']
 
-        self.addon = xbmcaddon.Addon()
+        self.addon = addon
         self.addon_handle = addon_handle
         self.addon_url = addon_url
+        self.cache = dict()
         self.addon_id = self.addon.getAddonInfo('id')
         self.addon_name = self.addon.getAddonInfo('name')
         self.addon_version = self.addon.getAddonInfo('version')
@@ -51,8 +49,6 @@ class Common:
         self.select_cdn = self.addon.getSetting('select_cdn') == 'true'
         self.preferred_cdn = self.addon.getSetting('preferred_cdn')
         self.max_bw = self.addon.getSetting('max_bw')
-
-        self.railCache = StorageServer.StorageServer(py2_encode('{0}.rail').format(self.addon_id), 24 * 7)
 
 
     def log(self, msg):
@@ -79,7 +75,7 @@ class Common:
     def get_filepath(self, file_name):
         if file_name.startswith('http'):
             file_name = file_name.split('/')[-1]
-        return os.path.join(self.get_datapath(), file_name)
+        return join(self.get_datapath(), file_name)
 
 
     def get_dialog(self):
@@ -114,7 +110,7 @@ class Common:
         missing_padding = len(data) % 4
         if missing_padding != 0:
             data += b'=' * (4 - missing_padding)
-        return base64.b64decode(data)
+        return b64decode(data)
 
 
     def get_resource(self, text, prefix=''):
@@ -147,11 +143,11 @@ class Common:
 
 
     def time_now(self):
-        return datetime.datetime.now().strftime(self.time_format)
+        return datetime.now().strftime(self.time_format)
 
 
     def time_stamp(self, str_date):
-        return datetime.datetime.fromtimestamp(time.mktime(time.strptime(str_date, self.time_format)))
+        return datetime.fromtimestamp(mktime(strptime(str_date, self.time_format)))
 
 
     def timedelta_total_seconds(self, timedelta):
@@ -162,9 +158,9 @@ class Common:
 
     def utc2local(self, date_string):
         if str(date_string).startswith('2'):
-            utc = datetime.datetime(*(time.strptime(date_string, self.time_format)[0:6]))
-            epoch = time.mktime(utc.timetuple())
-            offset = datetime.datetime.fromtimestamp(epoch) - datetime.datetime.utcfromtimestamp(epoch)
+            utc = datetime(*(strptime(date_string, self.time_format)[0:6]))
+            epoch = mktime(utc.timetuple())
+            offset = datetime.fromtimestamp(epoch) - datetime.utcfromtimestamp(epoch)
             return (utc + offset).strftime(self.time_format)
 
 
@@ -176,10 +172,10 @@ class Common:
         i = 0
         while not py2_encode(':') in mac_addr and i < 3:
             i += 1
-            time.sleep(1)
+            sleep(1)
             mac_addr = xbmc.getInfoLabel('Network.MacAddress')
         if py2_encode(':') in mac_addr:
-            device_id = str(uuid.UUID(hashlib.md5(mac_addr.encode("utf-8")).hexdigest()))
+            device_id = str(UUID(md5(mac_addr.encode("utf-8")).hexdigest()))
         elif self.get_setting('device_id'):
             device_id = self.get_setting('device_id')
         else:
@@ -199,29 +195,29 @@ class Common:
 
 
     def days(self, title, now, start):
-        today = datetime.date.today()
+        today = date.today()
         if start and not title == 'Live':
             if now[:10] == start[:10]:
                 return self.get_resource('tileLabelToday', 'browseui_').get('text')
-            elif str(today + datetime.timedelta(days=1)) == start[:10]:
+            elif str(today + timedelta(days=1)) == start[:10]:
                 return self.get_resource('tileLabelTomorrow', 'browseui_').get('text')
             else:
                 for i in range(2, 8):
-                    if str(today + datetime.timedelta(days=i)) == start[:10]:
-                        return self.get_resource((today + datetime.timedelta(days=i)).strftime('%A'), 'calendar_').get('text')
+                    if str(today + timedelta(days=i)) == start[:10]:
+                        return self.get_resource((today + timedelta(days=i)).strftime('%A'), 'calendar_').get('text')
         return self.get_resource(title, 'browseui_').get('text')
 
 
     def epg_date(self, date):
-        return datetime.datetime.fromtimestamp(time.mktime(time.strptime(date, self.date_format)))
+        return datetime.fromtimestamp(mktime(strptime(date, self.date_format)))
 
 
     def get_prev_day(self, date):
-        return (date - datetime.timedelta(days=1))
+        return (date - timedelta(days=1))
 
 
     def get_next_day(self, date):
-        return (date + datetime.timedelta(days=1))
+        return (date + timedelta(days=1))
 
 
     def get_date(self):
@@ -234,7 +230,7 @@ class Common:
 
 
     def get_mpx(self, token):
-        token_data = json.loads(self.b64dec(token.split('.')[1]))
+        token_data = loads(self.b64dec(token.split('.')[1]))
         return token_data['mpx']
 
 
@@ -254,23 +250,28 @@ class Common:
 
 
     def get_cache(self, file_name):
-        json_data = {}
-        file_ = self.get_filepath(file_name)
-        if xbmcvfs.exists(file_):
-            try:
-                f = xbmcvfs.File(file_, 'r')
-                json_data = json.load(f)
-                f.close()
-            except Exception as e:
-                self.log("[{0}] get cache error: {1}".format(self.addon_id, e))
-        return json_data
+        cached_data = self.cache.get(file_name)
+        if cached_data:
+            return cached_data
+        else:
+            json_data = {}
+            file_ = self.get_filepath(file_name)
+            if xbmcvfs.exists(file_):
+                try:
+                    f = xbmcvfs.File(file_, 'r')
+                    json_data = load(f)
+                    self.cache.update({file_name: json_data})
+                    f.close()
+                except Exception as e:
+                    self.log("[{0}] get cache error: {1}".format(self.addon_id, e))
+            return json_data
 
 
-    def cache(self, file_name, data):
+    def write_file(self, file_name, data):
         file_ = self.get_filepath(file_name)
         try:
             f = xbmcvfs.File(file_, 'w')
-            json.dump(data, f)
+            dump(data, f)
             f.close()
         except Exception as e:
             self.log("[{0}] cache error: {1}".format(self.addon_id, e))
@@ -294,7 +295,7 @@ class Common:
 
     def initcap(self, text):
         if text.isupper() and len(text) > 3:
-            text = string.capwords(text)
+            text = capwords(text)
             text = text.replace('Dazn', 'DAZN')
         elif not text.isupper() and not ' ' in text:
             parts = self.split_on_uppercase(text, True)

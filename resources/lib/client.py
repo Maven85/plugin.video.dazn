@@ -72,7 +72,13 @@ class Client:
 
 
     def railFromCache(self, id_, params=''):
-        return self.plugin.railCache.cacheFunction(self.rail, id_, params)
+        cached_data = self.plugin.cache.get('rail.{0}'.format(id_))
+        if cached_data:
+            return cached_data
+        else:
+            json_data = self.rail(id_, params)
+            self.plugin.cache.update({'rail.{0}'.format(id_): json_data})
+            return json_data
 
 
     def rail(self, id_, params=''):
@@ -101,7 +107,7 @@ class Client:
         self.PARAMS['languageCode'] = self.LANGUAGE
         self.PARAMS['region'] = self.COUNTRY
         self.PARAMS['platform'] = 'web'
-        self.plugin.cache(self.RESOURCES, self.content_data(self.RESOURCES))
+        self.plugin.write_file(self.RESOURCES, self.content_data(self.RESOURCES))
 
 
     def playback_data(self, id_):

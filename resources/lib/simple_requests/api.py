@@ -1,35 +1,32 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-
-from six.moves import urllib
+from gzip import GzipFile
 from io import StringIO
-import gzip
+from json import dumps, loads
+from six.moves.urllib.parse import quote, urlencode
+from six.moves.urllib.error import HTTPError
+from six.moves.urllib.request import build_opener, HTTPDefaultErrorHandler, HTTPRedirectHandler, HTTPSHandler, Request as _request
+from six.moves.urllib.response import addinfourl
+
 import xbmc
 
-import json as real_json
 
-try:
-    basestring
-except NameError:
-    basestring = str
-
-
-class ErrorHandler(urllib.request.HTTPDefaultErrorHandler):
+class ErrorHandler(HTTPDefaultErrorHandler):
 
 
     def http_error_default(self, req, fp, code, msg, hdrs):
-        infourl = urllib.response.addinfourl(fp, hdrs, req.get_full_url())
+        infourl = addinfourl(fp, hdrs, req.get_full_url())
         infourl.status = code
         infourl.code = code
         return infourl
 
 
-class NoRedirectHandler(urllib.request.HTTPRedirectHandler):
+class NoRedirectHandler(HTTPRedirectHandler):
 
 
     def http_error_302(self, req, fp, code, msg, headers):
-        infourl = urllib.response.addinfourl(fp, headers, req.get_full_url())
+        infourl = addinfourl(fp, headers, req.get_full_url())
         infourl.status = code
         infourl.code = code
         return infourl
@@ -41,7 +38,7 @@ class NoRedirectHandler(urllib.request.HTTPRedirectHandler):
     http_error_307 = http_error_302
 
 
-class Response():
+class Response:
 
 
     def __init__(self):
@@ -56,7 +53,7 @@ class Response():
 
 
     def json(self):
-        return real_json.loads(self.text)
+        return loads(self.text)
 
 
 class Request:
@@ -84,7 +81,7 @@ class Request:
         if not headers:
             headers = {}
 
-        url = urllib.parse.quote(url, safe="%/:=&?~#+!$,;'@()*[]")
+        url = quote(url, safe="%/:=&?~#+!$,;'@()*[]")
 
         handlers = []
 
@@ -96,37 +93,37 @@ class Request:
             ssl_context = ssl.create_default_context()
             ssl_context.check_hostname = False
             ssl_context.verify_mode = ssl.CERT_NONE
-            handlers.append(urllib.request.HTTPSHandler(context=ssl_context))
+            handlers.append(HTTPSHandler(context=ssl_context))
 
-        # handlers.append(urllib.request.HTTPCookieProcessor())
+        # handlers.append(HTTPCookieProcessor())
         # handlers.append(ErrorHandler)
         if not allow_redirects:
             handlers.append(NoRedirectHandler)
-        opener = urllib.request.build_opener(*handlers)
+        opener = build_opener(*handlers)
 
         if params:
-            url = '{0}?{1}'.format(url, urllib.parse.urlencode(params))
-        request = urllib.request.Request(url)
+            url = '{0}?{1}'.format(url, urlencode(params))
+        request = _request(url)
         if headers:
             for key in headers:
                 request.add_header(key, headers[key])
         if data or json:
             if self.plugin.get_dict_value(headers, 'content-type').startswith('application/x-www-form-urlencoded') and data:
                 # transform a string into a map of values
-                if isinstance(data, basestring):
+                if isinstance(data, six.string_types):
                     _data = data.split('&')
                     data = {}
                     for item in _data:
                         name, value = item.split('=')
                         data[name] = value
 
-                request.data = urllib.parse.urlencode(data)
+                request.data = urlencode(data)
             elif self.plugin.get_dict_value(headers, 'content-type').startswith('application/json') and data:
-                request.data = real_json.dumps(data).encode('utf-8')
+                request.data = dumps(data).encode('utf-8')
             elif json:
-                request.data = real_json.dumps(json).encode('utf-8')
+                request.data = dumps(json).encode('utf-8')
             else:
-                if not isinstance(data, basestring):
+                if not isinstance(data, six.string_types):
                     data = str(data)
 
                 if isinstance(data, str):
@@ -139,9 +136,9 @@ class Request:
         response = None
         try:
             response = opener.open(request)
-        except urllib.error.HTTPError as e:
+        except HTTPError as e:
             # HTTPError implements addinfourl, so we can use the exception to construct a response
-            if isinstance(e, urllib.response.addinfourl):
+            if isinstance(e, addinfourl):
                 response = e
         except Exception as e:
             result.text = e
@@ -154,7 +151,7 @@ class Request:
             return result
         elif response.headers.get('Content-Encoding', '').startswith('gzip'):
             buf = StringIO(response.read())
-            f = gzip.GzipFile(fileobj=buf)
+            f = GzipFile(fileobj=buf)
             result.text = f.read()
         else:
             result.text = response.read()
