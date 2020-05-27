@@ -43,7 +43,7 @@ class Context:
                 'id': i.get('id', ''),
                 'params': i.get('params', '')
             }
-            self.cm.append((type_, 'XBMC.RunPlugin({0})'.format(self.plugin.build_url(d))))
+            self.cm.append((type_, 'RunPlugin({0})'.format(self.plugin.build_url(d))))
         return self.cm
 
 
