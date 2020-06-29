@@ -4,6 +4,8 @@ from __future__ import unicode_literals
 from kodi_six.utils import py2_encode, py2_decode
 from six.moves.urllib.parse import urlencode
 
+import _strptime
+
 from base64 import b64decode
 from datetime import date, datetime, timedelta
 from hashlib import md5
