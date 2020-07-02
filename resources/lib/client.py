@@ -34,7 +34,7 @@ class Client:
         self.RAILS = self.plugin.api_base + 'v7/Rails'
         self.EPG = self.plugin.api_base + 'v1/Epg'
         self.EVENT = self.plugin.api_base + 'v2/Event'
-        self.PLAYBACK = self.plugin.api_base + 'v2/Playback'
+        self.PLAYBACK = 'https://api.playback.indazn.com/v3/Playback'
         self.SIGNIN = self.plugin.api_base + 'v5/SignIn'
         self.SIGNOUT = self.plugin.api_base + 'v1/SignOut'
         self.REFRESH = self.plugin.api_base + 'v5/RefreshAccessToken'
@@ -112,6 +112,7 @@ class Client:
 
     def playback_data(self, id_):
         self.HEADERS['Authorization'] = 'Bearer ' + self.TOKEN
+        self.HEADERS['x-dazn-device'] = self.DEVICE_ID
         self.PARAMS['LanguageCode'] = self.LANGUAGE
         self.PARAMS['AssetId'] = id_
         self.PARAMS['Format'] = 'MPEG-DASH'
