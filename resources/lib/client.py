@@ -29,17 +29,17 @@ class Client:
             '$format': 'json'
         }
 
-        self.STARTUP = self.plugin.api_base + 'v5/Startup'
-        self.RAIL = self.plugin.api_base + 'v2/Rail'
-        self.RAILS = self.plugin.api_base + 'v7/Rails'
-        self.EPG = self.plugin.api_base + 'v1/Epg'
-        self.EVENT = self.plugin.api_base + 'v2/Event'
-        self.PLAYBACK = 'https://api.playback.indazn.com/v3/Playback'
-        self.SIGNIN = self.plugin.api_base + 'v5/SignIn'
-        self.SIGNOUT = self.plugin.api_base + 'v1/SignOut'
-        self.REFRESH = self.plugin.api_base + 'v5/RefreshAccessToken'
-        self.PROFILE = self.plugin.api_base + 'v1/UserProfile'
-        self.RESOURCES = self.plugin.api_base + 'v1/ResourceStrings'
+        self.STARTUP = self.plugin.get_setting('api_endpoint_startup')
+        self.RAIL = self.plugin.get_setting('api_endpoint_rail')
+        self.RAILS = self.plugin.get_setting('api_endpoint_rails')
+        self.EPG = self.plugin.get_setting('api_endpoint_epg')
+        self.EVENT = self.plugin.get_setting('api_endpoint_event')
+        self.PLAYBACK = self.plugin.get_setting('api_endpoint_playback')
+        self.SIGNIN = self.plugin.get_setting('api_endpoint_signin')
+        self.SIGNOUT = self.plugin.get_setting('api_endpoint_signout')
+        self.REFRESH = self.plugin.get_setting('api_endpoint_refresh_access_token')
+        self.PROFILE = self.plugin.get_setting('api_endpoint_userprofile')
+        self.RESOURCES = self.plugin.get_setting('api_endpoint_resource_strings')
 
 
     def content_data(self, url):
@@ -54,16 +54,12 @@ class Client:
         self.PARAMS['groupId'] = id_
         self.PARAMS['params'] = params
         content_data = self.content_data(self.RAILS)
-        self.plugin.log('content_data = {0}'.format(content_data))
         for rail in content_data.get('Rails', []):
             id_ = rail.get('Id')
             resource = self.plugin.get_resource(id_, prefix='browseui_railHeader')
             title = resource.get('text')
-            self.plugin.log('resource = {0}'.format(resource))
-
             if resource.get('found') == False:
                 rail_data = self.railFromCache(id_, rail.get('Params', params))
-                self.plugin.log('rail_data = {0}'.format(rail_data))
                 title = rail_data.get('Title', rail.get('Id')) if isinstance(rail_data, dict) else rail.get('Id')
             else:
                 title = resource.get('text')
@@ -210,7 +206,7 @@ class Client:
             self.setToken(data['AuthToken'], data.get('Result', 'RefreshAccessTokenError'))
 
 
-    def initRegion(self):
+    def initStartupData(self):
         self.POST_DATA = {
             'LandingPageKey': 'generic',
             'Languages': '{0}, {1}'.format(self.plugin.gui_language(), self.LANGUAGE),
@@ -218,13 +214,16 @@ class Client:
             'Manufacturer': '',
             'PromoCode': ''
         }
-        data = self.request(self.STARTUP)
-        region = data.get('Region', {})
+        return self.request(self.STARTUP)
+
+
+    def initRegion(self, startup_data):
+        region = startup_data.get('Region', {})
         if region:
             self.PORTABILITY = region['CountryPortabilityStatus']
             self.COUNTRY = region['Country']
             self.LANGUAGE = region['Language']
-            self.setLanguage(data['SupportedLanguages'])
+            self.setLanguage(startup_data['SupportedLanguages'])
 
         return region
 

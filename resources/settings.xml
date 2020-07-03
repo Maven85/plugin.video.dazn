@@ -9,6 +9,17 @@
         <setting label="portability" type="text" id="portability" default="" visible="false"/>
         <setting label="token" type="text" id="token" default="" visible="false"/>
         <setting label="mpx" type="text" id="mpx" default="" visible="false"/>
+        <setting label="api_endpoint_startup" type="text" id="api_endpoint_startup" default="https://startup-prod.dazn.com/misl/v5/Startup" visible="false"/>
+        <setting label="api_endpoint_rail" type="text" id="api_endpoint_rail" default="" visible="false"/>
+        <setting label="api_endpoint_rails" type="text" id="api_endpoint_rails" default="" visible="false"/>
+        <setting label="api_endpoint_epg" type="text" id="api_endpoint_epg" default="" visible="false"/>
+        <setting label="api_endpoint_event" type="text" id="api_endpoint_event" default="" visible="false"/>
+        <setting label="api_endpoint_playback" type="text" id="api_endpoint_playback" default="" visible="false"/>
+        <setting label="api_endpoint_signin" type="text" id="api_endpoint_signin" default="" visible="false"/>
+        <setting label="api_endpoint_signout" type="text" id="api_endpoint_signout" default="" visible="false"/>
+        <setting label="api_endpoint_refresh_access_token" type="text" id="api_endpoint_refresh_access_token" default="" visible="false"/>
+        <setting label="api_endpoint_userprofile" type="text" id="api_endpoint_userprofile" default="" visible="false"/>
+        <setting label="api_endpoint_resource_strings" type="text" id="api_endpoint_resource_strings" default="" visible="false"/>
         <setting label="startup" type="bool" id="startup" default="true" visible="false"/>
     </category>
     <category label="30010">

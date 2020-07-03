@@ -51,6 +51,7 @@ class Common(Singleton):
         self.select_cdn = self.addon.getSetting('select_cdn') == 'true'
         self.preferred_cdn = self.addon.getSetting('preferred_cdn')
         self.max_bw = self.addon.getSetting('max_bw')
+        self.resources = self.addon.getSetting('api_endpoint_resource_strings')
 
 
     def log(self, msg):
@@ -117,7 +118,8 @@ class Common(Singleton):
 
     def get_resource(self, text, prefix=''):
         data_found = False
-        data = self.get_cache('ResourceStrings')
+        file_ = self.get_filepath(self.resources)
+        data = self.get_cache(file_)
         if data.get('Strings'):
             strings = data['Strings']
             try:
@@ -333,3 +335,21 @@ class Common(Singleton):
         key = key.lower()
         result = [dict[k] for k in dict if k.lower() == key]
         return result[0] if len(result) > 0 else ''
+
+
+    def init_api_endpoints(self, service_dict):
+        endpoints = dict(
+                        api_endpoint_rail='Rail',
+                        api_endpoint_rails='Rails',
+                        api_endpoint_epg='Epg',
+                        api_endpoint_event='Event',
+                        api_endpoint_playback='Playback',
+                        api_endpoint_signin='SignIn',
+                        api_endpoint_signout='SignOut',
+                        api_endpoint_refresh_access_token='RefreshAccessToken',
+                        api_endpoint_userprofile='UserProfile',
+                        api_endpoint_resource_strings='ResourceStrings'
+                        )
+        for key, value in endpoints.items():
+            last_key = list(service_dict.get(value).get('Versions'))[-1]
+            self.set_setting(key, service_dict.get(value).get('Versions').get(last_key).get('ServicePath'))
