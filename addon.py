@@ -56,7 +56,9 @@ def router(paramstring):
 
 if __name__ == '__main__':
     if plugin.startup or not client.TOKEN:
-        region = client.initRegion()
+        startup_data = client.initStartupData()
+        plugin.init_api_endpoints(startup_data.get('ServiceDictionary'))
+        region = client.initRegion(startup_data)
         playable = plugin.start_is_helper()
         client.DEVICE_ID = plugin.uniq_id()
         if client.DEVICE_ID and playable:
