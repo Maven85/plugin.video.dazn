@@ -338,7 +338,8 @@ class Common(Singleton):
 
 
     def init_api_endpoints(self, service_dict):
-        endpoints = dict(
+        endpoint_dict = dict()
+        endpoint_def_dict = dict(
                         api_endpoint_rail='Rail',
                         api_endpoint_rails='Rails',
                         api_endpoint_epg='Epg',
@@ -350,6 +351,10 @@ class Common(Singleton):
                         api_endpoint_userprofile='UserProfile',
                         api_endpoint_resource_strings='ResourceStrings'
                         )
-        for key, value in endpoints.items():
+        for key, value in endpoint_def_dict.items():
             last_key = list(service_dict.get(value).get('Versions'))[-1]
-            self.set_setting(key, service_dict.get(value).get('Versions').get(last_key).get('ServicePath'))
+            service_path = service_dict.get(value).get('Versions').get(last_key).get('ServicePath')
+            self.set_setting(key, service_path)
+            endpoint_dict.update({key: service_path})
+
+        return endpoint_dict

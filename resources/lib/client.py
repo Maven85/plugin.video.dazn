@@ -217,6 +217,20 @@ class Client:
         return self.request(self.STARTUP)
 
 
+    def initApiEndpoints(self, endpoints_dict):
+        self.STARTUP = endpoints_dict.get('api_endpoint_startup')
+        self.RAIL = endpoints_dict.get('api_endpoint_rail')
+        self.RAILS = endpoints_dict.get('api_endpoint_rails')
+        self.EPG = endpoints_dict.get('api_endpoint_epg')
+        self.EVENT = endpoints_dict.get('api_endpoint_event')
+        self.PLAYBACK = endpoints_dict.get('api_endpoint_playback')
+        self.SIGNIN = endpoints_dict.get('api_endpoint_signin')
+        self.SIGNOUT = endpoints_dict.get('api_endpoint_signout')
+        self.REFRESH = endpoints_dict.get('api_endpoint_refresh_access_token')
+        self.PROFILE = endpoints_dict.get('api_endpoint_userprofile')
+        self.RESOURCES = endpoints_dict.get('api_endpoint_resource_strings')
+
+
     def initRegion(self, startup_data):
         region = startup_data.get('Region', {})
         if region:
