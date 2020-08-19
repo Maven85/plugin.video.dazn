@@ -356,5 +356,7 @@ class Common(Singleton):
             service_path = service_dict.get(value).get('Versions').get(last_key).get('ServicePath')
             self.set_setting(key, service_path)
             endpoint_dict.update({key: service_path})
+            if key == 'api_endpoint_resource_strings':
+                self.resources = service_path
 
         return endpoint_dict
