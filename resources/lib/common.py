@@ -21,10 +21,13 @@ import xbmcaddon
 import xbmcgui
 import xbmcvfs
 
-from .singleton import Singleton
+try:
+    import StorageServer
+except:
+    import storageserverdummy as StorageServer
 
 
-class Common(Singleton):
+class Common():
 
 
     def __init__(self, addon=None, addon_handle=None, addon_url=None):
@@ -36,7 +39,6 @@ class Common(Singleton):
         self.addon = addon
         self.addon_handle = addon_handle
         self.addon_url = addon_url
-        self.cache = dict()
         self.addon_id = self.addon.getAddonInfo('id')
         self.addon_name = self.addon.getAddonInfo('name')
         self.addon_version = self.addon.getAddonInfo('version')
@@ -52,6 +54,8 @@ class Common(Singleton):
         self.preferred_cdn = self.addon.getSetting('preferred_cdn')
         self.max_bw = self.addon.getSetting('max_bw')
         self.resources = self.addon.getSetting('api_endpoint_resource_strings')
+
+        self.railCache = StorageServer.StorageServer(py2_encode('{0}.rail').format(self.addon_id), 24 * 7)
 
 
     def log(self, msg):
@@ -118,8 +122,7 @@ class Common(Singleton):
 
     def get_resource(self, text, prefix=''):
         data_found = False
-        file_ = self.get_filepath(self.resources)
-        data = self.get_cache(file_)
+        data = self.get_cache(self.resources)
         if data.get('Strings'):
             strings = data['Strings']
             try:
@@ -254,24 +257,19 @@ class Common(Singleton):
 
 
     def get_cache(self, file_name):
-        cached_data = self.cache.get(file_name)
-        if cached_data:
-            return cached_data
-        else:
-            json_data = {}
-            file_ = self.get_filepath(file_name)
-            if xbmcvfs.exists(file_):
-                try:
-                    f = xbmcvfs.File(file_, 'r')
-                    json_data = load(f)
-                    self.cache.update({file_name: json_data})
-                    f.close()
-                except Exception as e:
-                    self.log("[{0}] get cache error: {1}".format(self.addon_id, e))
-            return json_data
+        json_data = {}
+        file_ = self.get_filepath(file_name)
+        if xbmcvfs.exists(file_):
+            try:
+                f = xbmcvfs.File(file_, 'r')
+                json_data = load(f)
+                f.close()
+            except Exception as e:
+                self.log("[{0}] get cache error: {1}".format(self.addon_id, e))
+        return json_data
 
 
-    def write_file(self, file_name, data):
+    def cache(self, file_name, data):
         file_ = self.get_filepath(file_name)
         try:
             f = xbmcvfs.File(file_, 'w')
