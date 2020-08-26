@@ -44,7 +44,7 @@ class Tiles:
 
 
     def add_thumb(self, i):
-        url = self.plugin.api_base + 'v2/image?id={0}&Quality=95&Width={1}&Height={2}&ResizeAction=fill&VerticalAlignment=top&Format={3}'
+        url = self.plugin.api_img_base + '?id={0}&Quality=95&Width={1}&Height={2}&ResizeAction=fill&VerticalAlignment=top&Format={3}'
         image = i.get('Image', '')
         if image:
             if self.type == 'Navigation':
