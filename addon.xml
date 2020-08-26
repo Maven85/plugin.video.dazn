@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.dazn" version="1.3.8+matrix.1" name="DAZN" provider-name="Jin, Maven">
+<addon id="plugin.video.dazn" version="1.3.9+matrix.1" name="DAZN" provider-name="Jin, Maven">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.inputstreamhelper" version="0.5.0"/>
@@ -14,7 +14,10 @@
     <extension point="xbmc.addon.metadata">
         <reuselanguageinvoker>true</reuselanguageinvoker>
         <news>
-- init API endpoints dynamic on startup
+- fixed error when starting the plugin for the first time
+- fixed display of labels for email/password when starting the plugin for the first time
+- cache rail data using script.common.plugin.cache
+- fixed image display
         </news>
         <assets>
             <icon>resources/icon.png</icon>
