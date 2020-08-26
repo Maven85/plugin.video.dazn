@@ -32,6 +32,7 @@ class Common():
 
     def __init__(self, addon=None, addon_handle=None, addon_url=None):
         self.api_base = 'https://isl.dazn.com/misl/'
+        self.api_img_base = 'https://images.discovery.indazn.com/eu/v2/eu/image'
         self.time_format = '%Y-%m-%dT%H:%M:%SZ'
         self.date_format = '%Y-%m-%d'
         self.portability_list = ['AT', 'DE', 'IT', 'ES']
