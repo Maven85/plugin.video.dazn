@@ -117,7 +117,7 @@ class Common():
     def b64dec(self, data):
         missing_padding = len(data) % 4
         if missing_padding != 0:
-            data += b'=' * (4 - missing_padding)
+            data += py2_encode('=') * (4 - missing_padding)
         return b64decode(data)
 
 
