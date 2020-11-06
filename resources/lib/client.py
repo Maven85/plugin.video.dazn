@@ -256,7 +256,7 @@ class Client:
         else:
             r = requests.get(url, headers=self.HEADERS, params=self.PARAMS)
 
-        if self.plugin.get_dict_value(r.headers, 'content-type').startswith('application/json'):
+        if r.text and self.plugin.get_dict_value(r.headers, 'content-type').startswith('application/json'):
             return r.json()
         else:
             if not r.status_code == 204:
