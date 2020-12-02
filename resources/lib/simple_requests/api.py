@@ -2,7 +2,12 @@
 
 from __future__ import unicode_literals
 from gzip import GzipFile
-from io import StringIO
+try:
+    # Python 2
+    from StringIO import StringIO
+except ImportError:
+    # Python 3
+    from io import StringIO
 from json import dumps, loads
 from six.moves.urllib.parse import quote, urlencode
 from six.moves.urllib.error import HTTPError
