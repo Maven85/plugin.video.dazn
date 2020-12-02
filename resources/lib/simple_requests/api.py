@@ -2,8 +2,8 @@
 
 from __future__ import unicode_literals
 from gzip import GzipFile
-from io import StringIO
 from json import dumps, loads
+from six import BytesIO as StringIO
 from six.moves.urllib.parse import quote, urlencode
 from six.moves.urllib.error import HTTPError
 from six.moves.urllib.request import build_opener, HTTPDefaultErrorHandler, HTTPRedirectHandler, HTTPSHandler, Request as _request
