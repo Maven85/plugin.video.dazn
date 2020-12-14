@@ -8,8 +8,9 @@ from .simple_requests.api import Request
 class Client:
 
 
-    def __init__(self, plugin):
+    def __init__(self, plugin, credential):
         self.plugin = plugin
+        self.credential = credential
 
         self.DEVICE_ID = self.plugin.get_setting('device_id')
         self.TOKEN = self.plugin.get_setting('token')
@@ -29,7 +30,7 @@ class Client:
             '$format': 'json'
         }
 
-        self.STARTUP = self.plugin.get_setting('api_endpoint_startup')
+        self.STARTUP = 'https://startup-prod.dazn.com/misl/v5/Startup'
         self.RAIL = self.plugin.get_setting('api_endpoint_rail')
         self.RAILS = self.plugin.get_setting('api_endpoint_rails')
         self.EPG = self.plugin.get_setting('api_endpoint_epg')
@@ -159,7 +160,7 @@ class Client:
 
 
     def signIn(self):
-        credentials = self.plugin.get_credentials()
+        credentials = self.credential.get_credentials()
         if credentials:
             self.POST_DATA = {
                 'Email': credentials['email'],
@@ -172,6 +173,8 @@ class Client:
                 self.errorHandler(data)
             else:
                 self.setToken(data['AuthToken'], data.get('Result', 'SignInError'))
+                if self.plugin.get_setting('save_login') == 'true':
+                    self.credential.set_credentials(credentials['email'], credentials['password'])
         else:
             self.plugin.dialog_ok(self.plugin.get_resource('signin_tvNoSignUpPerex').get('text'))
 
@@ -212,7 +215,6 @@ class Client:
 
 
     def initApiEndpoints(self, endpoints_dict):
-        self.STARTUP = endpoints_dict.get('api_endpoint_startup')
         self.RAIL = endpoints_dict.get('api_endpoint_rail')
         self.RAILS = endpoints_dict.get('api_endpoint_rails')
         self.EPG = endpoints_dict.get('api_endpoint_epg')

@@ -17,6 +17,10 @@ msgid "My Account"
 msgstr "Mon Compte"
 
 msgctxt "#30001"
+msgid "Save login data?"
+msgstr "Enregistrer les données de connexion?"
+
+msgctxt "#30002"
 msgid "Sign Out"
 msgstr "Se Déconnecter"
 

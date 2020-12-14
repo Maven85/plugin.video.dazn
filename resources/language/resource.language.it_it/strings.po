@@ -17,6 +17,10 @@ msgid "My Account"
 msgstr "Il Mio Account"
 
 msgctxt "#30001"
+msgid "Save login data?"
+msgstr "Salvare i dati di accesso?"
+
+msgctxt "#30002"
 msgid "Sign Out"
 msgstr "Esci"
 
