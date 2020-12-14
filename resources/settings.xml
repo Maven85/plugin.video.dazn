@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
     <category label="30000">
-        <setting label="30001" type="action" id="logout" action="RunPlugin(plugin://plugin.video.dazn/?mode=logout)" option="close"/>
+    	<setting label="30001" type="bool" id="save_login" default="false"/>
+        <setting label="30002" type="action" id="logout" action="RunPlugin(plugin://plugin.video.dazn/?mode=logout)" option="close"/>
         <setting label="country" type="text" id="country" default="" visible="false"/>
         <setting label="language" type="text" id="language" default="en" visible="false"/>
         <setting label="device_id" type="text" id="device_id" default="" visible="false"/>
@@ -9,7 +10,6 @@
         <setting label="portability" type="text" id="portability" default="" visible="false"/>
         <setting label="token" type="text" id="token" default="" visible="false"/>
         <setting label="mpx" type="text" id="mpx" default="" visible="false"/>
-        <setting label="api_endpoint_startup" type="text" id="api_endpoint_startup" default="https://startup-prod.dazn.com/misl/v5/Startup" visible="false"/>
         <setting label="api_endpoint_rail" type="text" id="api_endpoint_rail" default="" visible="false"/>
         <setting label="api_endpoint_rails" type="text" id="api_endpoint_rails" default="" visible="false"/>
         <setting label="api_endpoint_epg" type="text" id="api_endpoint_epg" default="" visible="false"/>
@@ -21,6 +21,8 @@
         <setting label="api_endpoint_userprofile" type="text" id="api_endpoint_userprofile" default="" visible="false"/>
         <setting label="api_endpoint_resource_strings" type="text" id="api_endpoint_resource_strings" default="" visible="false"/>
         <setting label="startup" type="bool" id="startup" default="true" visible="false"/>
+        <setting label="email" type="text" id="email" default="" visible="false"/>
+        <setting label="password" type="text" id="password" default="" visible="false"/>
     </category>
     <category label="30010">
         <setting label="30011" type="bool" id="force_view" default="false"/>

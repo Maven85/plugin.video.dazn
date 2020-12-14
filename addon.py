@@ -7,8 +7,9 @@ import sys
 
 import xbmcaddon
 
-from resources.lib.common import Common
 from resources.lib.client import Client
+from resources.lib.common import Common
+from resources.lib.credential import Credential
 from resources.lib.parser import Parser
 
 handle_ = int(sys.argv[1])
@@ -19,7 +20,8 @@ plugin = Common(
     addon_handle=handle_,
     addon_url=url_
 )
-client = Client(plugin)
+credential = Credential(plugin)
+client = Client(plugin, credential)
 parser = Parser(plugin)
 
 
@@ -46,6 +48,7 @@ def router(paramstring):
         parser.playback(client.playback(id_, plugin.youth_protection_pin(verify_age)), title, True)
     elif mode == 'logout':
         if plugin.logout():
+            credential.clear_credentials()
             client.signOut()
             sys.exit(0)
     elif mode == 'is_settings':
@@ -55,6 +58,9 @@ def router(paramstring):
 
 
 if __name__ == '__main__':
+    if plugin.get_setting('save_login') == 'false' and self.has_credentials():
+        credential.clear_credentials()
+
     if plugin.startup or not client.TOKEN:
         startup_data = client.initStartupData()
         endpoint_dict = plugin.init_api_endpoints(startup_data.get('ServiceDictionary'))

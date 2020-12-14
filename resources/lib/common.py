@@ -134,18 +134,6 @@ class Common():
         return {'text': self.initcap(text), 'found': data_found}
 
 
-    def get_credentials(self):
-        email = self.get_dialog().input(self.get_resource('signin_emaillabel').get('text'), type=xbmcgui.INPUT_ALPHANUM)
-        if '@' in email:
-            password = self.get_dialog().input(self.get_resource('signin_passwordlabel').get('text'), type=xbmcgui.INPUT_ALPHANUM, option=xbmcgui.ALPHANUM_HIDE_INPUT)
-            if len(password) > 4:
-                return {
-                    'email': email,
-                    'password': password
-                }
-        return {}
-
-
     def logout(self):
         return self.dialog_yesno(self.get_resource('signout_body').get('text'))
 
