@@ -20,7 +20,7 @@ class Credential(object):
 
 
     def encode(self, data):
-        key_handle = DES3.new(self.plugin.uniq_id(delay=2), DES3.MODE_CBC, iv=b'\0\0\0\0\0\0\0\0')
+        key_handle = DES3.new(self.plugin.uniq_id(), DES3.MODE_CBC, iv=b'\0\0\0\0\0\0\0\0')
         encrypted = key_handle.encrypt(pad(data.encode('utf-8'), DES3.block_size))
         return b64encode(encrypted)
 
@@ -29,7 +29,7 @@ class Credential(object):
         if data == '':
             return data
 
-        key_handle = DES3.new(self.plugin.uniq_id(delay=2), DES3.MODE_CBC, iv=b'\0\0\0\0\0\0\0\0')
+        key_handle = DES3.new(self.plugin.uniq_id(), DES3.MODE_CBC, iv=b'\0\0\0\0\0\0\0\0')
         decrypted = unpad(key_handle.decrypt(b64decode(data)), DES3.block_size)
         return decrypted.decode('utf-8')
 
