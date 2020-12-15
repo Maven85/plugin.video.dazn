@@ -58,7 +58,7 @@ def router(paramstring):
 
 
 if __name__ == '__main__':
-    if plugin.get_setting('save_login') == 'false' and self.has_credentials():
+    if plugin.get_setting('save_login') == 'false' and credential.has_credentials():
         credential.clear_credentials()
 
     if plugin.startup or not client.TOKEN:
