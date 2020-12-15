@@ -49,7 +49,7 @@ class Credential(object):
 
     def get_credentials(self):
         if self.plugin.get_setting('save_login') == 'true' and self.has_credentials():
-           return {
+            return {
                 'email': self.decode(self.plugin.get_setting('email')),
                 'password': self.decode(self.plugin.get_setting('password'))
             } 
