@@ -20,7 +20,7 @@ class Credential(object):
 
 
     def encode(self, data):
-        key_handle = DES3.new(self.plugin.uniq_id(), DES3.MODE_CBC, iv=b'\0\0\0\0\0\0\0\0')
+        key_handle = DES3.new(self.uniq_id(), DES3.MODE_CBC, iv=b'\0\0\0\0\0\0\0\0')
         encrypted = key_handle.encrypt(pad(data.encode('utf-8'), DES3.block_size))
         return b64encode(encrypted)
 
@@ -29,9 +29,19 @@ class Credential(object):
         if data == '':
             return data
 
-        key_handle = DES3.new(self.plugin.uniq_id(), DES3.MODE_CBC, iv=b'\0\0\0\0\0\0\0\0')
+        key_handle = DES3.new(self.uniq_id(), DES3.MODE_CBC, iv=b'\0\0\0\0\0\0\0\0')
         decrypted = unpad(key_handle.decrypt(b64decode(data)), DES3.block_size)
         return decrypted.decode('utf-8')
+
+
+    def uniq_id(self):
+        id = self.plugin.uniq_id()
+        if len(id) > 24:
+            id = id[:24]
+        elif len(id) < 24:
+            id = '{0}{1}'.format(id, (24 - len(id)) * '=')
+
+        return id.encode('utf-8')
 
 
     def has_credentials(self):
