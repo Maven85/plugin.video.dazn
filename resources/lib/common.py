@@ -78,7 +78,7 @@ class Common():
 
 
     def get_datapath(self):
-        return py2_decode(xbmc.translatePath(self.get_addon().getAddonInfo('profile')))
+        return py2_decode(xbmcvfs.translatePath(self.get_addon().getAddonInfo('profile')))
 
 
     def get_filepath(self, file_name):
