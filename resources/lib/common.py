@@ -7,6 +7,7 @@ from six.moves.urllib.parse import urlencode
 import _strptime
 
 from base64 import b64decode
+from calendar import timegm
 from datetime import date, datetime, timedelta
 from hashlib import md5
 from inputstreamhelper import Helper
@@ -154,10 +155,11 @@ class Common():
 
     def utc2local(self, date_string):
         if str(date_string).startswith('2'):
-            utc = datetime(*(strptime(date_string, self.time_format)[0:6]))
-            epoch = mktime(utc.timetuple())
-            offset = datetime.fromtimestamp(epoch) - datetime.utcfromtimestamp(epoch)
-            return (utc + offset).strftime(self.time_format)
+            utc_dt = datetime(*(strptime(date_string, self.time_format)[0:6]))
+            local_ts = calendar.timegm(utc_dt.timetuple())
+            local_dt = datetime.fromtimestamp(local_ts)
+            assert utc_dt.resolution >= timedelta(microseconds=1)
+            return local_dt.replace(microsecond=utc_dt.microsecond).strftime(self.time_format)
 
 
     def uniq_id(self):
