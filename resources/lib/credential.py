@@ -79,14 +79,3 @@ class Credential(object):
         user, password = '', ''
         self.plugin.set_setting('email', user)
         self.plugin.set_setting('password', password)
-
-
-    def get_mac_address(cls, delay=1):
-        mac_addr = xbmc.getInfoLabel('Network.MacAddress')
-        # hack response busy
-        i = 0
-        while py2_encode(':') not in mac_addr and i < 3:
-            i += 1
-            sleep(delay)
-            mac_addr = xbmc.getInfoLabel('Network.MacAddress')
-        return mac_addr

@@ -30,12 +30,12 @@ class Client:
             '$format': 'json'
         }
 
-        self.STARTUP = 'https://startup-prod.dazn.com/misl/v5/Startup'
+        self.STARTUP = 'https://startup.core.indazn.com/misl/v5/Startup'
         self.RAIL = self.plugin.get_setting('api_endpoint_rail')
-        self.RAILS = self.plugin.get_setting('api_endpoint_rails')
+        self.RAILS = 'https://rails.discovery.indazn.com/eu/v7/rails'  # self.plugin.get_setting('api_endpoint_rails')
         self.EPG = self.plugin.get_setting('api_endpoint_epg')
         self.EVENT = self.plugin.get_setting('api_endpoint_event')
-        self.PLAYBACK = self.plugin.get_setting('api_endpoint_playback')
+        self.PLAYBACK = 'https://api.playback.indazn.com/v3/Playback'  # self.plugin.get_setting('api_endpoint_playback')
         self.SIGNIN = self.plugin.get_setting('api_endpoint_signin')
         self.SIGNOUT = self.plugin.get_setting('api_endpoint_signout')
         self.REFRESH = self.plugin.get_setting('api_endpoint_refresh_access_token')
