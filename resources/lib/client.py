@@ -26,16 +26,14 @@ class Client:
             'Referer': self.plugin.api_base
         }
 
-        self.PARAMS = {
-            '$format': 'json'
-        }
+        self.PARAMS = {}
 
         self.STARTUP = 'https://startup.core.indazn.com/misl/v5/Startup'
         self.RAIL = self.plugin.get_setting('api_endpoint_rail')
-        self.RAILS = 'https://rails.discovery.indazn.com/eu/v7/rails'  # self.plugin.get_setting('api_endpoint_rails')
+        self.RAILS = self.plugin.get_setting('api_endpoint_rails')
         self.EPG = self.plugin.get_setting('api_endpoint_epg')
         self.EVENT = self.plugin.get_setting('api_endpoint_event')
-        self.PLAYBACK = 'https://api.playback.indazn.com/v3/Playback'  # self.plugin.get_setting('api_endpoint_playback')
+        self.PLAYBACK = self.plugin.get_setting('api_endpoint_playback')
         self.SIGNIN = self.plugin.get_setting('api_endpoint_signin')
         self.SIGNOUT = self.plugin.get_setting('api_endpoint_signout')
         self.REFRESH = self.plugin.get_setting('api_endpoint_refresh_access_token')
@@ -51,7 +49,8 @@ class Client:
 
 
     def rails(self, id_, params=''):
-        self.PARAMS['Country'] = self.COUNTRY
+        self.PARAMS = {}
+        self.PARAMS['country'] = self.COUNTRY
         self.PARAMS['groupId'] = id_
         self.PARAMS['params'] = params
         content_data = self.content_data(self.RAILS)
@@ -73,14 +72,16 @@ class Client:
 
 
     def rail(self, id_, params=''):
-        self.PARAMS['LanguageCode'] = self.LANGUAGE
-        self.PARAMS['Country'] = self.COUNTRY
+        self.PARAMS = {}
+        self.PARAMS['languageCode'] = self.LANGUAGE
+        self.PARAMS['country'] = self.COUNTRY
         self.PARAMS['id'] = id_
         self.PARAMS['params'] = params
         return self.content_data(self.RAIL)
 
 
     def epg(self, params):
+        self.PARAMS = {}
         self.PARAMS['languageCode'] = self.LANGUAGE
         self.PARAMS['country'] = self.COUNTRY
         self.PARAMS['date'] = params
@@ -88,13 +89,15 @@ class Client:
 
 
     def event(self, id_):
-        self.PARAMS['LanguageCode'] = self.LANGUAGE
-        self.PARAMS['Country'] = self.COUNTRY
-        self.PARAMS['Id'] = id_
+        self.PARAMS = {}
+        self.PARAMS['languageCode'] = self.LANGUAGE
+        self.PARAMS['country'] = self.COUNTRY
+        self.PARAMS['id'] = id_
         return self.content_data(self.EVENT)
 
 
     def resources(self):
+        self.PARAMS = {}
         self.PARAMS['languageCode'] = self.LANGUAGE
         self.PARAMS['region'] = self.COUNTRY
         self.PARAMS['platform'] = 'web'
@@ -102,15 +105,23 @@ class Client:
 
 
     def playback_data(self, id_):
-        self.HEADERS['Authorization'] = 'Bearer ' + self.TOKEN
+        self.HEADERS['authorization'] = 'Bearer ' + self.TOKEN
         self.HEADERS['x-dazn-device'] = self.DEVICE_ID
-        self.PARAMS['LanguageCode'] = self.LANGUAGE
+        self.PARAMS = {}
         self.PARAMS['AssetId'] = id_
+        self.PARAMS['LanguageCode'] = self.LANGUAGE
+        self.PARAMS['Platform'] = 'web'
         self.PARAMS['Format'] = 'MPEG-DASH'
         self.PARAMS['PlayerId'] = 'DAZN-' + self.DEVICE_ID
+        self.PARAMS['Model'] = 'unknown'
         self.PARAMS['Secure'] = 'true'
+        self.PARAMS['Manufacturer'] = 'unknown'
         self.PARAMS['PlayReadyInitiator'] = 'false'
-        return self.request(self.PLAYBACK)
+        self.PARAMS['MtaLanguageCode'] = self.LANGUAGE
+        self.PARAMS['AppVersion'] = '8.5.0'
+        res = self.request(self.PLAYBACK)
+        self.plugin.log('playback: {0}'.format(res))
+        return res
 
 
     def playback(self, id_, pin):
@@ -125,7 +136,7 @@ class Client:
 
 
     def userProfile(self):
-        self.HEADERS['Authorization'] = 'Bearer ' + self.TOKEN
+        self.HEADERS['authorization'] = 'Bearer ' + self.TOKEN
         data = self.request(self.PROFILE)
         if data.get('odata.error', None):
             self.errorHandler(data)
@@ -180,7 +191,7 @@ class Client:
 
 
     def signOut(self):
-        self.HEADERS['Authorization'] = 'Bearer ' + self.TOKEN
+        self.HEADERS['authorization'] = 'Bearer ' + self.TOKEN
         self.POST_DATA = {
             'DeviceId': self.DEVICE_ID
         }
@@ -191,7 +202,7 @@ class Client:
 
 
     def refreshToken(self):
-        self.HEADERS['Authorization'] = 'Bearer ' + self.TOKEN
+        self.HEADERS['authorization'] = 'Bearer ' + self.TOKEN
         self.POST_DATA = {
             'DeviceId': self.DEVICE_ID
         }
@@ -219,7 +230,7 @@ class Client:
         self.RAILS = endpoints_dict.get('api_endpoint_rails')
         self.EPG = endpoints_dict.get('api_endpoint_epg')
         self.EVENT = endpoints_dict.get('api_endpoint_event')
-        self.PLAYBACK = endpoints_dict.get('api_endpoint_playback')
+        self.PLAYBACK = self.plugin.get_setting('api_endpoint_playback')
         self.SIGNIN = endpoints_dict.get('api_endpoint_signin')
         self.SIGNOUT = endpoints_dict.get('api_endpoint_signout')
         self.REFRESH = endpoints_dict.get('api_endpoint_refresh_access_token')
@@ -262,7 +273,7 @@ class Client:
             return r.json()
         else:
             if not r.status_code == 204:
-                self.plugin.log('[{0}] error: {1} ({2}, {3})'.format(self.plugin.addon_id, url, str(r.status_code), r.headers.get('Content-Type', '')))
+                self.plugin.log('[{0}] error: {1} ({2}, {3})'.format(self.plugin.addon_id, url, str(r.status_code), self.plugin.get_dict_value(r.headers, 'content-type')))
             if r.status_code == -1:
                 self.plugin.log('[{0}] error: {1}'.format(self.plugin.addon_id, r.text))
             return {}

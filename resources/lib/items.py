@@ -96,7 +96,7 @@ class Items:
         listitem.setProperty('inputstream.adaptive.manifest_update_parameter', 'full')
         listitem.setProperty('inputstream.adaptive.max_bandwidth', self.plugin.max_bw)
         listitem.setProperty('inputstream.adaptive.license_type', 'com.widevine.alpha')
-        listitem.setProperty('inputstream.adaptive.license_key', '{0}&{1}&_widevineChallenge=B{{SSM}}|||JBlicense'.format(item.LaUrl, item.LaUrlAuthParam))
+        listitem.setProperty('inputstream.adaptive.license_key', '{0}|authorization=Bearer {1}|R{{SSM}}|'.format(item.LaUrl, self.plugin.get_setting('token')))
         if context and resolved:
             listitem.setInfo('video', {'Title': name})
             xbmc.Player().play(path, listitem)
