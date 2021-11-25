@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-from kodi_six.utils import py2_encode, py2_decode
+from kodi_six.utils import PY2, py2_encode, py2_decode
 from six.moves.urllib.parse import urlencode
 
 import _strptime
@@ -22,11 +22,15 @@ import xbmcaddon
 import xbmcgui
 import xbmcvfs
 
+if PY2:
+    from xbmc import translatePath as xbmcvfs_translatePath
+else:
+    from xbmcvfs import translatePath as xbmcvfs_translatePath
+
 try:
     import StorageServer
 except:
     import storageserverdummy as StorageServer
-
 
 
 class Common():
@@ -79,7 +83,7 @@ class Common():
 
 
     def get_datapath(self):
-        return py2_decode(xbmc.translatePath(self.get_addon().getAddonInfo('profile')))
+        return py2_decode(xbmcvfs_translatePath(self.get_addon().getAddonInfo('profile')))
 
 
     def get_filepath(self, file_name):
@@ -157,7 +161,7 @@ class Common():
     def utc2local(self, date_string):
         if str(date_string).startswith('2'):
             utc_dt = datetime(*(strptime(date_string, self.time_format)[0:6]))
-            local_ts = calendar.timegm(utc_dt.timetuple())
+            local_ts = timegm(utc_dt.timetuple())
             local_dt = datetime.fromtimestamp(local_ts)
             assert utc_dt.resolution >= timedelta(microseconds=1)
             return local_dt.replace(microsecond=utc_dt.microsecond).strftime(self.time_format)

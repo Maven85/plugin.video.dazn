@@ -12,7 +12,6 @@ class Playback:
         self.plugin = plugin
         self.ManifestUrl = ''
         self.LaUrl = ''
-        self.LaUrlAuthParam = ''
         self.Cdns = []
         self.get_detail(data.get('PlaybackPrecision', {}), data.get('PlaybackDetails', []))
 
@@ -44,5 +43,4 @@ class Playback:
                 if r.status_code == 200 and self.plugin.get_dict_value(r.headers, 'content-type').startswith('application/dash+xml'):
                     self.ManifestUrl = i['ManifestUrl']
                     self.LaUrl = i['LaUrl']
-                    self.LaUrlAuthParam = '{0}={1}'.format(i['LaUrlAuthParamName'], self.plugin.get_setting('mpx'))
                     break
