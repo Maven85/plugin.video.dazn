@@ -135,7 +135,7 @@ class Request:
         result = Response()
         response = None
         try:
-            response = opener.open(request)
+            response = opener.open(request, timeout=30)
         except HTTPError as e:
             # HTTPError implements addinfourl, so we can use the exception to construct a response
             if isinstance(e, addinfourl):
