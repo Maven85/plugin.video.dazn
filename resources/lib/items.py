@@ -90,8 +90,7 @@ class Items:
         listitem = xbmcgui.ListItem()
         listitem.setContentLookup(False)
         listitem.setMimeType('application/dash+xml')
-        listitem.setProperty('inputstream', 'inputstream.adaptive')
-        listitem.setProperty('inputstreamaddon', 'inputstream.adaptive')
+        listitem.setProperty('inputstreamaddon' if self.plugin.kodi_version <= 18 else 'inputstream', 'inputstream.adaptive')
         listitem.setProperty('inputstream.adaptive.manifest_type', 'mpd')
         listitem.setProperty('inputstream.adaptive.manifest_update_parameter', 'full')
         listitem.setProperty('inputstream.adaptive.max_bandwidth', self.plugin.max_bw)
@@ -99,7 +98,14 @@ class Items:
         listitem.setProperty('inputstream.adaptive.license_key', '{0}|authorization=Bearer {1}|R{{SSM}}|'.format(item.LaUrl, self.plugin.get_setting('token')))
         if context and resolved:
             listitem.setInfo('video', {'Title': name})
-            xbmc.Player().play(path, listitem)
+            player = xbmc.Player()
+            player.play(path, listitem)
+            if 'beginning' in context:
+                monitor = xbmc.Monitor()
+                while not monitor.abortRequested() and (player.isPlaying() == False or player.getTotalTime() == 0):
+                    monitor.waitForAbort(0.1)
+                player.seekTime(0)
+                del monitor
         else:
             listitem.setPath(path)
             xbmcplugin.setResolvedUrl(self.plugin.addon_handle, resolved, listitem)
