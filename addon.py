@@ -44,8 +44,8 @@ def router(paramstring):
         parser.epg_items(client.epg(date), date, mode)
     elif mode == 'play':
         parser.playback(client.playback(id_, plugin.youth_protection_pin(verify_age)))
-    elif mode == 'play_context':
-        parser.playback(client.playback(id_, plugin.youth_protection_pin(verify_age)), title, True)
+    elif 'play_context' in mode:
+        parser.playback(client.playback(id_, plugin.youth_protection_pin(verify_age)), title, mode)
     elif mode == 'logout':
         if plugin.logout():
             credential.clear_credentials()

@@ -36,11 +36,9 @@ class Parser:
 
 
     def rail_items(self, data, mode, list_=True):
-        highlights = True if 'highlights' in mode else False
-        focus = data.get('StartPosition', False)
         for i in data.get('Tiles', []):
             item = Tiles(self.plugin, i).item
-            if highlights:
+            if 'highlights' in mode:
                 if item['type'] == 'Highlights':
                     item['cm'] = Context(self.plugin).goto(item)
                     self.items.add_item(item)
@@ -53,6 +51,8 @@ class Parser:
                             self.items.add_item(_item)
             else:
                 context = Context(self.plugin)
+                if item.get('type') == 'Live' and 'Scheduled' in i.get('Id', ''):
+                    context.live(item)
                 if item.get('related', []):
                     cm_items = []
                     for i in item['related']:
@@ -62,6 +62,7 @@ class Parser:
                 item['cm'] = context.goto(item)
                 self.items.add_item(item)
         if list_:
+            focus = data.get('StartPosition', False)
             self.items.list_items(focus)
 
 
@@ -88,5 +89,5 @@ class Parser:
         self.items.list_items(upd=update, epg=True)
 
 
-    def playback(self, data, name=False, context=False):
+    def playback(self, data, name=False, context=None):
         self.items.play_item(Playback(self.plugin, data), name, context)

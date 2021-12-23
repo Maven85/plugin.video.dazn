@@ -21,6 +21,17 @@ class Context:
         return self.cm
 
 
+    def live(self, item):
+        d = {
+            'mode': 'play_context_from_beginning',
+            'title': py2_encode(item['title']),
+            'id': item.get('id', ''),
+            'params': item.get('params', '')
+        }
+        self.cm.append((self.plugin.get_string(12021), 'RunPlugin({0})'.format(self.plugin.build_url(d))))
+        return self.cm
+
+
     def highlights(self, item, mode):
         d = {
             'mode': mode,
