@@ -174,6 +174,7 @@ class Client:
     def signIn(self):
         credentials = self.credential.get_credentials()
         if credentials:
+            self.HEADERS['x-dazn-ua'] = '{} {}'.format(self.plugin.get_user_agent(), 'signin/4.18.4.5 hyper/0.8.4 (web; production; de)')
             self.POST_DATA = {
                 'Email': credentials['email'],
                 'Password': credentials['password'],
@@ -204,6 +205,7 @@ class Client:
 
     def refreshToken(self):
         self.HEADERS['authorization'] = 'Bearer ' + self.TOKEN
+        self.HEADERS['x-dazn-ua'] = '{} {}'.format(self.plugin.get_user_agent(), 'signin/4.18.4.5 hyper/0.8.4 (web; production; de)')
         self.POST_DATA = {
             'DeviceId': self.DEVICE_ID
         }
