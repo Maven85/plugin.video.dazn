@@ -13,6 +13,7 @@ from hashlib import md5
 from inputstreamhelper import Helper
 from json import dump, load, loads
 from os.path import join
+from platform import uname
 from string import capwords
 from time import mktime, sleep, strptime
 from uuid import UUID
@@ -62,6 +63,8 @@ class Common():
         self.max_bw = self.addon.getSetting('max_bw')
         self.resources = self.addon.getSetting('api_endpoint_resource_strings')
         self.kodi_version = int(xbmc.getInfoLabel('System.BuildVersion').split('.')[0])
+        self.user_agent = None
+        self.android_properties = {}
 
         self.railCache = StorageServer.StorageServer(py2_encode('{0}.rail').format(self.addon_id), 24 * 7)
 
@@ -429,3 +432,74 @@ class Common():
             listitem.addStreamInfo(streamlabels)
 
         return listitem
+
+
+    def get_user_agent(self):
+
+        if self.user_agent:
+            return self.user_agent
+
+        # Fails on some systems
+        try:
+            if PY2:
+                os_uname = uname()
+            else:
+                os_uname = list(uname())
+        except Exception:
+            os_uname = ['Linux', 'hostname', 'kernel-ver', 'kernel-sub-ver', 'x86_64']
+
+        # android
+        user_agent_suffix = 'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.82 Safari/537.36'
+        if xbmc.getCondVisibility('System.Platform.Android'):
+            user_agent = 'Mozilla/5.0 (Linux; Android {}; {}) {}'.format(
+                    self.get_android_prop('ro.build.version.release', True) or '12',
+                    self.get_android_prop('ro.product.model', True) or 'Pixel 6',
+                    user_agent_suffix)
+
+        # linux on arm uses widevine from chromeos
+        elif os_uname[0] == 'Linux' and os_uname[4].lower().find('arm') != -1:
+            user_agent = 'Mozilla/5.0 (X11; CrOS {} 14268.67.0) {}'.format(os_uname[4], user_agent_suffix)
+        elif os_uname[0] == 'Linux':
+            user_agent = 'Mozilla/5.0 (X11; Linux {}) {}'.format(os_uname[4], user_agent_suffix)
+        elif os_uname[0] == 'Darwin':
+            user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 12_1) {}'.format(user_agent_suffix)
+        else:
+            user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) {}'.format(user_agent_suffix)
+
+        self.user_agent = user_agent
+        return user_agent
+
+
+    def get_android_prop(self, key, exact_match=False):
+
+        if xbmc.getCondVisibility('System.Platform.Android'):
+            if len(self.android_properties.keys()) == 0:
+                try:
+                    from subprocess import check_output
+                    prop_output = check_output(['/system/bin/getprop']).splitlines()
+                    for prop in prop_output:
+                        prop = compat._decode(prop)
+                        prop_k_v = prop.split(']: [')
+                        if len(prop_k_v) == 2 and prop_k_v[0].startswith('[') and prop_k_v[1].endswith(']'):
+                            self.android_properties.update({prop_k_v[0][1:]: prop_k_v[1][:-1]})
+                    self.log('Found android properties {}', self.android_properties)
+                except Exception as e:
+                    self.log('Getting android properties failed with exception: {}', e)
+
+            if exact_match is True and self.android_properties.get(key, None) is not None:
+                return self.android_properties.get(key)
+            else:
+                for prop_key, prop_value in self.android_properties.items():
+                    if prop_key.find(key) != -1:
+                        return prop_value
+
+            if exact_match is True:
+                try:
+                    from subprocess import check_output
+                    prop_output = check_output(['/system/bin/getprop', key]).splitlines()
+                    if len(prop_output) == 1 and len(prop_output) != 0:
+                        prop = py2_decode(prop_output[0])
+                        self.android_properties.update({key: prop})
+                        return prop
+                except Exception as e:
+                    self.log_error('Getting android property {} with exception: {}', key, e)
