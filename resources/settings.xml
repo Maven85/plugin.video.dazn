@@ -20,6 +20,7 @@
         <setting label="api_endpoint_refresh_access_token" type="text" id="api_endpoint_refresh_access_token" default="" visible="false"/>
         <setting label="api_endpoint_userprofile" type="text" id="api_endpoint_userprofile" default="" visible="false"/>
         <setting label="api_endpoint_resource_strings" type="text" id="api_endpoint_resource_strings" default="" visible="false"/>
+        <setting label="api_endpoint_devices" type="text" id="api_endpoint_devices" default="" visible="false"/>
         <setting label="startup" type="bool" id="startup" default="true" visible="false"/>
         <setting label="email" type="text" id="email" default="" visible="false"/>
         <setting label="password" type="text" id="password" default="" visible="false"/>
