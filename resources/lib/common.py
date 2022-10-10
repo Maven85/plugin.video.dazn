@@ -478,13 +478,13 @@ class Common():
                     from subprocess import check_output
                     prop_output = check_output(['/system/bin/getprop']).splitlines()
                     for prop in prop_output:
-                        prop = compat._decode(prop)
+                        prop = prop.decode()
                         prop_k_v = prop.split(']: [')
                         if len(prop_k_v) == 2 and prop_k_v[0].startswith('[') and prop_k_v[1].endswith(']'):
                             self.android_properties.update({prop_k_v[0][1:]: prop_k_v[1][:-1]})
-                    self.log('Found android properties {}', self.android_properties)
+                    self.log('Found android properties {}'.format(self.android_properties))
                 except Exception as e:
-                    self.log('Getting android properties failed with exception: {}', e)
+                    self.log('Getting android properties failed with exception: {}'.format(e))
 
             if exact_match is True and self.android_properties.get(key, None) is not None:
                 return self.android_properties.get(key)
@@ -498,8 +498,8 @@ class Common():
                     from subprocess import check_output
                     prop_output = check_output(['/system/bin/getprop', key]).splitlines()
                     if len(prop_output) == 1 and len(prop_output) != 0:
-                        prop = py2_decode(prop_output[0])
+                        prop = prop_output[0].decode()
                         self.android_properties.update({key: prop})
                         return prop
                 except Exception as e:
-                    self.log_error('Getting android property {} with exception: {}', key, e)
+                    self.log('Getting android property {} with exception: {}'.format(key, e))
