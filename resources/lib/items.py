@@ -67,13 +67,13 @@ class Items:
 
         listitem = xbmcgui.ListItem(item['title'])
         listitem.setArt(art)
-        listitem.setInfo(type='Video', infoLabels=labels)
+        listitem = self.plugin.set_videoinfo(listitem, labels)
 
         if 'play' in item['mode']:
             self.cache = False
             self.video = True
             folder = False
-            listitem.addStreamInfo('video', {'duration': item.get('duration', 0)})
+            listitem = self.plugin.set_streaminfo(listitem, {'duration': item.get('duration', 0)})
             listitem.setProperty('IsPlayable', item.get('playable', 'false'))
         else:
             folder = True
@@ -97,12 +97,12 @@ class Items:
         listitem.setProperty('inputstream.adaptive.license_type', 'com.widevine.alpha')
         listitem.setProperty('inputstream.adaptive.license_key', '{0}|authorization=Bearer {1}|R{{SSM}}|'.format(item.LaUrl, self.plugin.get_setting('token')))
         if context and resolved:
-            listitem.setInfo('video', {'Title': name})
+            listitem = self.plugin.set_videoinfo(listitem, dict(title=name))
             player = xbmc.Player()
             player.play(path, listitem)
             if 'beginning' in context:
                 monitor = xbmc.Monitor()
-                while not monitor.abortRequested() and (player.isPlaying() == False or player.getTotalTime() == 0):
+                while not monitor.abortRequested() and (player.isPlayingVideo() == False or player.getTotalTime() == 0):
                     monitor.waitForAbort(0.1)
                 player.seekTime(0)
                 del monitor
