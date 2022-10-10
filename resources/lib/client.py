@@ -39,6 +39,7 @@ class Client:
         self.REFRESH = self.plugin.get_setting('api_endpoint_refresh_access_token')
         self.PROFILE = self.plugin.get_setting('api_endpoint_userprofile')
         self.RESOURCES = self.plugin.get_setting('api_endpoint_resource_strings')
+        self.DEVICES = self.plugin.get_setting('api_endpoint_devices')
 
 
     def content_data(self, url):
@@ -214,6 +215,21 @@ class Client:
             self.setToken(data['AuthToken'], data.get('Result', 'RefreshAccessTokenError'))
 
 
+    def playableDevices(self):
+        self.HEADERS['authorization'] = 'Bearer ' + self.TOKEN
+        data = self.request(self.DEVICES)
+        if data.get('odata.error', None):
+            self.errorHandler(data)
+            return None
+        else:
+            playableDevices = 0
+            for device in data.get('devices'):
+                if device.get('playable'):
+                    playableDevices += 1
+
+            return playableDevices
+
+
     def initStartupData(self):
         self.POST_DATA = {
             'LandingPageKey': 'generic',
@@ -286,7 +302,7 @@ class Client:
         self.plugin.log('[{0}] version: {1} country: {2} language: {3} portability: {4}'.format(self.plugin.addon_id, self.plugin.addon_version, self.COUNTRY, self.LANGUAGE, self.PORTABILITY))
         self.plugin.log('[{0}] error: {1} ({2})'.format(self.plugin.addon_id, msg, code))
 
-        error_codes = ['10006', '10008']
+        error_codes = ['10006', '10008', '10450']
         pin_codes = ['10155', '10161', '10163']
 
         if code == '10000' and self.ERRORS < 3:
@@ -297,6 +313,11 @@ class Client:
             self.startUp()
         elif code == '10049':
             self.plugin.dialog_ok(self.plugin.get_resource('signin_errormessage').get('text'))
+        elif code == '10450' and self.ERRORS < 3:
+            if self.playableDevices() >= 5:
+                self.plugin.dialog_ok(self.plugin.get_resource('error2_65_450_403_header').get('text'))
+            else:
+                self.refreshToken()
         elif code in error_codes:
             self.plugin.dialog_ok(self.plugin.get_resource('error_{0}'.format(code)).get('text'))
         elif code in pin_codes:

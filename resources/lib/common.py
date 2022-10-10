@@ -346,7 +346,8 @@ class Common():
                         api_endpoint_signout='SignOut',
                         api_endpoint_refresh_access_token='RefreshAccessToken',
                         api_endpoint_userprofile='UserProfile',
-                        api_endpoint_resource_strings='ResourceStrings'
+                        api_endpoint_resource_strings='ResourceStrings',
+                        api_endpoint_devices='Devices'
                         )
         for key, value in endpoint_def_dict.items():
             last_key = list(service_dict.get(value).get('Versions'))[-1]
