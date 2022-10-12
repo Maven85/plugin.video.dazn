@@ -26,7 +26,8 @@ class Context:
             'mode': 'play_context_from_beginning',
             'title': py2_encode(item['title']),
             'id': item.get('id', ''),
-            'params': item.get('params', '')
+            'params': item.get('params', ''),
+            'verify_age': item.get('verify_age', False)
         }
         self.cm.append((self.plugin.get_string(12021), 'RunPlugin({0})'.format(self.plugin.build_url(d))))
         return self.cm
