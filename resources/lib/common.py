@@ -429,7 +429,7 @@ class Common():
 
             videoinfotag.addVideoStream(videostream)
         else:
-            listitem.addStreamInfo(streamlabels)
+            listitem.addStreamInfo('video', streamlabels)
 
         return listitem
 
