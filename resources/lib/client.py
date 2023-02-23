@@ -322,6 +322,8 @@ class Client:
                 self.plugin.dialog_ok(self.plugin.get_resource('error2_65_450_403_header').get('text'))
             else:
                 self.refreshToken()
+        elif code == '10801':
+            self.plugin.dialog_ok(self.plugin.get_resource('error2_65_801_403_header').get('text'))
         elif code in error_codes:
             self.plugin.dialog_ok(self.plugin.get_resource('error_{0}'.format(code)).get('text'))
         elif code in pin_codes:
