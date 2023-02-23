@@ -93,9 +93,9 @@ class Items:
         listitem.setProperty('inputstreamaddon' if self.plugin.kodi_version <= 18 else 'inputstream', 'inputstream.adaptive')
         listitem.setProperty('inputstream.adaptive.manifest_type', 'mpd')
         listitem.setProperty('inputstream.adaptive.manifest_update_parameter', 'full')
-        listitem.setProperty('inputstream.adaptive.max_bandwidth', self.plugin.max_bw)
         listitem.setProperty('inputstream.adaptive.license_type', 'com.widevine.alpha')
         listitem.setProperty('inputstream.adaptive.license_key', '{0}|authorization=Bearer {1}|R{{SSM}}|'.format(item.LaUrl, self.plugin.get_setting('token')))
+        listitem = self.plugin.set_stream_selection_type(listitem)
         if context and resolved:
             listitem = self.plugin.set_videoinfo(listitem, dict(title=name))
             player = xbmc.Player()
