@@ -18,6 +18,7 @@ class Client:
         self.COUNTRY = self.plugin.get_setting('country')
         self.LANGUAGE = self.plugin.get_setting('language')
         self.PORTABILITY = self.plugin.get_setting('portability')
+        self.MAX_REGISTRABLE_DEVICES = self.plugin.get_setting('max_registrable_devices')
         self.POST_DATA = {}
         self.ERRORS = 0
 
@@ -163,12 +164,14 @@ class Client:
         if auth and result == 'SignedIn':
             self.TOKEN = auth['Token']
             self.MPX = self.plugin.get_mpx(self.TOKEN)
+            self.MAX_REGISTRABLE_DEVICES = self.plugin.get_max_registrable_devices(self.TOKEN)
         else:
             if result in ['HardOffer', 'SignedInInactive', 'SignedInPaused']:
                 self.plugin.dialog_ok(self.plugin.get_resource('error_10101').get('text'))
             self.signOut()
         self.plugin.set_setting('token', self.TOKEN)
         self.plugin.set_setting('mpx', self.MPX)
+        self.plugin.set_setting('max_registrable_devices', '{}'.format(self.MAX_REGISTRABLE_DEVICES))
 
 
     def signIn(self):
@@ -256,6 +259,7 @@ class Client:
         self.REFRESH = endpoints_dict.get('api_endpoint_refresh_access_token')
         self.PROFILE = endpoints_dict.get('api_endpoint_userprofile')
         self.RESOURCES = endpoints_dict.get('api_endpoint_resource_strings')
+        self.DEVICES = endpoints_dict.get('api_endpoint_devices')
 
 
     def initRegion(self, startup_data):
@@ -318,7 +322,7 @@ class Client:
         elif code == '10049':
             self.plugin.dialog_ok(self.plugin.get_resource('signin_errormessage').get('text'))
         elif code == '10450' and self.ERRORS < 3:
-            if self.playableDevices() >= 5:
+            if self.playableDevices() >= int(self.MAX_REGISTRABLE_DEVICES):
                 self.plugin.dialog_ok(self.plugin.get_resource('error2_65_450_403_header').get('text'))
             else:
                 self.refreshToken()

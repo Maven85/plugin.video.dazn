@@ -24,6 +24,7 @@
         <setting label="startup" type="bool" id="startup" default="true" visible="false"/>
         <setting label="email" type="text" id="email" default="" visible="false"/>
         <setting label="password" type="text" id="password" default="" visible="false"/>
+        <setting label="max_registrable_devices" type="text" id="max_registrable_devices" default="" visible="false"/>
     </category>
     <category label="30010">
         <setting label="30011" type="bool" id="force_view" default="false"/>
