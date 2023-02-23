@@ -193,14 +193,16 @@ class Client:
 
 
     def signOut(self):
-        self.HEADERS['authorization'] = 'Bearer ' + self.TOKEN
-        self.POST_DATA = {
-            'DeviceId': self.DEVICE_ID
-        }
-        r = self.request(self.SIGNOUT)
+        if self.TOKEN:
+            self.HEADERS['authorization'] = 'Bearer ' + self.TOKEN
+            self.POST_DATA = {
+                'DeviceId': self.DEVICE_ID
+            }
+            r = self.request(self.SIGNOUT)
         self.TOKEN = ''
         self.plugin.set_setting('token', self.TOKEN)
         self.plugin.set_setting('mpx', '')
+        self.plugin.set_setting('device_id', '')
 
 
     def refreshToken(self):
