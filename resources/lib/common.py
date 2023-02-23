@@ -528,3 +528,13 @@ class Common():
         except Exception:
             pass
         return values
+
+
+    def set_stream_selection_type(self, listitem):
+
+        if self.kodi_version >= 20:
+            listitem.setProperty('inputstream.adaptive.chooser_bandwidth_max', self.max_bw)
+        else:
+            listitem.setProperty('inputstream.adaptive.max_bandwidth', self.max_bw)
+
+        return listitem
