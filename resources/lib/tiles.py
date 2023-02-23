@@ -22,6 +22,7 @@ class Tiles:
         self.related = i.get('Related', [])
         self.videos = i.get('Videos', [])
         self.verify_age = i.get('VerifyAge', False)
+        self.is_linear = i.get('IsLinear', True)
         if self.nav:
             self.mode = 'rails'
             self.id = i['NavigateTo']
@@ -67,6 +68,7 @@ class Tiles:
         self.item['id'] = self.id
         self.item['type'] = self.type
         self.item['verify_age'] = self.verify_age
+        self.item['is_linear'] = self.is_linear
 
         if self.params:
             self.item['params'] = self.params
