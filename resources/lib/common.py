@@ -246,6 +246,17 @@ class Common():
         return token_data['mpx']
 
 
+    def get_max_registrable_devices(self, token):
+        token_data = loads(self.b64dec(token.split('.')[1]))
+        tier_id = token_data.get('entitlements', {}).get('entitlementSets', [])[0].get('id')
+        if 'gold' in tier_id:
+            maxRegistrableDevices = 6
+        else:
+            maxRegistrableDevices = 3
+
+        return maxRegistrableDevices
+
+
     def language(self, language, languages):
         gui_lang = self.gui_language()
         for i in languages:
