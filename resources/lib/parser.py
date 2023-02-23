@@ -51,7 +51,7 @@ class Parser:
                             self.items.add_item(_item)
             else:
                 context = Context(self.plugin)
-                if item.get('type') == 'Live' and 'Scheduled' in i.get('Id', ''):
+                if item.get('type') == 'live' and item.get('is_linear') == False:
                     context.live(item)
                 if item.get('related', []):
                     cm_items = []
