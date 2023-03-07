@@ -183,12 +183,12 @@ class Common():
         i = 0
         while not py2_encode(':') in mac_addr and i < 3:
             i += 1
-            time_sleep(1)
+            sleep(1)
             mac_addr = xbmc.getInfoLabel('Network.MacAddress')
         if py2_encode(':') in mac_addr:
-            device_id = str(uuid_UUID(hashlib_md5(mac_addr.encode('utf-8')).hexdigest()))
+            device_id = str(UUID(md5(mac_addr.encode('utf-8')).hexdigest()))
         elif xbmc.getCondVisibility('System.Platform.Android'):
-            device_id = str(uuid_UUID(hashlib_md5(self.get_android_uuid().encode('utf-8')).hexdigest()))
+            device_id = str(UUID(md5(self.get_android_uuid().encode('utf-8')).hexdigest()))
 
         if device_id == '':
             self.log('[{0}] error: failed to get device id ({1})'.format(self.addon_id, str(mac_addr)))
