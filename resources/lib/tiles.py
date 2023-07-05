@@ -9,6 +9,7 @@ class Tiles:
     def __init__(self, plugin, i):
         self.item = {}
         self.plugin = plugin
+        self.USER_ENTITLEMENTS = self.plugin.get_setting('entitlements').split(',')
         self.title = i['Title']
         self.subtitle = i.get('SubTitle', '')
         self.description = i['Description']
@@ -23,6 +24,7 @@ class Tiles:
         self.videos = i.get('Videos', [])
         self.verify_age = i.get('VerifyAge', False)
         self.is_linear = i.get('IsLinear', True)
+        self.entitlement_ids = i.get('EntitlementIds', [])
         if self.nav:
             self.mode = 'rails'
             self.id = i['NavigateTo']
@@ -69,6 +71,7 @@ class Tiles:
         self.item['type'] = self.type
         self.item['verify_age'] = self.verify_age
         self.item['is_linear'] = self.is_linear
+        self.item['entitlement_ids'] = self.entitlement_ids
 
         if self.params:
             self.item['params'] = self.params
@@ -96,6 +99,9 @@ class Tiles:
                     sub_title = self.type
             if sub_title not in self.title:
                 self.item['title'] = '{0} ({1})'.format(self.title, sub_title)
+
+        if self.entitlement_ids and self.entitlement_ids[0] not in self.USER_ENTITLEMENTS:
+            self.item['title'] = '[COLOR orange]{0}[/COLOR]'.format(self.item['title'])
 
         if self.start:
             self.item['date'] = self.start[:10]
