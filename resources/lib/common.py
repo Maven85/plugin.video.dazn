@@ -241,20 +241,22 @@ class Common():
         return date
 
 
-    def get_mpx(self, token):
-        token_data = loads(self.b64dec(token.split('.')[1]))
-        return token_data['mpx']
-
-
     def get_max_registrable_devices(self, token):
         token_data = loads(self.b64dec(token.split('.')[1]))
-        tier_id = token_data.get('entitlements', {}).get('entitlementSets', [])[0].get('id')
-        if 'gold' in tier_id:
-            maxRegistrableDevices = 6
-        else:
-            maxRegistrableDevices = 3
+        maxRegistrableDevices = token_data.get('entitlements', {}).get('features', {}).get('DEVICE', {}).get('max_registered_devices', 6)
 
         return maxRegistrableDevices
+
+
+    def get_entitlements(self, token):
+        entitlements = []
+
+        token_data = loads(self.b64dec(token.split('.')[1]))
+        entitlementSets = token_data.get('entitlements', {}).get('entitlementSets', [])
+        if entitlementSets:
+            entitlements.extend(entitlementSets[0].get('entitlements', []))
+
+        return entitlements
 
 
     def language(self, language, languages):

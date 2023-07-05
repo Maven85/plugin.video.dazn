@@ -14,11 +14,11 @@ class Client:
 
         self.DEVICE_ID = self.plugin.get_setting('device_id')
         self.TOKEN = self.plugin.get_setting('token')
-        self.MPX = self.plugin.get_setting('mpx')
         self.COUNTRY = self.plugin.get_setting('country')
         self.LANGUAGE = self.plugin.get_setting('language')
         self.PORTABILITY = self.plugin.get_setting('portability')
         self.MAX_REGISTRABLE_DEVICES = self.plugin.get_setting('max_registrable_devices')
+        self.ENTITLEMENTS = self.plugin.get_setting('entitlements').split(',')
         self.POST_DATA = {}
         self.ERRORS = 0
 
@@ -161,17 +161,17 @@ class Client:
 
     def setToken(self, auth, result):
         self.plugin.log('[{0}] signin: {1}'.format(self.plugin.addon_id, result))
-        if auth and result == 'SignedIn':
+        if auth and result in ['SignedIn', 'SignedInInactive']:
             self.TOKEN = auth['Token']
-            self.MPX = self.plugin.get_mpx(self.TOKEN)
             self.MAX_REGISTRABLE_DEVICES = self.plugin.get_max_registrable_devices(self.TOKEN)
+            self.ENTITLEMENTS = self.plugin.get_entitlements(self.TOKEN)
         else:
-            if result in ['HardOffer', 'SignedInInactive', 'SignedInPaused']:
+            if result in ['HardOffer', 'SignedInPaused']:
                 self.plugin.dialog_ok(self.plugin.get_resource('error_10101').get('text'))
             self.signOut()
         self.plugin.set_setting('token', self.TOKEN)
-        self.plugin.set_setting('mpx', self.MPX)
         self.plugin.set_setting('max_registrable_devices', '{}'.format(self.MAX_REGISTRABLE_DEVICES))
+        self.plugin.set_setting('entitlements', ','.join(self.ENTITLEMENTS))
 
 
     def signIn(self):
@@ -190,7 +190,7 @@ class Client:
                 self.errorHandler(data)
             else:
                 self.setToken(data['AuthToken'], data.get('Result', 'SignInError'))
-                if self.plugin.get_setting('save_login') == 'true':
+                if self.plugin.get_setting('save_login') == 'true' and self.plugin.get_setting('token'):
                     self.credential.set_credentials(credentials['email'], credentials['password'])
         else:
             self.plugin.dialog_ok(self.plugin.get_resource('signin_tvNoSignUpPerex').get('text'))
@@ -205,7 +205,6 @@ class Client:
             r = self.request(self.SIGNOUT)
         self.TOKEN = ''
         self.plugin.set_setting('token', self.TOKEN)
-        self.plugin.set_setting('mpx', '')
         self.plugin.set_setting('device_id', '')
 
 

@@ -25,8 +25,7 @@ client = Client(plugin, credential)
 parser = Parser(plugin)
 
 
-def router(paramstring):
-    args = dict(parse_qs(paramstring))
+def router(args):
     mode = args.get('mode', ['rails'])[0]
     title = args.get('title', [''])[0]
     id_ = args.get('id', ['home'])[0]
@@ -61,7 +60,10 @@ if __name__ == '__main__':
     if plugin.get_setting('save_login') == 'false' and credential.has_credentials():
         credential.clear_credentials()
 
-    if plugin.startup or not client.TOKEN:
+    paramstring = sys.argv[2][1:]
+    args = dict(parse_qs(paramstring))
+
+    if args.get('mode', ['rails'])[0] != 'logout' and (plugin.startup or not client.TOKEN):
         startup_data = client.initStartupData()
         endpoint_dict = plugin.init_api_endpoints(startup_data.get('ServiceDictionary'))
         client.initApiEndpoints(endpoint_dict)
@@ -77,6 +79,6 @@ if __name__ == '__main__':
             client.TOKEN = ''
 
     if client.TOKEN and client.DEVICE_ID:
-        router(sys.argv[2][1:])
+        router(args)
     else:
         sys.exit(0)
