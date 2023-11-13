@@ -100,8 +100,10 @@ class Tiles:
             if sub_title not in self.title:
                 self.item['title'] = '{0} ({1})'.format(self.title, sub_title)
 
-        if self.entitlement_ids and self.entitlement_ids[0] not in self.USER_ENTITLEMENTS:
-            self.item['title'] = '[COLOR orange]{0}[/COLOR]'.format(self.item['title'])
+        if self.entitlement_ids:
+            entitlements_found = [entitlement_id for entitlement_id in self.entitlement_ids if entitlement_id in self.USER_ENTITLEMENTS]
+            if len(entitlements_found) == 0:
+                self.item['title'] = '[COLOR orange]{0}[/COLOR]'.format(self.item['title'])
 
         if self.start:
             self.item['date'] = self.start[:10]
