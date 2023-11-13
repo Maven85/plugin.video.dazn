@@ -98,14 +98,10 @@ class Items:
         listitem = self.plugin.set_stream_selection_type(listitem)
         if context and resolved:
             listitem = self.plugin.set_videoinfo(listitem, dict(title=name))
+            if 'beginning' in context:
+                listitem.setProperty('inputstream.adaptive.play_timeshift_buffer', 'true')
             player = xbmc.Player()
             player.play(path, listitem)
-            if 'beginning' in context:
-                monitor = xbmc.Monitor()
-                while not monitor.abortRequested() and (player.isPlayingVideo() == False or player.getTotalTime() == 0):
-                    monitor.waitForAbort(0.1)
-                player.seekTime(0)
-                del monitor
         else:
             listitem.setPath(path)
             xbmcplugin.setResolvedUrl(self.plugin.addon_handle, resolved, listitem)
