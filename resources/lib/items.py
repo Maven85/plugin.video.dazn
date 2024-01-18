@@ -90,12 +90,13 @@ class Items:
         listitem = xbmcgui.ListItem()
         listitem.setContentLookup(False)
         listitem.setMimeType('application/dash+xml')
-        listitem.setProperty('inputstreamaddon' if self.plugin.kodi_version <= 18 else 'inputstream', 'inputstream.adaptive')
-        listitem.setProperty('inputstream.adaptive.manifest_type', 'mpd')
-        listitem.setProperty('inputstream.adaptive.manifest_update_parameter', 'full')
+        listitem.setProperty('inputstream', 'inputstream.adaptive')
         listitem.setProperty('inputstream.adaptive.license_type', 'com.widevine.alpha')
-        listitem.setProperty('inputstream.adaptive.license_key', '{0}|authorization=Bearer {1}|R{{SSM}}|'.format(item.LaUrl, self.plugin.get_setting('token')))
-        listitem = self.plugin.set_stream_selection_type(listitem)
+        listitem.setProperty('inputstream.adaptive.license_key', '{0}|authorization=Bearer {1}&user-agent={2}|R{{SSM}}|'.format(item.LaUrl, self.plugin.get_setting('token'), self.plugin.get_user_agent()))
+        listitem.setProperty('inputstream.adaptive.manifest_headers', 'user-agent={}'.format(self.plugin.get_user_agent()))
+        listitem.setProperty('inputstream.adaptive.stream_headers', 'user-agent={}'.format(self.plugin.get_user_agent()))
+        listitem.setProperty('inputstream.adaptive.stream_params', item.CdnToken)
+        listitem.setProperty('inputstream.adaptive.chooser_bandwidth_max', self.plugin.get_max_bw())
         if context and resolved:
             listitem = self.plugin.set_videoinfo(listitem, dict(title=name))
             if 'beginning' in context:

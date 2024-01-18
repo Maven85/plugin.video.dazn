@@ -12,6 +12,7 @@ class Playback:
         self.plugin = plugin
         self.ManifestUrl = ''
         self.LaUrl = ''
+        self.CdnToken = ''
         self.Cdns = []
         self.get_detail(data.get('PlaybackPrecision', {}), data.get('PlaybackDetails', []))
 
@@ -39,8 +40,10 @@ class Playback:
     def parse_detail(self, details, cdn=''):
         for i in details:
             if cdn == self.clean_name([i['CdnName']])[0] or not cdn:
-                r = Request(self.plugin).head(i['ManifestUrl'])
+                url = '{}{}{}={}'.format(i['ManifestUrl'], '&' if i['ManifestUrl'].find('?') > -1 else '?', i['CdnToken']['Name'], i['CdnToken']['Value'])
+                r = Request(self.plugin).head(url, headers={'user-agent': self.plugin.get_user_agent()})
                 if r.status_code == 200 and self.plugin.get_dict_value(r.headers, 'content-type').startswith('application/dash+xml'):
-                    self.ManifestUrl = i['ManifestUrl']
+                    self.ManifestUrl = url
                     self.LaUrl = i['LaUrl']
+                    self.CdnToken = '{}={}'.format(i['CdnToken']['Name'], i['CdnToken']['Value'])
                     break
