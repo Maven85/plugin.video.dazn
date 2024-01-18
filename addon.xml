@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.dazn" version="1.3.26" name="DAZN" provider-name="Jin, Maven">
+<addon id="plugin.video.dazn" version="1.4.0+nexus.1" name="DAZN" provider-name="Jin, Maven">
     <requires>
-        <import addon="xbmc.python" version="2.26.0"/>
+        <import addon="xbmc.python" version="3.0.1"/>
         <import addon="script.module.inputstreamhelper" version="0.5.0"/>
-        <import addon="script.module.kodi-six" version="0.1.3"/>
-        <import addon="script.module.six" version="1.13.0"/>
-        <import addon="script.common.plugin.cache" version="2.6.1"/>
+        <import addon="script.module.kodi-six" version="0.1.3.1"/>
+        <import addon="script.module.six" version="1.14.0"/>
+        <import addon="script.common.plugin.cache" version="2.6.1.1"/>
     </requires>
     <extension point="xbmc.python.pluginsource" library="addon.py">
         <provides>video</provides>
@@ -14,6 +14,9 @@
     <extension point="xbmc.addon.metadata">
         <reuselanguageinvoker>true</reuselanguageinvoker>
         <news>
+V1.4.0
+- fixed playback
+- added the date of an event in the title
 V1.3.26
 - improved package permission detection
 - use the ia property to play a buffered live stream from the beginning
