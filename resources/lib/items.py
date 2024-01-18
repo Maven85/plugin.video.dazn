@@ -96,6 +96,8 @@ class Items:
         listitem.setProperty('inputstream', 'inputstream.adaptive')
         listitem.setProperty('inputstream.adaptive.license_type', 'com.widevine.alpha')
         listitem.setProperty('inputstream.adaptive.license_key', '{0}|authorization=Bearer {1}&user-agent={2}|R{{SSM}}|'.format(item.LaUrl, self.plugin.get_setting('token'), self.plugin.get_user_agent()))
+        if self.plugin.get_kodi_version() <= 20:
+            listitem.setProperty('inputstream.adaptive.manifest_type', 'mpd')
         listitem.setProperty('inputstream.adaptive.manifest_headers', 'user-agent={}'.format(self.plugin.get_user_agent()))
         listitem.setProperty('inputstream.adaptive.stream_headers', 'user-agent={}'.format(self.plugin.get_user_agent()))
         listitem.setProperty('inputstream.adaptive.stream_params', item.CdnToken)
