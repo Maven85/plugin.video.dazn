@@ -38,7 +38,7 @@ class Items:
                 pass
 
 
-    def add_item(self, item):
+    def add_item(self, item, epg=False):
         verify_age = item.get('verify_age', False)
 
         data = {
@@ -65,7 +65,10 @@ class Items:
         if verify_age:
             labels['mpaa'] = 'PG-18'
 
-        listitem = xbmcgui.ListItem(item['title'])
+        title = item['title']
+        if epg == False and item.get('type', None) in ['CatchUp', 'Highlights', 'OnDemand'] and item.get('articlenav') != 'Show' and item.get('date', None):
+            title = '{} ({})'.format(title, item['date'])
+        listitem = xbmcgui.ListItem(title)
         listitem.setArt(art)
         listitem = self.plugin.set_videoinfo(listitem, labels)
 
