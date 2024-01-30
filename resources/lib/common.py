@@ -63,7 +63,7 @@ class Common():
         self.max_bw = self.addon.getSetting('max_bw')
         self.resources = self.addon.getSetting('api_endpoint_resource_strings')
         self.kodi_version = int(xbmc.getInfoLabel('System.BuildVersion').split('.')[0])
-        self.user_agent = None
+        self.user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
         self.android_properties = {}
 
         self.railCache = StorageServer.StorageServer(py2_encode('{0}.rail').format(self.addon_id), 24 * 7)
@@ -458,7 +458,7 @@ class Common():
         except Exception:
             os_uname = ['Linux', 'hostname', 'kernel-ver', 'kernel-sub-ver', 'x86_64']
 
-        user_agent_suffix = 'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36'
+        user_agent_suffix = 'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
 
         # android
         if xbmc.getCondVisibility('System.Platform.Android'):
@@ -477,7 +477,7 @@ class Common():
         else:
             user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) {}'.format(user_agent_suffix)
 
-        self.user_agent = user_agent
+        # self.user_agent = user_agent
         return user_agent
 
 
