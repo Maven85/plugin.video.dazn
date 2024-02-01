@@ -38,7 +38,7 @@ class Client:
         self.SIGNIN = self.plugin.get_setting('api_endpoint_signin')
         self.SIGNOUT = self.plugin.get_setting('api_endpoint_signout')
         self.REFRESH = self.plugin.get_setting('api_endpoint_refresh_access_token')
-        self.PROFILE = self.plugin.get_setting('api_endpoint_userprofile')
+        self.PROFILE = 'https://user-profile.ar.indazn.com/v1/UserProfile'  # self.plugin.get_setting('api_endpoint_userprofile')
         self.RESOURCES = self.plugin.get_setting('api_endpoint_resource_strings')
         self.DEVICES = self.plugin.get_setting('api_endpoint_devices')
 
@@ -261,7 +261,7 @@ class Client:
         self.SIGNIN = endpoints_dict.get('api_endpoint_signin')
         self.SIGNOUT = endpoints_dict.get('api_endpoint_signout')
         self.REFRESH = endpoints_dict.get('api_endpoint_refresh_access_token')
-        self.PROFILE = endpoints_dict.get('api_endpoint_userprofile')
+        # self.PROFILE = endpoints_dict.get('api_endpoint_userprofile')
         self.RESOURCES = endpoints_dict.get('api_endpoint_resource_strings')
         self.DEVICES = endpoints_dict.get('api_endpoint_devices')
 
