@@ -26,7 +26,7 @@ class Parser:
                 'params': 'today',
             }
             epg['cm'] = Context(self.plugin).highlights(epg, mode='epg_highlights')
-            self.items.add_item(epg)
+            self.items.add_item(epg, True)
         for i in data.get('Rails', []):
             item = Rails(self.plugin, i).item
             if item.get('id', '') == 'CatchUp':
@@ -35,20 +35,20 @@ class Parser:
         self.items.list_items()
 
 
-    def rail_items(self, data, mode, list_=True):
+    def rail_items(self, data, mode, list_=True, epg_=False):
         for i in data.get('Tiles', []):
             item = Tiles(self.plugin, i).item
             if 'highlights' in mode:
                 if item['type'] == 'Highlights':
                     item['cm'] = Context(self.plugin).goto(item)
-                    self.items.add_item(item)
+                    self.items.add_item(item, epg_)
                 elif item.get('related', []):
                     for i in item['related']:
                         context = Context(self.plugin)
                         if i.get('Videos', []):
                             _item = Tiles(self.plugin, i).item
                             _item['cm'] = context.goto(_item)
-                            self.items.add_item(_item)
+                            self.items.add_item(_item, epg_)
             else:
                 context = Context(self.plugin)
                 if item.get('type') == 'Live' and item.get('is_linear') == False:
@@ -60,7 +60,7 @@ class Parser:
                             cm_items.append(Tiles(self.plugin, i).item)
                     context.related(cm_items)
                 item['cm'] = context.goto(item)
-                self.items.add_item(item)
+                self.items.add_item(item, epg_)
         if list_:
             focus = data.get('StartPosition', False)
             self.items.list_items(focus)
@@ -84,7 +84,7 @@ class Parser:
 
 
             self.items.add_item(date_item(self.plugin.get_prev_day(date)))
-            self.rail_items(data, mode, list_=False)
+            self.rail_items(data, mode, list_=False, epg_=True)
             self.items.add_item(date_item(self.plugin.get_next_day(date)))
         self.items.list_items(upd=update, epg=True)
 

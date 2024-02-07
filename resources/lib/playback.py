@@ -39,7 +39,7 @@ class Playback:
     def parse_detail(self, details, cdn=''):
         for i in details:
             if cdn == self.clean_name([i['CdnName']])[0] or not cdn:
-                r = Request(self.plugin).head(i['ManifestUrl'])
+                r = Request(self.plugin).head(i['ManifestUrl'], headers={'user-agent': self.plugin.get_user_agent()})
                 if r.status_code == 200 and self.plugin.get_dict_value(r.headers, 'content-type').startswith('application/dash+xml'):
                     self.ManifestUrl = i['ManifestUrl']
                     self.LaUrl = i['LaUrl']

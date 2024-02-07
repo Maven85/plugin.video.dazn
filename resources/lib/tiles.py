@@ -9,7 +9,7 @@ class Tiles:
     def __init__(self, plugin, i):
         self.item = {}
         self.plugin = plugin
-        self.USER_ENTITLEMENTS = self.plugin.get_setting('entitlements').split(',')
+        self.user_entitlements = self.plugin.get_setting('entitlements').split(',')
         self.title = i['Title']
         self.subtitle = i.get('SubTitle', '')
         self.description = i['Description']
@@ -33,6 +33,7 @@ class Tiles:
             self.mode = 'play'
             self.id = i['AssetId']
             self.params = i['EventId']
+        self.articlenav = i.get('ArticleNavigateTo', '')
         self.update_item(i)
 
 
@@ -101,7 +102,7 @@ class Tiles:
                 self.item['title'] = '{0} ({1})'.format(self.title, sub_title)
 
         if self.entitlement_ids:
-            entitlements_found = [entitlement_id for entitlement_id in self.entitlement_ids if entitlement_id in self.USER_ENTITLEMENTS]
+            entitlements_found = [entitlement_id for entitlement_id in self.entitlement_ids if entitlement_id in self.user_entitlements]
             if len(entitlements_found) == 0:
                 self.item['title'] = '[COLOR orange]{0}[/COLOR]'.format(self.item['title'])
 
@@ -111,6 +112,7 @@ class Tiles:
         self.item['related'] = self.related
         self.item['sport'] = self.sport
         self.item['competition'] = self.competition
+        self.item['articlenav'] = self.articlenav
 
         self.add_thumb(i)
         self.add_duration()
