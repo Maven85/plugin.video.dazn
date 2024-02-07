@@ -38,7 +38,7 @@ class Client:
         self.SIGNIN = self.plugin.get_setting('api_endpoint_signin')
         self.SIGNOUT = self.plugin.get_setting('api_endpoint_signout')
         self.REFRESH = self.plugin.get_setting('api_endpoint_refresh_access_token')
-        self.PROFILE = self.plugin.get_setting('api_endpoint_userprofile')
+        self.PROFILE = 'https://user-profile.ar.indazn.com/v1/UserProfile'  # self.plugin.get_setting('api_endpoint_userprofile')
         self.RESOURCES = self.plugin.get_setting('api_endpoint_resource_strings')
         self.DEVICES = self.plugin.get_setting('api_endpoint_devices')
 
@@ -109,21 +109,24 @@ class Client:
     def playback_data(self, id_):
         self.HEADERS['authorization'] = 'Bearer ' + self.TOKEN
         self.HEADERS['x-dazn-device'] = self.DEVICE_ID
+        self.HEADERS['user-agent'] = self.plugin.get_user_agent()
         self.PARAMS = {}
         self.PARAMS['AssetId'] = id_
-        self.PARAMS['LanguageCode'] = self.LANGUAGE
+        self.PARAMS['PlayerId'] = 'test'
+        self.PARAMS['DrmType'] = 'WIDEVINE'
         self.PARAMS['Platform'] = 'web'
         self.PARAMS['Format'] = 'MPEG-DASH'
-        self.PARAMS['PlayerId'] = 'DAZN-' + self.DEVICE_ID
-        self.PARAMS['Model'] = 'unknown'
+        self.PARAMS['LanguageCode'] = self.LANGUAGE
+        self.PARAMS['Model'] = 'N/A'
         self.PARAMS['Secure'] = 'true'
+        self.PARAMS['Latitude'] = ''
+        self.PARAMS['Longitude'] = ''
         self.PARAMS['Manufacturer'] = 'unknown'
         self.PARAMS['PlayReadyInitiator'] = 'false'
         self.PARAMS['MtaLanguageCode'] = self.LANGUAGE
-        self.PARAMS['AppVersion'] = '9.26.0'
-        res = self.request(self.PLAYBACK)
-        self.plugin.log('playback: {0}'.format(res))
-        return res
+        self.PARAMS['AppVersion'] = '9.38.0'
+        self.PARAMS['capabilities'] = 'mta'
+        return self.request(self.PLAYBACK)
 
 
     def playback(self, id_, pin):
@@ -258,7 +261,7 @@ class Client:
         self.SIGNIN = endpoints_dict.get('api_endpoint_signin')
         self.SIGNOUT = endpoints_dict.get('api_endpoint_signout')
         self.REFRESH = endpoints_dict.get('api_endpoint_refresh_access_token')
-        self.PROFILE = endpoints_dict.get('api_endpoint_userprofile')
+        # self.PROFILE = endpoints_dict.get('api_endpoint_userprofile')
         self.RESOURCES = endpoints_dict.get('api_endpoint_resource_strings')
         self.DEVICES = endpoints_dict.get('api_endpoint_devices')
 

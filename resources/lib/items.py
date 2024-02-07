@@ -38,7 +38,7 @@ class Items:
                 pass
 
 
-    def add_item(self, item):
+    def add_item(self, item, epg=False):
         verify_age = item.get('verify_age', False)
 
         data = {
@@ -65,7 +65,10 @@ class Items:
         if verify_age:
             labels['mpaa'] = 'PG-18'
 
-        listitem = xbmcgui.ListItem(item['title'])
+        title = item['title']
+        if epg == False and item.get('type', None) in ['CatchUp', 'Highlights', 'OnDemand'] and item.get('articlenav') != 'Show' and item.get('date', None):
+            title = '{} ({})'.format(title, item['date'])
+        listitem = xbmcgui.ListItem(title)
         listitem.setArt(art)
         listitem = self.plugin.set_videoinfo(listitem, labels)
 
@@ -90,12 +93,13 @@ class Items:
         listitem = xbmcgui.ListItem()
         listitem.setContentLookup(False)
         listitem.setMimeType('application/dash+xml')
-        listitem.setProperty('inputstreamaddon' if self.plugin.kodi_version <= 18 else 'inputstream', 'inputstream.adaptive')
+        listitem.setProperty('inputstreamaddon' if self.plugin.get_kodi_version() <= 18 else 'inputstream', 'inputstream.adaptive')
+        listitem.setProperty('inputstream.adaptive.license_type', 'com.widevine.alpha')
+        listitem.setProperty('inputstream.adaptive.license_key', '{0}|authorization=Bearer {1}&user-agent={2}|R{{SSM}}|'.format(item.LaUrl, self.plugin.get_setting('token'), self.plugin.get_user_agent()))
         listitem.setProperty('inputstream.adaptive.manifest_type', 'mpd')
         listitem.setProperty('inputstream.adaptive.manifest_update_parameter', 'full')
-        listitem.setProperty('inputstream.adaptive.license_type', 'com.widevine.alpha')
-        listitem.setProperty('inputstream.adaptive.license_key', '{0}|authorization=Bearer {1}|R{{SSM}}|'.format(item.LaUrl, self.plugin.get_setting('token')))
-        listitem = self.plugin.set_stream_selection_type(listitem)
+        listitem.setProperty('inputstream.adaptive.stream_headers', 'user-agent={}'.format(self.plugin.get_user_agent()))
+        listitem.setProperty('inputstream.adaptive.max_bandwidth', self.plugin.get_max_bw())
         if context and resolved:
             listitem = self.plugin.set_videoinfo(listitem, dict(title=name))
             if 'beginning' in context:
