@@ -100,14 +100,14 @@ class Items:
             listitem.setProperty('inputstream.adaptive.manifest_type', 'mpd')
         listitem.setProperty('inputstream.adaptive.manifest_headers', 'user-agent={}'.format(self.plugin.get_user_agent()))
         listitem.setProperty('inputstream.adaptive.stream_headers', 'user-agent={}'.format(self.plugin.get_user_agent()))
-        listitem.setProperty('inputstream.adaptive.stream_params', item.CdnToken)
+        if item.CdnToken:
+            listitem.setProperty('inputstream.adaptive.stream_params', item.CdnToken)
         listitem.setProperty('inputstream.adaptive.chooser_bandwidth_max', self.plugin.get_max_bw())
         if context and resolved:
             listitem.setArt(art)
             listitem = self.plugin.set_videoinfo(listitem, dict(title=name))
             if 'beginning' in context:
                 listitem.setProperty('inputstream.adaptive.play_timeshift_buffer', 'true')
-            self.plugin.log("listitem = {0}".format(listitem))
             player = xbmc.Player()
             player.play(path, listitem)
         else:
