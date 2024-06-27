@@ -53,7 +53,10 @@ class Context:
                 'mode': 'play_context',
                 'title': py2_encode(i['title']),
                 'id': i.get('id', ''),
-                'params': i.get('params', '')
+                'params': i.get('params', ''),
+                'art': {
+                    'thumb': i.get('thumb', self.plugin.addon_icon)
+                }
             }
             self.cm.append((type_, 'RunPlugin({0})'.format(self.plugin.build_url(d))))
         return self.cm

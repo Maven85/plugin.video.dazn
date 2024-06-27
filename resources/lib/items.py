@@ -87,7 +87,7 @@ class Items:
         xbmcplugin.addDirectoryItem(self.plugin.addon_handle, self.plugin.build_url(data), listitem, folder)
 
 
-    def play_item(self, item, name, context):
+    def play_item(self, item, name, art, context):
         path = item.ManifestUrl
         resolved = True if path else False
         listitem = xbmcgui.ListItem()
@@ -103,9 +103,11 @@ class Items:
         listitem.setProperty('inputstream.adaptive.stream_params', item.CdnToken)
         listitem.setProperty('inputstream.adaptive.chooser_bandwidth_max', self.plugin.get_max_bw())
         if context and resolved:
+            listitem.setArt(art)
             listitem = self.plugin.set_videoinfo(listitem, dict(title=name))
             if 'beginning' in context:
                 listitem.setProperty('inputstream.adaptive.play_timeshift_buffer', 'true')
+            self.plugin.log("listitem = {0}".format(listitem))
             player = xbmc.Player()
             player.play(path, listitem)
         else:
