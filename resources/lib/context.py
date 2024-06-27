@@ -27,7 +27,10 @@ class Context:
             'title': py2_encode(item['title']),
             'id': item.get('id', ''),
             'params': item.get('params', ''),
-            'verify_age': item.get('verify_age', False)
+            'verify_age': item.get('verify_age', False),
+            'art': {
+                'thumb': i.get('thumb', self.plugin.addon_icon)
+            }
         }
         self.cm.append((self.plugin.get_string(12021), 'RunPlugin({0})'.format(self.plugin.build_url(d))))
         return self.cm
