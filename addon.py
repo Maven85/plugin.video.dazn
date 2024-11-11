@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-from json import loads as json_loads
-from six.moves.urllib.parse import parse_qs
 
-import sys
+from json import loads
+from sys import argv
+from urllib.parse import parse_qs
 
 import xbmcaddon
 
@@ -13,8 +13,8 @@ from resources.lib.common import Common
 from resources.lib.credential import Credential
 from resources.lib.parser import Parser
 
-handle_ = int(sys.argv[1])
-url_ = sys.argv[0]
+handle_ = int(argv[1])
+url_ = argv[0]
 
 plugin = Common(
     addon=xbmcaddon.Addon(),
@@ -45,7 +45,7 @@ def router(args):
     elif mode == 'play':
         parser.playback(client.playback(id_, plugin.youth_protection_pin(verify_age)))
     elif 'play_context' in mode:
-        art = json_loads(args.get('art', [''])[0].replace('\'', '"'))
+        art = loads(args.get('art', [''])[0].replace('\'', '"'))
         parser.playback(client.playback(id_, plugin.youth_protection_pin(verify_age)), title, art, mode)
     elif mode == 'logout':
         if plugin.logout():

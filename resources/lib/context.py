@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-from kodi_six.utils import py2_encode
 
 
 class Context:
@@ -24,7 +23,7 @@ class Context:
     def live(self, item):
         d = {
             'mode': 'play_context_from_beginning',
-            'title': py2_encode(item['title']),
+            'title': item['title'],
             'id': item.get('id', ''),
             'params': item.get('params', ''),
             'verify_age': item.get('verify_age', False),
@@ -39,7 +38,7 @@ class Context:
     def highlights(self, item, mode):
         d = {
             'mode': mode,
-            'title': py2_encode(item['title']),
+            'title': item['title'],
             'id': item.get('id', ''),
             'params': item.get('params', '')
         }
@@ -54,7 +53,7 @@ class Context:
                 type_ = i['type']
             d = {
                 'mode': 'play_context',
-                'title': py2_encode(i['title']),
+                'title': i['title'],
                 'id': i.get('id', ''),
                 'params': i.get('params', ''),
                 'art': {
@@ -70,7 +69,7 @@ class Context:
             i = item['sport']
             d = {
                 'mode': 'rails',
-                'title': py2_encode(i['Title']),
+                'title': i['Title'],
                 'id': 'sport',
                 'params': i['Id']
             }
@@ -80,7 +79,7 @@ class Context:
             i = item['competition']
             d = {
                 'mode': 'rails',
-                'title': py2_encode(i['Title']),
+                'title': i['Title'],
                 'id': 'competition',
                 'params': i['Id']
             }

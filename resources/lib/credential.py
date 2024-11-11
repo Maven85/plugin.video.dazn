@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-from kodi_six.utils import py2_encode
+
 from base64 import b64encode, b64decode
 from Cryptodome.Cipher import DES3
 from Cryptodome.Util.Padding import pad, unpad
@@ -62,7 +62,7 @@ class Credential(object):
             return {
                 'email': self.decode(self.plugin.get_setting('email')),
                 'password': self.decode(self.plugin.get_setting('password'))
-            } 
+            }
         else:
             email = self.plugin.get_dialog().input(self.plugin.get_resource('signin_emaillabel').get('text'), type=xbmcgui.INPUT_ALPHANUM)
             if '@' in email:

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-from kodi_six.utils import py2_encode
 
 import xbmc
 import xbmcgui
@@ -43,7 +42,7 @@ class Items:
 
         data = {
             'mode': item['mode'],
-            'title': py2_encode(item['title']),
+            'title': item['title'],
             'id': item.get('id', ''),
             'params': item.get('params', ''),
             'verify_age': verify_age

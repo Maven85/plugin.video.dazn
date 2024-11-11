@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-from kodi_six.utils import PY2, py2_encode, py2_decode
-from six.moves.urllib.parse import urlencode
-
-import _strptime
 
 from base64 import b64decode
 from calendar import timegm
@@ -16,17 +12,13 @@ from os.path import join
 from platform import uname
 from string import capwords
 from time import mktime, sleep, strptime
+from urllib.parse import urlencode
 from uuid import UUID
 
 import xbmc
 import xbmcaddon
 import xbmcgui
 import xbmcvfs
-
-if PY2:
-    from xbmc import translatePath as xbmcvfs_translatePath
-else:
-    from xbmcvfs import translatePath as xbmcvfs_translatePath
 
 try:
     import StorageServer
@@ -66,7 +58,7 @@ class Common():
         self.user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36'
         self.android_properties = {}
 
-        self.railCache = StorageServer.StorageServer(py2_encode('{0}.rail').format(self.addon_id), 24 * 7)
+        self.railCache = StorageServer.StorageServer('{0}.rail'.format(self.addon_id), 24 * 7)
 
 
     def log(self, msg):
@@ -87,7 +79,7 @@ class Common():
 
 
     def get_datapath(self):
-        return py2_decode(xbmcvfs_translatePath(self.get_addon().getAddonInfo('profile')))
+        return xbmcvfs.translatePath(self.get_addon().getAddonInfo('profile'))
 
 
     def get_filepath(self, file_name):
@@ -131,7 +123,7 @@ class Common():
     def b64dec(self, data):
         missing_padding = len(data) % 4
         if missing_padding != 0:
-            data += py2_encode('=') * (4 - missing_padding)
+            data += '=' * (4 - missing_padding)
         return b64decode(data)
 
 
@@ -181,11 +173,11 @@ class Common():
         mac_addr = xbmc.getInfoLabel('Network.MacAddress')
         # hack response busy
         i = 0
-        while not py2_encode(':') in mac_addr and i < 3:
+        while not ':' in mac_addr and i < 3:
             i += 1
             sleep(1)
             mac_addr = xbmc.getInfoLabel('Network.MacAddress')
-        if py2_encode(':') in mac_addr:
+        if ':' in mac_addr:
             device_id = str(UUID(md5(mac_addr.encode('utf-8')).hexdigest()))
         elif xbmc.getCondVisibility('System.Platform.Android'):
             device_id = str(UUID(md5(self.get_android_uuid().encode('utf-8')).hexdigest()))
@@ -451,10 +443,7 @@ class Common():
 
         # Fails on some systems
         try:
-            if PY2:
-                os_uname = uname()
-            else:
-                os_uname = list(uname())
+            os_uname = list(uname())
         except Exception:
             os_uname = ['Linux', 'hostname', 'kernel-ver', 'kernel-sub-ver', 'x86_64']
 
@@ -517,8 +506,8 @@ class Common():
 
 
     def get_android_uuid(self):
-        from subprocess import PIPE as subprocess_PIPE, Popen as subprocess_Popen
-        from re import sub as re_sub
+        from subprocess import PIPE, Popen
+        from re import sub
         values = ''
         try:
             # Due to the new android security we cannot get any type of serials
@@ -526,11 +515,11 @@ class Common():
                         'ro.product.manufacturer', 'ro.product.model', 'ro.product.platform',
                         'persist.sys.timezone', 'persist.sys.locale', 'net.hostname']
             # Warning net.hostname property starting from android 10 is deprecated return empty
-            with subprocess_Popen(['/system/bin/getprop'], stdout=subprocess_PIPE) as proc:
+            with Popen(['/system/bin/getprop'], stdout=PIPE) as proc:
                 output_data = proc.communicate()[0].decode('utf-8')
             list_values = output_data.splitlines()
             for value in list_values:
-                value_splitted = re_sub(r'\[|\]|\s', '', value).split(':')
+                value_splitted = sub(r'\[|\]|\s', '', value).split(':')
                 if value_splitted[0] in sys_prop:
                     values += value_splitted[1]
         except Exception:

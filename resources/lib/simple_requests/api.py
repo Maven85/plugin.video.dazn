@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
+
 from gzip import GzipFile
+from io import StringIO
 from json import dumps, loads
-from six import BytesIO as StringIO
-from six.moves.urllib.parse import quote, urlencode
-from six.moves.urllib.error import HTTPError
-from six.moves.urllib.request import build_opener, HTTPDefaultErrorHandler, HTTPRedirectHandler, HTTPSHandler, Request as _request
-from six.moves.urllib.response import addinfourl
+from urllib.parse import quote, urlencode
+from urllib.error import HTTPError
+from urllib.request import build_opener, HTTPDefaultErrorHandler, HTTPRedirectHandler, HTTPSHandler, Request as _request
+from urllib.response import addinfourl
 
 import xbmc
 
@@ -110,7 +111,7 @@ class Request:
         if data or json:
             if self.plugin.get_dict_value(headers, 'content-type').startswith('application/x-www-form-urlencoded') and data:
                 # transform a string into a map of values
-                if isinstance(data, six.string_types):
+                if isinstance(data, str):
                     _data = data.split('&')
                     data = {}
                     for item in _data:
@@ -123,7 +124,7 @@ class Request:
             elif json:
                 request.data = dumps(json).encode('utf-8')
             else:
-                if not isinstance(data, six.string_types):
+                if not isinstance(data, str):
                     data = str(data)
 
                 if isinstance(data, str):

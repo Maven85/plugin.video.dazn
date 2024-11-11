@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 from urllib.parse import quote_plus
+
 from .simple_requests.api import Request
 
 
