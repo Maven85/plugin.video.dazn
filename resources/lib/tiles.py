@@ -49,10 +49,13 @@ class Tiles:
 
     def add_thumb(self, i):
         url = self.plugin.api_img_base + '/{0}/fill/none/top/none/85/{1}/{2}/{3}/image'
-        image = i.get('Image', '')
+        image = i.get('PortraitImage', '') if i.get('PortraitImage') and i.get('Title', '').strip() == '' else i.get('Image')
         if image:
             if self.type == 'Navigation':
-                self.item['thumb'] = url.format(image['Id'], '512', '512', image['ImageMimeType'])
+                if image['ImageType'] == "image-portrait":
+                    self.item['thumb'] = url.format(image['Id'], '334', '501', image['ImageMimeType'])
+                else:
+                    self.item['thumb'] = url.format(image['Id'], '512', '512', image['ImageMimeType'])
             else:
                 self.item['thumb'] = url.format(image['Id'], '720', '404', image['ImageMimeType'])
             self.item['fanart'] = url.format(image['Id'], '1280', '720', image['ImageMimeType'])
@@ -67,7 +70,7 @@ class Tiles:
     def update_item(self, i):
         self.item['mode'] = self.mode
         self.item['title'] = self.title
-        self.item['plot'] = self.description
+        self.item['plot'] = self.description if self.description != 'OTHER' else ''
         self.item['id'] = self.id
         self.item['type'] = self.type
         self.item['verify_age'] = self.verify_age
