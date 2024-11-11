@@ -94,9 +94,23 @@ class Items:
         listitem.setContentLookup(False)
         listitem.setMimeType('application/dash+xml')
         listitem.setProperty('inputstream', 'inputstream.adaptive')
-        listitem.setProperty('inputstream.adaptive.license_type', 'com.widevine.alpha')
-        listitem.setProperty('inputstream.adaptive.license_key', '{0}|authorization=Bearer {1}&user-agent={2}|R{{SSM}}|'.format(item.LaUrl, self.plugin.get_setting('token'), self.plugin.get_user_agent()))
-        if self.plugin.get_kodi_version() <= 20:
+        license_headers = 'authorization=Bearer {0}&user-agent={1}'.format(self.plugin.get_setting('token'), self.plugin.get_user_agent())
+        if self.plugin.get_kodi_version() >= 21:
+            drm_cfg = {
+                'DRM KeySystem': 'com.widevine.alpha',
+                'License server url': item.LaUrl,
+                'License headers': license_headers
+            }
+            listitem.setProperty('inputstream.adaptive.drm_legacy', '|'.join(drm_cfg.values()))
+        else:
+            drm_cfg = {
+                'License server url': item.LaUrl,
+                'License headers': license_headers,
+                'License post data': 'R{SSM}',
+                'License response data': ''
+            }
+            listitem.setProperty('inputstream.adaptive.license_type', 'com.widevine.alpha')
+            listitem.setProperty('inputstream.adaptive.license_key', '|'.join(drm_cfg.values()))
             listitem.setProperty('inputstream.adaptive.manifest_type', 'mpd')
         listitem.setProperty('inputstream.adaptive.manifest_headers', 'user-agent={}'.format(self.plugin.get_user_agent()))
         listitem.setProperty('inputstream.adaptive.stream_headers', 'user-agent={}'.format(self.plugin.get_user_agent()))
