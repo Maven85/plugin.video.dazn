@@ -162,12 +162,12 @@ class Request:
 
     def get(self, url, **kwargs):
         kwargs.setdefault('allow_redirects', True)
-        return self._request('GET', url, **kwargs)
+        return self._request('GET', url, verify=False, **kwargs)
 
 
     def post(self, url, data=None, json=None, **kwargs):
         kwargs.setdefault('allow_redirects', True)
-        return self._request('POST', url, data=data, json=json, **kwargs)
+        return self._request('POST', url, data=data, json=json, verify=False, **kwargs)
 
 
     def put(self, url, data=None, json=None, **kwargs):
