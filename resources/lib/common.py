@@ -55,7 +55,7 @@ class Common():
         self.max_bw = self.addon.getSetting('max_bw')
         self.resources = self.addon.getSetting('api_endpoint_resource_strings')
         self.kodi_version = int(xbmc.getInfoLabel('System.BuildVersion').split('.')[0])
-        self.user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36'
+        self.user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
         self.android_properties = {}
 
         self.railCache = StorageServer.StorageServer('{0}.rail'.format(self.addon_id), 24 * 7)
@@ -363,6 +363,8 @@ class Common():
         for key, value in endpoint_def_dict.items():
             last_key = list(service_dict.get(value).get('Versions'))[-1]
             service_path = service_dict.get(value).get('Versions').get(last_key).get('ServicePath')
+            if value == 'UserProfile' and service_path.lower().endswith('/userprofile') == False:
+                service_path += 'userprofile' if service_path.endswith('/') else '/userprofile'
             self.set_setting(key, service_path)
             endpoint_dict.update({key: service_path})
             if key == 'api_endpoint_resource_strings':

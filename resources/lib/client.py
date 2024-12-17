@@ -38,7 +38,7 @@ class Client:
         self.SIGNIN = self.plugin.get_setting('api_endpoint_signin')
         self.SIGNOUT = self.plugin.get_setting('api_endpoint_signout')
         self.REFRESH = self.plugin.get_setting('api_endpoint_refresh_access_token')
-        self.PROFILE = 'https://user-profile.ar.indazn.com/v1/UserProfile'  # self.plugin.get_setting('api_endpoint_userprofile')
+        self.PROFILE = self.plugin.get_setting('api_endpoint_userprofile')
         self.RESOURCES = self.plugin.get_setting('api_endpoint_resource_strings')
         self.DEVICES = self.plugin.get_setting('api_endpoint_devices')
 
@@ -111,21 +111,19 @@ class Client:
         self.HEADERS['x-dazn-device'] = self.DEVICE_ID
         self.HEADERS['user-agent'] = self.plugin.get_user_agent()
         self.PARAMS = {}
-        self.PARAMS['AssetId'] = id_
-        self.PARAMS['PlayerId'] = 'test'
+        self.PARAMS['AppVersion'] = '0.60.0'
         self.PARAMS['DrmType'] = 'WIDEVINE'
-        self.PARAMS['Platform'] = 'web'
         self.PARAMS['Format'] = 'MPEG-DASH'
+        self.PARAMS['PlayerId'] = '@dazn/peng-html5-core/web/web'
+        self.PARAMS['Platform'] = 'web'
         self.PARAMS['LanguageCode'] = self.LANGUAGE
-        self.PARAMS['Model'] = 'N/A'
+        self.PARAMS['Model'] = 'unknown'
         self.PARAMS['Secure'] = 'true'
-        self.PARAMS['Latitude'] = ''
-        self.PARAMS['Longitude'] = ''
         self.PARAMS['Manufacturer'] = 'unknown'
         self.PARAMS['PlayReadyInitiator'] = 'false'
-        self.PARAMS['MtaLanguageCode'] = self.LANGUAGE
-        self.PARAMS['AppVersion'] = '9.41.0-hotfix.1.645'
-        self.PARAMS['capabilities'] = 'mta'
+        self.PARAMS['Capabilities'] = 'mta'
+        self.PARAMS['MtaLanguageCode'] = ''
+        self.PARAMS['AssetId'] = id_
         return self.request(self.PLAYBACK)
 
 
@@ -181,7 +179,7 @@ class Client:
         credentials = self.credential.get_credentials()
         if credentials:
             self.HEADERS['user-agent'] = '{}'.format(self.plugin.get_user_agent())
-            self.HEADERS['x-dazn-ua'] = '{} {}'.format(self.plugin.get_user_agent(), 'signin/4.40.3.81 hyper/0.14.0 (web; production; de)')
+            self.HEADERS['x-dazn-ua'] = '{} {}'.format(self.plugin.get_user_agent(), 'signin/4.48.21.19301 hyper/0.14.0 (web; production; de)')
             self.POST_DATA = {
                 'Email': credentials['email'],
                 'Password': credentials['password'],
@@ -260,7 +258,7 @@ class Client:
         self.SIGNIN = endpoints_dict.get('api_endpoint_signin')
         self.SIGNOUT = endpoints_dict.get('api_endpoint_signout')
         self.REFRESH = endpoints_dict.get('api_endpoint_refresh_access_token')
-        # self.PROFILE = endpoints_dict.get('api_endpoint_userprofile')
+        self.PROFILE = endpoints_dict.get('api_endpoint_userprofile')
         self.RESOURCES = endpoints_dict.get('api_endpoint_resource_strings')
         self.DEVICES = endpoints_dict.get('api_endpoint_devices')
 
