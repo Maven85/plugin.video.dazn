@@ -246,7 +246,8 @@ class Common():
         token_data = loads(self.b64dec(token.split('.')[1]))
         entitlementSets = token_data.get('entitlements', {}).get('entitlementSets', [])
         if entitlementSets:
-            entitlements.extend(entitlementSets[0].get('entitlements', []))
+            for entitlementSet in entitlementSets:
+                entitlements.extend(entitlementSet.get('entitlements', []))
 
         return entitlements
 
