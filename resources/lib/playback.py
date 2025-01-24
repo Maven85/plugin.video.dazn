@@ -2,9 +2,8 @@
 
 from __future__ import unicode_literals
 
+from requests import head
 from urllib.parse import quote_plus
-
-from .simple_requests.api import Request
 
 
 class Playback:
@@ -45,7 +44,7 @@ class Playback:
                 url = i['ManifestUrl']
                 if i.get('CdnToken'):
                     url = '{}{}{}={}'.format(url, '&' if url.find('?') > -1 else '?', i['CdnToken']['Name'], quote_plus(i['CdnToken']['Value']))
-                r = Request(self.plugin).head(url, headers={'user-agent': self.plugin.get_user_agent()})
+                r = head(url, headers={'user-agent': self.plugin.get_user_agent()}, verify=False)
                 if r.status_code == 200 and self.plugin.get_dict_value(r.headers, 'content-type').startswith('application/dash+xml'):
                     self.ManifestUrl = url
                     self.LaUrl = i['LaUrl']

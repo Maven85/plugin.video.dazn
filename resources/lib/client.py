@@ -2,7 +2,9 @@
 
 from __future__ import unicode_literals
 
-from .simple_requests.api import Request
+from json import dumps
+from requests import get, post
+from urllib.parse import urlencode
 
 
 class Client:
@@ -287,12 +289,13 @@ class Client:
 
 
     def request(self, url):
-        requests = Request(self.plugin)
         if self.POST_DATA:
-            r = requests.post(url, headers=self.HEADERS, data=self.POST_DATA, params=self.PARAMS)
+            if self.PARAMS:
+                url = '{0}?{1}'.format(url, urlencode(self.PARAMS))
+            r = post(url, headers=self.HEADERS, data=dumps(self.POST_DATA).encode('utf-8'), verify=False)
             self.POST_DATA = {}
         else:
-            r = requests.get(url, headers=self.HEADERS, params=self.PARAMS)
+            r = get(url, headers=self.HEADERS, params=self.PARAMS, verify=False)
 
         if r.text and self.plugin.get_dict_value(r.headers, 'content-type').startswith('application/json'):
             return r.json()
