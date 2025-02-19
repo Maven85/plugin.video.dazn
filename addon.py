@@ -8,6 +8,7 @@ from urllib.parse import parse_qs
 
 import xbmcaddon
 
+from resources.lib.api import Request
 from resources.lib.client import Client
 from resources.lib.common import Common
 from resources.lib.credential import Credential
@@ -15,15 +16,17 @@ from resources.lib.parser import Parser
 
 handle_ = int(argv[1])
 url_ = argv[0]
+addon_ = xbmcaddon.Addon()
 
 plugin = Common(
-    addon=xbmcaddon.Addon(),
+    addon=addon_,
     addon_handle=handle_,
     addon_url=url_
 )
+requests = Request(addon_)
 credential = Credential(plugin)
-client = Client(plugin, credential)
-parser = Parser(plugin)
+client = Client(plugin, credential, requests)
+parser = Parser(plugin, requests)
 
 
 def router(args):

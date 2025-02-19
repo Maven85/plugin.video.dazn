@@ -68,6 +68,14 @@ msgctxt "#30024"
 msgid "Preferred CDN"
 msgstr "CDN preferido"
 
+msgctxt "#30030"
+msgid "Connection"
+msgstr "Conexión"
+
+msgctxt "#30031"
+msgid "Verfiy SSL certificates"
+msgstr "Verificar certificados SSL"
+
 msgctxt "#30214"
 msgid "Switch to Sport"
 msgstr "Cambiar a Deportes"

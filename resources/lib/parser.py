@@ -12,8 +12,9 @@ from .tiles import Tiles
 class Parser:
 
 
-    def __init__(self, plugin):
+    def __init__(self, plugin, requests):
         self.plugin = plugin
+        self.requests = requests
         self.items = Items(self.plugin)
 
 
@@ -90,4 +91,4 @@ class Parser:
 
 
     def playback(self, data, name='', art=None, context=None):
-        self.items.play_item(Playback(self.plugin, data), name, art, context)
+        self.items.play_item(Playback(self.plugin, self.requests, data), name, art, context)

@@ -4,7 +4,7 @@
         <import addon="xbmc.python" version="3.0.1"/>
         <import addon="script.module.inputstreamhelper" version="0.5.0"/>
         <import addon="script.common.plugin.cache" version="2.6.1.1"/>
-        <import addon="script.module.requests"/>
+        <import addon="script.module.urllib3"/>
     </requires>
     <extension point="xbmc.python.pluginsource" library="addon.py">
         <provides>video</provides>

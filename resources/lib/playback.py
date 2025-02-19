@@ -2,15 +2,15 @@
 
 from __future__ import unicode_literals
 
-from requests import head
 from urllib.parse import quote_plus
 
 
 class Playback:
 
 
-    def __init__(self, plugin, data):
+    def __init__(self, plugin, requests, data):
         self.plugin = plugin
+        self.requests = requests
         self.ManifestUrl = ''
         self.LaUrl = ''
         self.CdnToken = ''
@@ -44,8 +44,8 @@ class Playback:
                 url = i['ManifestUrl']
                 if i.get('CdnToken'):
                     url = '{}{}{}={}'.format(url, '&' if url.find('?') > -1 else '?', i['CdnToken']['Name'], quote_plus(i['CdnToken']['Value']))
-                r = head(url, headers={'user-agent': self.plugin.get_user_agent()}, verify=False)
-                if r.status_code == 200 and self.plugin.get_dict_value(r.headers, 'content-type').startswith('application/dash+xml'):
+                res = self.requests.exchange(url, headers={'user-agent': self.plugin.get_user_agent()}, method='HEAD')
+                if res.status == 200 and self.plugin.get_dict_value(res.headers, 'content-type').startswith('application/dash+xml'):
                     self.ManifestUrl = url
                     self.LaUrl = i['LaUrl']
                     if i.get('CdnToken'):

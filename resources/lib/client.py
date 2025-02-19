@@ -3,16 +3,15 @@
 from __future__ import unicode_literals
 
 from json import dumps
-from requests import get, post
-from urllib.parse import urlencode
 
 
 class Client:
 
 
-    def __init__(self, plugin, credential):
+    def __init__(self, plugin, credential, requests):
         self.plugin = plugin
         self.credential = credential
+        self.requests = requests
 
         self.DEVICE_ID = self.plugin.get_setting('device_id')
         self.TOKEN = self.plugin.get_setting('token')
@@ -289,21 +288,18 @@ class Client:
 
 
     def request(self, url):
-        if self.POST_DATA:
-            if self.PARAMS:
-                url = '{0}?{1}'.format(url, urlencode(self.PARAMS))
-            r = post(url, headers=self.HEADERS, data=dumps(self.POST_DATA).encode('utf-8'), verify=False)
-            self.POST_DATA = {}
-        else:
-            r = get(url, headers=self.HEADERS, params=self.PARAMS, verify=False)
+        res = self.requests.exchange(url, params=self.PARAMS, json=self.POST_DATA, headers=self.HEADERS)
 
-        if r.text and self.plugin.get_dict_value(r.headers, 'content-type').startswith('application/json'):
-            return r.json()
+        if self.POST_DATA:
+            self.POST_DATA = {}
+
+        if res.data and self.plugin.get_dict_value(res.headers, 'content-type').startswith('application/json'):
+            return res.json()
         else:
-            if not r.status_code == 204:
-                self.plugin.log('[{0}] error: {1} ({2}, {3})'.format(self.plugin.addon_id, url, str(r.status_code), self.plugin.get_dict_value(r.headers, 'content-type')))
-            if r.status_code == -1:
-                self.plugin.log('[{0}] error: {1}'.format(self.plugin.addon_id, r.text))
+            if not res.status == 204:
+                self.plugin.log('[{0}] error: {1} ({2}, {3})'.format(self.plugin.addon_id, url, str(res.status), self.plugin.get_dict_value(res.headers, 'content-type')))
+            if r.status == -1:
+                self.plugin.log('[{0}] error: {1}'.format(self.plugin.addon_id, res.data))
             return {}
 
 

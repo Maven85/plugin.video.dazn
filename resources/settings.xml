@@ -39,4 +39,7 @@
         <setting label="30023" type="bool" id="select_cdn" default="false"/>
         <setting label="30024" type="text" id="preferred_cdn" enable="false" default=""/>
     </category>
+    <category label="30030">
+		<setting label="30031" type="bool" id="verify_ssl_certificates" default="false"/>
+	</category>
 </settings>
