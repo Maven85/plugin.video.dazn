@@ -298,7 +298,7 @@ class Client:
         else:
             if not res.status == 204:
                 self.plugin.log('[{0}] error: {1} ({2}, {3})'.format(self.plugin.addon_id, url, str(res.status), self.plugin.get_dict_value(res.headers, 'content-type')))
-            if r.status == -1:
+            if res.status == -1:
                 self.plugin.log('[{0}] error: {1}'.format(self.plugin.addon_id, res.data))
             return {}
 
