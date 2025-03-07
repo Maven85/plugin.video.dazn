@@ -228,8 +228,9 @@ class Common():
         date = 'today'
         dlg = self.get_dialog().numeric(1, self.get_string(30230))
         if dlg:
-            spl = dlg.split('/')
+            spl = [s.strip() for s in dlg.split('/')]
             date = '%s-%s-%s' % (spl[2], spl[1], spl[0])
+            date = self.epg_date(date)
         return date
 
 
@@ -362,7 +363,9 @@ class Common():
                         api_endpoint_devices='Devices'
                         )
         for key, value in endpoint_def_dict.items():
-            last_key = list(service_dict.get(value).get('Versions'))[-1]
+            endpoint_key_list = list(service_dict.get(value).get('Versions'))
+            endpoint_key_list.sort()
+            last_key = endpoint_key_list[-1]
             service_path = service_dict.get(value).get('Versions').get(last_key).get('ServicePath')
             if value == 'UserProfile' and service_path.lower().endswith('/userprofile') == False:
                 service_path += 'userprofile' if service_path.endswith('/') else '/userprofile'

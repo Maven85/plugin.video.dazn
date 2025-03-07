@@ -2,6 +2,8 @@
 
 from __future__ import unicode_literals
 
+from datetime import date
+
 from .context import Context
 from .items import Items
 from .playback import Playback
@@ -24,7 +26,7 @@ class Parser:
                 'mode': 'epg',
                 'title': self.plugin.get_resource('header_schedule').get('text'),
                 'plot': None,
-                'params': 'today',
+                'params': str(date.today()),
             }
             epg['cm'] = Context(self.plugin).highlights(epg, mode='epg_highlights')
             self.items.add_item(epg, True)
@@ -68,9 +70,9 @@ class Parser:
 
 
     def epg_items(self, data, params, mode):
-        update = False if params == 'today' else True
+        update = False if params == str(date.today()) else True
         if data.get('Date'):
-            date = self.plugin.epg_date(data['Date'])
+            epg_date = self.plugin.epg_date(data['Date'])
             cm = Context(self.plugin).epg_date()
 
 
@@ -78,15 +80,15 @@ class Parser:
                 return {
                     'mode': mode,
                     'title': '{0} ({1})'.format(self.plugin.get_resource(day.strftime('%A'), prefix='calendar_').get('text'), day.strftime(self.plugin.date_format)),
-                    'plot': '{0} ({1})'.format(self.plugin.get_resource(date.strftime('%A'), prefix='calendar_').get('text'), date.strftime(self.plugin.date_format)),
+                    'plot': '{0} ({1})'.format(self.plugin.get_resource(epg_date.strftime('%A'), prefix='calendar_').get('text'), epg_date.strftime(self.plugin.date_format)),
                     'params': day,
                     'cm': cm
                 }
 
 
-            self.items.add_item(date_item(self.plugin.get_prev_day(date)))
+            self.items.add_item(date_item(self.plugin.get_prev_day(epg_date)))
             self.rail_items(data, mode, list_=False, epg_=True)
-            self.items.add_item(date_item(self.plugin.get_next_day(date)))
+            self.items.add_item(date_item(self.plugin.get_next_day(epg_date)))
         self.items.list_items(upd=update, epg=True)
 
 
