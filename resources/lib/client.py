@@ -112,7 +112,7 @@ class Client:
         self.HEADERS['x-dazn-device'] = self.DEVICE_ID
         self.HEADERS['user-agent'] = self.plugin.get_user_agent()
         self.PARAMS = {}
-        self.PARAMS['AppVersion'] = '0.60.0'
+        self.PARAMS['AppVersion'] = '0.70.2'
         self.PARAMS['DrmType'] = 'WIDEVINE'
         self.PARAMS['Format'] = 'MPEG-DASH'
         self.PARAMS['PlayerId'] = '@dazn/peng-html5-core/web/web'

@@ -2,6 +2,9 @@
 
 from __future__ import unicode_literals
 
+from urllib.parse import urlencode
+
+from json import dumps
 import xbmc
 import xbmcgui
 import xbmcplugin
@@ -93,17 +96,35 @@ class Items:
         listitem.setContentLookup(False)
         listitem.setMimeType('application/dash+xml')
         listitem.setProperty('inputstream', 'inputstream.adaptive')
-        license_headers = 'authorization=Bearer {0}&user-agent={1}'.format(self.plugin.get_setting('token'), self.plugin.get_user_agent())
-        if self.plugin.get_kodi_version() >= 21:
+        license_headers = urlencode({'authorization': 'Bearer {}'.format(self.plugin.get_setting('token')), 'user-agent': self.plugin.get_user_agent()})
+        if self.plugin.get_setting('proxy_use') == 'true':
+            license_url = 'http://{}:{}/api/{}/license'.format(
+                self.plugin.get_setting('proxy_host'),
+                self.plugin.get_setting('proxy_port'),
+                item.AssetId
+            )
+        else:
+            license_url = item.LaUrl
+        if self.plugin.get_kodi_version() >= 22:
+            drm_cfg = {
+                "com.widevine.alpha": {
+                    "license": {
+                        "server_url": license_url,
+                        "req_headers": license_headers
+                    }
+                }
+            }
+            listitem.setProperty('inputstream.adaptive.drm', dumps(drm_cfg))
+        elif self.plugin.get_kodi_version() == 21:
             drm_cfg = {
                 'DRM KeySystem': 'com.widevine.alpha',
-                'License server url': item.LaUrl,
+                'License server url': license_url,
                 'License headers': license_headers
             }
             listitem.setProperty('inputstream.adaptive.drm_legacy', '|'.join(drm_cfg.values()))
         else:
             drm_cfg = {
-                'License server url': item.LaUrl,
+                'License server url': license_url,
                 'License headers': license_headers,
                 'License post data': 'R{SSM}',
                 'License response data': ''
@@ -111,8 +132,8 @@ class Items:
             listitem.setProperty('inputstream.adaptive.license_type', 'com.widevine.alpha')
             listitem.setProperty('inputstream.adaptive.license_key', '|'.join(drm_cfg.values()))
             listitem.setProperty('inputstream.adaptive.manifest_type', 'mpd')
-        listitem.setProperty('inputstream.adaptive.manifest_headers', 'user-agent={}'.format(self.plugin.get_user_agent()))
-        listitem.setProperty('inputstream.adaptive.stream_headers', 'user-agent={}'.format(self.plugin.get_user_agent()))
+        listitem.setProperty('inputstream.adaptive.manifest_headers', urlencode({'user-agent': self.plugin.get_user_agent()}))
+        listitem.setProperty('inputstream.adaptive.stream_headers', urlencode({'user-agent': self.plugin.get_user_agent()}))
         if item.CdnToken:
             listitem.setProperty('inputstream.adaptive.stream_params', item.CdnToken)
         listitem.setProperty('inputstream.adaptive.chooser_bandwidth_max', self.plugin.get_max_bw())

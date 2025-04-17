@@ -30,7 +30,7 @@ class Common():
 
 
     def __init__(self, addon=None, addon_handle=None, addon_url=None):
-        self.api_base = 'https://isl.dazn.com/misl/'
+        self.api_base = 'https://www.dazn.com/'
         self.api_img_base = 'https://image.discovery.indazn.com/eu/v3/eu/none'
         self.time_format = '%Y-%m-%dT%H:%M:%SZ'
         self.date_format = '%Y-%m-%d'
@@ -55,7 +55,7 @@ class Common():
         self.max_bw = self.addon.getSetting('max_bw')
         self.resources = self.addon.getSetting('api_endpoint_resource_strings')
         self.kodi_version = int(xbmc.getInfoLabel('System.BuildVersion').split('.')[0])
-        self.user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
+        self.user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36'
         self.android_properties = {}
 
         self.railCache = StorageServer.StorageServer('{0}.rail'.format(self.addon_id), 24 * 7)

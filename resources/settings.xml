@@ -40,6 +40,10 @@
         <setting label="30024" type="text" id="preferred_cdn" enable="false" default=""/>
     </category>
     <category label="30030">
-		<setting label="30031" type="bool" id="verify_ssl_certificates" default="false"/>
+		<setting label="30031" type="bool" id="verify_ssl_certificates" default="false" enable="eq(2,false)"/>
+		<setting type="sep"/>
+		<setting label="30032" type="bool" id="proxy_use" default="false"/>
+		<setting label="30033" type="ipaddress" id="proxy_host" default="127.0.0.1" visible="eq(-1,true)"/>
+		<setting label="30034" type="number" id="proxy_port" default="8012" visible="eq(-2,true)"/>
 	</category>
 </settings>

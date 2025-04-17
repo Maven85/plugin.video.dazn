@@ -76,6 +76,18 @@ msgctxt "#30031"
 msgid "Verfiy SSL certificates"
 msgstr ""
 
+msgctxt "#30032"
+msgid "Use proxy"
+msgstr ""
+
+msgctxt "#30033"
+msgid "Proxy host"
+msgstr ""
+
+msgctxt "#30034"
+msgid "Proxy port"
+msgstr ""
+
 msgctxt "#30214"
 msgid "Switch to Sport"
 msgstr ""
