@@ -96,7 +96,11 @@ class Items:
         listitem.setContentLookup(False)
         listitem.setMimeType('application/dash+xml')
         listitem.setProperty('inputstream', 'inputstream.adaptive')
-        license_headers = urlencode({'authorization': 'Bearer {}'.format(self.plugin.get_setting('token')), 'user-agent': self.plugin.get_user_agent()})
+        license_headers = urlencode({
+			'authorization': 'Bearer {}'.format(self.plugin.get_setting('token')),
+            'content-type': 'application/octet-stream',            
+            'user-agent': self.plugin.get_user_agent()
+        })
         if self.plugin.get_setting('proxy_use') == 'true':
             license_url = 'http://{}:{}/api/{}/license'.format(
                 self.plugin.get_setting('proxy_host'),
@@ -107,10 +111,10 @@ class Items:
             license_url = item.LaUrl
         if self.plugin.get_kodi_version() >= 22:
             drm_cfg = {
-                "com.widevine.alpha": {
-                    "license": {
-                        "server_url": license_url,
-                        "req_headers": license_headers
+                'com.widevine.alpha': {
+                    'license': {
+                        'server_url': license_url,
+                        'req_headers': license_headers
                     }
                 }
             }

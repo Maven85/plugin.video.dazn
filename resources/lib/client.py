@@ -25,7 +25,8 @@ class Client:
 
         self.HEADERS = {
             'Content-Type': 'application/json',
-            'Referer': self.plugin.api_base
+            'Referer': self.plugin.api_base,
+            'User-Agent': self.plugin.get_user_agent()
         }
 
         self.PARAMS = {}
@@ -108,9 +109,8 @@ class Client:
 
 
     def playback_data(self, id_):
-        self.HEADERS['authorization'] = 'Bearer ' + self.TOKEN
+        self.HEADERS['authorization'] = 'Bearer {}'.format(self.TOKEN)
         self.HEADERS['x-dazn-device'] = self.DEVICE_ID
-        self.HEADERS['user-agent'] = self.plugin.get_user_agent()
         self.PARAMS = {}
         self.PARAMS['AppVersion'] = '0.70.2'
         self.PARAMS['DrmType'] = 'WIDEVINE'
@@ -140,7 +140,7 @@ class Client:
 
 
     def userProfile(self):
-        self.HEADERS['authorization'] = 'Bearer ' + self.TOKEN
+        self.HEADERS['authorization'] = 'Bearer {}'.format(self.TOKEN)
         data = self.request(self.PROFILE)
         if data.get('odata.error', None):
             self.errorHandler(data)
@@ -179,8 +179,7 @@ class Client:
     def signIn(self):
         credentials = self.credential.get_credentials()
         if credentials:
-            self.HEADERS['user-agent'] = '{}'.format(self.plugin.get_user_agent())
-            self.HEADERS['x-dazn-ua'] = '{} {}'.format(self.plugin.get_user_agent(), 'signin/4.48.21.19301 hyper/0.14.0 (web; production; de)')
+            self.HEADERS['x-dazn-ua'] = '{} {}'.format(self.plugin.get_user_agent(), 'signin/4.53.12-reset-flow.0.17300 hyper/0.14.0 (web; production; de)')
             self.POST_DATA = {
                 'Email': credentials['email'],
                 'Password': credentials['password'],
@@ -200,7 +199,7 @@ class Client:
 
     def signOut(self):
         if self.TOKEN:
-            self.HEADERS['authorization'] = 'Bearer ' + self.TOKEN
+            self.HEADERS['authorization'] = 'Bearer {}'.format(self.TOKEN)
             self.POST_DATA = {
                 'DeviceId': self.DEVICE_ID
             }
@@ -211,8 +210,7 @@ class Client:
 
 
     def refreshToken(self):
-        self.HEADERS['authorization'] = 'Bearer ' + self.TOKEN
-        self.HEADERS['user-agent'] = '{}'.format(self.plugin.get_user_agent())
+        self.HEADERS['authorization'] = 'Bearer {}'.format(self.TOKEN)
         self.POST_DATA = {
             'DeviceId': self.DEVICE_ID
         }
@@ -225,7 +223,7 @@ class Client:
 
 
     def playableDevices(self):
-        self.HEADERS['authorization'] = 'Bearer ' + self.TOKEN
+        self.HEADERS['authorization'] = 'Bearer {}'.format(self.TOKEN)
         data = self.request(self.DEVICES)
         if data.get('odata.error', None):
             self.errorHandler(data)

@@ -337,7 +337,7 @@ class Common():
     def youth_protection_pin(self, verify_age):
         pin = ''
         if verify_age:
-            pin = self.get_dialog().input(self.get_resource('youthProtectionTV_verified_body').get('text'), type=xbmcgui.INPUT_ALPHANUM, option=xbmcgui.ALPHANUM_HIDE_INPUT)
+            pin = self.get_dialog().input('{}: {}'.format(self.get_resource('setting_YouthProtection').get('text'), self.get_resource('n2_ageverificationPinEntry_body').get('text')), type=xbmcgui.INPUT_ALPHANUM, option=xbmcgui.ALPHANUM_HIDE_INPUT)
         return pin
 
 
