@@ -2,11 +2,11 @@
 
 from __future__ import unicode_literals
 
+from ssl import TLSVersion
 from urllib.parse import urlencode
 from urllib3 import PoolManager, ProxyManager
 from urllib3.util import create_urllib3_context
 import xbmc
-import http
 
 
 class Request:
@@ -15,6 +15,7 @@ class Request:
     def __init__(self, addon):
         self.ctx = create_urllib3_context()
         self.ctx.load_default_certs()
+        self.ctx.maximum_version = TLSVersion.TLSv1_2
         self.ctx.post_handshake_auth = True if addon.getSetting('verify_ssl_certificates') == 'true' else False
 
         self.proxy_use = addon.getSetting('proxy_use') == 'true'
