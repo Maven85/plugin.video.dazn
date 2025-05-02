@@ -97,19 +97,17 @@ class Items:
         listitem.setMimeType('application/dash+xml')
         listitem.setProperty('inputstream', 'inputstream.adaptive')
         license_headers = urlencode({
-			'authorization': 'Bearer {}'.format(self.plugin.get_setting('token')),
-            'content-type': 'application/octet-stream',            
+            'authorization': 'Bearer {}'.format(self.plugin.get_setting('token')),
+            'content-type': 'application/octet-stream',
             'user-agent': self.plugin.get_user_agent()
         })
-        if self.plugin.get_setting('proxy_use') == 'true':
-            license_url = 'http://{}:{}/api/{}/license'.format(
-                self.plugin.get_setting('proxy_host'),
-                self.plugin.get_setting('proxy_port'),
-                item.AssetId
-            )
-        else:
-            license_url = item.LaUrl
-        if self.plugin.get_kodi_version() >= 22:
+        license_url = 'http://{}:{}/api/{}/license'.format(
+            self.plugin.get_setting('proxy_host') if self.plugin.get_setting('proxy_use') == 'true' else 'localhost',
+            self.plugin.get_setting('proxy_port') if self.plugin.get_setting('proxy_use') == 'true' else 8014,
+            item.AssetId
+        )
+        kodi_version = self.plugin.get_kodi_version()
+        if kodi_version >= 22:
             drm_cfg = {
                 'com.widevine.alpha': {
                     'license': {
@@ -119,7 +117,7 @@ class Items:
                 }
             }
             listitem.setProperty('inputstream.adaptive.drm', dumps(drm_cfg))
-        elif self.plugin.get_kodi_version() == 21:
+        elif kodi_version == 21:
             drm_cfg = {
                 'DRM KeySystem': 'com.widevine.alpha',
                 'License server url': license_url,
@@ -136,8 +134,11 @@ class Items:
             listitem.setProperty('inputstream.adaptive.license_type', 'com.widevine.alpha')
             listitem.setProperty('inputstream.adaptive.license_key', '|'.join(drm_cfg.values()))
             listitem.setProperty('inputstream.adaptive.manifest_type', 'mpd')
-        listitem.setProperty('inputstream.adaptive.manifest_headers', urlencode({'user-agent': self.plugin.get_user_agent()}))
-        listitem.setProperty('inputstream.adaptive.stream_headers', urlencode({'user-agent': self.plugin.get_user_agent()}))
+        if kodi_version >= 22:
+            listitem.setProperty('inputstream.adaptive.common_headers', urlencode({'user-agent': self.plugin.get_user_agent()}))
+        else:
+            listitem.setProperty('inputstream.adaptive.manifest_headers', urlencode({'user-agent': self.plugin.get_user_agent()}))
+            listitem.setProperty('inputstream.adaptive.stream_headers', urlencode({'user-agent': self.plugin.get_user_agent()}))
         if item.CdnToken:
             listitem.setProperty('inputstream.adaptive.stream_params', item.CdnToken)
         listitem.setProperty('inputstream.adaptive.chooser_bandwidth_max', self.plugin.get_max_bw())

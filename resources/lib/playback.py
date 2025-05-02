@@ -52,16 +52,15 @@ class Playback:
                 if res.status == 200 and self.plugin.get_dict_value(res.headers, 'content-type').startswith('application/dash+xml'):
                     self.ManifestUrl = url
                     self.LaUrl = i['LaUrl']
-                    if self.plugin.get_setting('proxy_use') == 'true':
-                        self.requests.exchange(
-                                'http://{}:{}/api/{}/{}/licenseurl'.format(
-                                    self.plugin.get_setting('proxy_host'),
-                                    self.plugin.get_setting('proxy_port'),
-                                    self.AssetId,
-                                    b64encode(self.LaUrl.encode('utf-8')).decode('utf-8')),
-                                headers={'user-agent': self.plugin.get_user_agent()},
-                                method='POST'
-                        )
+                    self.requests.exchange(
+                            'http://{}:{}/api/{}/{}/licenseurl'.format(
+                                self.plugin.get_setting('proxy_host') if self.plugin.get_setting('proxy_use') == 'true' else 'localhost',
+                                self.plugin.get_setting('proxy_port') if self.plugin.get_setting('proxy_use') == 'true' else 8014,
+                                self.AssetId,
+                                b64encode(self.LaUrl.encode('utf-8')).decode('utf-8')),
+                            headers={'user-agent': self.plugin.get_user_agent()},
+                            method='POST'
+                    )
                     if i.get('CdnToken'):
                         self.CdnToken = '{}={}'.format(i['CdnToken']['Name'], quote_plus(i['CdnToken']['Value']))
                     break
