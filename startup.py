@@ -4,8 +4,8 @@ from __future__ import unicode_literals
 
 from base64 import b64decode
 from bottle import request, response, route, run
-from urllib.parse import unquote_plus
-import json, xbmc, xbmcaddon, xbmcgui
+from json import dumps, loads
+import xbmc, xbmcaddon, xbmcgui
 
 from resources.lib.api import Request
 
@@ -28,7 +28,7 @@ class WebServer():
         self.addonname = self.addon.getAddonInfo('name')
         self.laUrls = {}
 
-        self.requests = Request(self.addon)
+        self.requests = Request(self.addon, False)
         self.port = 8014
 
         run(host='0.0.0.0', port=self.port, debug=False, quiet=True)
@@ -40,14 +40,14 @@ class WebServer():
 
     def stop_kodi(self):
         # IT'S NOT THE BEST SOLUTION... BUT IT WORKS.
-        self.requests.exchange('http://localhost:{}'.format(self.port))
+        self.requests.exchange(f'http://localhost:{self.port}')
 
 
 @route('/api/<asset_id>/<license_url>/licenseurl', method='POST')
 def proxy_license_url(asset_id, license_url):
     response.set_header('content-type', 'application/json')
     w.laUrls.update({asset_id: b64decode(license_url).decode('utf-8')})
-    return json.dumps({'success': True})
+    return dumps({'success': True})
 
 
 @route('/api/<asset_id>/license', method='POST')
@@ -65,7 +65,7 @@ def content_license(asset_id, license_headers, cdm_payload):
             license_headers.pop('host') if 'host' in license_headers else license_headers.pop('Host')
             cdm_request = w.requests.exchange(w.laUrls[asset_id], data=cdm_payload, headers=license_headers)
             try:
-                j = json.loads(cdm_request.data)
+                j = loads(cdm_request.data)
                 if j.get('odata.error'):
                     xbmcgui.Dialog().notification(w.addonname, f"{j.get('odata.error').get('message', {}).get('value', 'unknown')}", xbmcgui.NOTIFICATION_ERROR)
                     raise Exception(f"ERROR: {j.get('odata.error').get('message', {}).get('value', 'unknown')}")
@@ -74,7 +74,7 @@ def content_license(asset_id, license_headers, cdm_payload):
             return cdm_request.data
         except Exception as e:
             pass
-    xbmcgui.Dialog().notification(w.addonname, f"No license url found for asset id {asset_id}.", xbmcgui.NOTIFICATION_ERROR)
+    xbmcgui.Dialog().notification(w.addonname, f'No license url found for asset id {asset_id}.', xbmcgui.NOTIFICATION_ERROR)
     return
 
 
@@ -93,6 +93,6 @@ def start():
     t.stop_kodi()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     xbmcaddon.Addon().setSetting('startup', 'true')
     start()

@@ -16,7 +16,7 @@ class Context:
             'mode': 'epg',
             'id': 'date'
         }
-        self.cm.append((self.plugin.get_string(30230), 'ActivateWindow(Videos, {0})'.format(self.plugin.build_url(d))))
+        self.cm.append((self.plugin.get_string(30230), f'ActivateWindow(Videos, {self.plugin.build_url(d)})'))
         return self.cm
 
 
@@ -31,7 +31,7 @@ class Context:
                 'thumb': item.get('thumb', self.plugin.addon_icon)
             }
         }
-        self.cm.append((self.plugin.get_string(12021), 'RunPlugin({0})'.format(self.plugin.build_url(d))))
+        self.cm.append((self.plugin.get_string(12021), f'RunPlugin({self.plugin.build_url(d)})'))
         return self.cm
 
 
@@ -42,13 +42,13 @@ class Context:
             'id': item.get('id', ''),
             'params': item.get('params', '')
         }
-        self.cm.append((self.plugin.get_string(30231), 'Container.Update({0})'.format(self.plugin.build_url(d))))
+        self.cm.append((self.plugin.get_string(30231), f'Container.Update({self.plugin.build_url(d)})'))
         return self.cm
 
 
     def related(self, cm_items):
         for i in cm_items:
-            type_ = self.plugin.get_resource('{0}{1}Title'.format(i['type'][0].lower(), i['type'][1:]), 'browseui_').get('text')
+            type_ = self.plugin.get_resource(f"{i['type'][0].lower()}{i['type'][1:]}Title", 'browseui_').get('text')
             if type_.endswith('Title'):
                 type_ = i['type']
             d = {
@@ -60,7 +60,7 @@ class Context:
                     'thumb': i.get('thumb', self.plugin.addon_icon)
                 }
             }
-            self.cm.append((type_, 'RunPlugin({0})'.format(self.plugin.build_url(d))))
+            self.cm.append((type_, f'RunPlugin({self.plugin.build_url(d)})'))
         return self.cm
 
 
@@ -73,7 +73,7 @@ class Context:
                 'id': 'sport',
                 'params': i['Id']
             }
-            self.cm.append((self.plugin.get_string(30214), 'Container.Update({0})'.format(self.plugin.build_url(d))))
+            self.cm.append((self.plugin.get_string(30214), f'Container.Update({self.plugin.build_url(d)})'))
 
         if item.get('competition', None):
             i = item['competition']
@@ -83,6 +83,6 @@ class Context:
                 'id': 'competition',
                 'params': i['Id']
             }
-            self.cm.append((self.plugin.get_string(30215), 'Container.Update({0})'.format(self.plugin.build_url(d))))
+            self.cm.append((self.plugin.get_string(30215), f'Container.Update({self.plugin.build_url(d)})'))
 
         return self.cm

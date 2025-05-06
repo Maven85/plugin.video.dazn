@@ -30,7 +30,7 @@ class Items:
                 view_id = self.plugin.view_id_videos
             if epg:
                 view_id = self.plugin.view_id_epg
-            xbmc.executebuiltin('Container.SetViewMode({0})'.format(view_id))
+            xbmc.executebuiltin(f'Container.SetViewMode({view_id})')
 
         if focus:
             try:
@@ -69,7 +69,7 @@ class Items:
 
         title = item['title']
         if epg == False and item.get('type', None) in ['CatchUp', 'Highlights', 'OnDemand'] and item.get('articlenav') != 'Show' and item.get('date', None):
-            title = '{} ({})'.format(title, item['date'])
+            title = f"{title} ({item['date']})"
         listitem = xbmcgui.ListItem(title)
         listitem.setArt(art)
         listitem = self.plugin.set_videoinfo(listitem, labels)
@@ -97,14 +97,18 @@ class Items:
         listitem.setMimeType('application/dash+xml')
         listitem.setProperty('inputstream', 'inputstream.adaptive')
         license_headers = urlencode({
-            'authorization': 'Bearer {}'.format(self.plugin.get_setting('token')),
+            'authorization': f"Bearer {self.plugin.get_setting('token')}",
             'content-type': 'application/octet-stream',
             'user-agent': self.plugin.get_user_agent()
         })
-        license_url = 'http://{}:{}/api/{}/license'.format(
-            self.plugin.get_setting('proxy_host') if self.plugin.get_setting('proxy_use') == 'true' else 'localhost',
-            self.plugin.get_setting('proxy_port') if self.plugin.get_setting('proxy_use') == 'true' else 8014,
-            item.AssetId
+        license_url = (
+            f"http://"
+            f"{self.plugin.get_setting('proxy_host') if self.plugin.get_setting('proxy_use') == 'true' else 'localhost'}"
+            f":"
+            f"{self.plugin.get_setting('proxy_port') if self.plugin.get_setting('proxy_use') == 'true' else 8014}"
+            f"/api/"
+            f"{item.AssetId}"
+            f"/license"
         )
         kodi_version = self.plugin.get_kodi_version()
         if kodi_version >= 22:

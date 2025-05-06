@@ -109,7 +109,7 @@ class Client:
 
 
     def playback_data(self, id_):
-        self.HEADERS['authorization'] = 'Bearer {}'.format(self.TOKEN)
+        self.HEADERS['authorization'] = f'Bearer {self.TOKEN}'
         self.HEADERS['x-dazn-device'] = self.DEVICE_ID
         self.PARAMS = {}
         self.PARAMS['AppVersion'] = '0.70.2'
@@ -140,7 +140,7 @@ class Client:
 
 
     def userProfile(self):
-        self.HEADERS['authorization'] = 'Bearer {}'.format(self.TOKEN)
+        self.HEADERS['authorization'] = f'Bearer {self.TOKEN}'
         data = self.request(self.PROFILE)
         if data.get('odata.error', None):
             self.errorHandler(data)
@@ -162,7 +162,7 @@ class Client:
 
 
     def setToken(self, auth, result):
-        self.plugin.log('[{0}] signin: {1}'.format(self.plugin.addon_id, result))
+        self.plugin.log(f'[{self.plugin.addon_id}] signin: {result}')
         if auth and result in ['SignedIn', 'SignedInInactive']:
             self.TOKEN = auth['Token']
             self.MAX_REGISTRABLE_DEVICES = self.plugin.get_max_registrable_devices(self.TOKEN)
@@ -172,14 +172,14 @@ class Client:
                 self.plugin.dialog_ok(self.plugin.get_resource('error_10101').get('text'))
             self.signOut()
         self.plugin.set_setting('token', self.TOKEN)
-        self.plugin.set_setting('max_registrable_devices', '{}'.format(self.MAX_REGISTRABLE_DEVICES))
+        self.plugin.set_setting('max_registrable_devices', f'{self.MAX_REGISTRABLE_DEVICES}')
         self.plugin.set_setting('entitlements', ','.join(self.ENTITLEMENTS))
 
 
     def signIn(self):
         credentials = self.credential.get_credentials()
         if credentials:
-            self.HEADERS['x-dazn-ua'] = '{} {}'.format(self.plugin.get_user_agent(), 'signin/4.53.12-reset-flow.0.17300 hyper/0.14.0 (web; production; de)')
+            self.HEADERS['x-dazn-ua'] = f'{self.plugin.get_user_agent()} signin/4.53.12-reset-flow.0.17300 hyper/0.14.0 (web; production; de)'
             self.POST_DATA = {
                 'Email': credentials['email'],
                 'Password': credentials['password'],
@@ -199,7 +199,7 @@ class Client:
 
     def signOut(self):
         if self.TOKEN:
-            self.HEADERS['authorization'] = 'Bearer {}'.format(self.TOKEN)
+            self.HEADERS['authorization'] = f'Bearer {self.TOKEN}'
             self.POST_DATA = {
                 'DeviceId': self.DEVICE_ID
             }
@@ -210,7 +210,7 @@ class Client:
 
 
     def refreshToken(self):
-        self.HEADERS['authorization'] = 'Bearer {}'.format(self.TOKEN)
+        self.HEADERS['authorization'] = f'Bearer {self.TOKEN}'
         self.POST_DATA = {
             'DeviceId': self.DEVICE_ID
         }
@@ -223,7 +223,7 @@ class Client:
 
 
     def playableDevices(self):
-        self.HEADERS['authorization'] = 'Bearer {}'.format(self.TOKEN)
+        self.HEADERS['authorization'] = f'Bearer {self.TOKEN}'
         data = self.request(self.DEVICES)
         if data.get('odata.error', None):
             self.errorHandler(data)
@@ -240,7 +240,7 @@ class Client:
     def initStartupData(self):
         self.POST_DATA = {
             'LandingPageKey': 'generic',
-            'Languages': '{0}, {1}'.format(self.plugin.gui_language(), self.LANGUAGE),
+            'Languages': f'{self.plugin.gui_language()}, {self.LANGUAGE}',
             'Platform': 'web',
             'Manufacturer': '',
             'PromoCode': ''
@@ -281,7 +281,7 @@ class Client:
                 self.signIn()
         else:
             self.TOKEN = ''
-            self.plugin.log('[{0}] version: {1} region: {2}'.format(self.plugin.addon_id, self.plugin.addon_version, region))
+            self.plugin.log(f'[{self.plugin.addon_id}] version: {self.plugin.addon_version} region: {region}')
             self.plugin.dialog_ok(self.plugin.get_resource('error_2003_notAvailableInCountry').get('text'))
 
 
@@ -295,9 +295,9 @@ class Client:
             return res.json()
         else:
             if not res.status == 204:
-                self.plugin.log('[{0}] error: {1} ({2}, {3})'.format(self.plugin.addon_id, url, str(res.status), self.plugin.get_dict_value(res.headers, 'content-type')))
+                self.plugin.log(f'[{self.plugin.addon_id}] error: {url} ({res.status}, {self.plugin.get_dict_value(res.headers, "content-type")})')
             if res.status == -1:
-                self.plugin.log('[{0}] error: {1}'.format(self.plugin.addon_id, res.data))
+                self.plugin.log(f'[{self.plugin.addon_id}] error: {res.data}')
             return {}
 
 
@@ -305,8 +305,8 @@ class Client:
         self.ERRORS += 1
         msg = data['odata.error']['message']['value']
         code = str(data['odata.error']['code'])
-        self.plugin.log('[{0}] version: {1} country: {2} language: {3} portability: {4}'.format(self.plugin.addon_id, self.plugin.addon_version, self.COUNTRY, self.LANGUAGE, self.PORTABILITY))
-        self.plugin.log('[{0}] error: {1} ({2})'.format(self.plugin.addon_id, msg, code))
+        self.plugin.log(f'[{self.plugin.addon_id}] version: {self.plugin.addon_version} country: {self.COUNTRY} language: {self.LANGUAGE} portability: {self.PORTABILITY}')
+        self.plugin.log(f'[{self.plugin.addon_id}] error: {msg} ({code})')
 
         error_codes = ['10006', '10008', '10450']
         pin_codes = ['10155', '10161', '10163']
@@ -327,7 +327,7 @@ class Client:
         elif code == '10801':
             self.plugin.dialog_ok(self.plugin.get_resource('error2_65_801_403_header').get('text'))
         elif code in error_codes:
-            self.plugin.dialog_ok(self.plugin.get_resource('error_{0}'.format(code)).get('text'))
+            self.plugin.dialog_ok(self.plugin.get_resource(f'error_{code}').get('text'))
         elif code in pin_codes:
             self.TOKEN = ''
-            self.plugin.dialog_ok(self.plugin.get_resource('error_{0}'.format(code)).get('text'))
+            self.plugin.dialog_ok(self.plugin.get_resource(f'error_{code}').get('text'))

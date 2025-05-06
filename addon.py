@@ -3,7 +3,7 @@
 from __future__ import unicode_literals
 
 from json import loads
-from sys import argv
+from sys import argv, exit
 from urllib.parse import parse_qs
 
 import xbmcaddon
@@ -23,14 +23,14 @@ plugin = Common(
     addon_handle=handle_,
     addon_url=url_
 )
-requests = Request(addon_)
+requests = Request(addon_, plugin.get_setting('proxy_use') == 'true')
 credential = Credential(plugin)
 client = Client(plugin, credential, requests)
 parser = Parser(plugin, requests)
 
 
 def router(args):
-    plugin.log("args = {0}".format(args))
+    plugin.log(f'args = {args}')
     mode = args.get('mode', ['rails'])[0]
     title = args.get('title', [''])[0]
     id_ = args.get('id', ['home'])[0]
@@ -86,4 +86,4 @@ if __name__ == '__main__':
     if client.TOKEN and client.DEVICE_ID:
         router(args)
     else:
-        sys.exit(0)
+        exit(0)

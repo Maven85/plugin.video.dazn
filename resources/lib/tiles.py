@@ -48,23 +48,22 @@ class Tiles:
 
 
     def add_thumb(self, i):
-        url = self.plugin.api_img_base + '/{0}/fill/none/top/none/85/{1}/{2}/{3}/image'
         image = i.get('PortraitImage', '') if i.get('PortraitImage') and i.get('Title', '').strip() == '' else i.get('Image')
         if image:
             if self.type == 'Navigation':
                 if image['ImageType'] == "image-portrait":
-                    self.item['thumb'] = url.format(image['Id'], '334', '501', image['ImageMimeType'])
+                    self.item['thumb'] = f"{self.plugin.api_img_base}/{image['Id']}/fill/none/top/none/85/334/501/{image['ImageMimeType']}"
                 else:
-                    self.item['thumb'] = url.format(image['Id'], '512', '512', image['ImageMimeType'])
+                    self.item['thumb'] = f"{self.plugin.api_img_base}/{image['Id']}/fill/none/top/none/85/512/512/{image['ImageMimeType']}"
             else:
-                self.item['thumb'] = url.format(image['Id'], '720', '404', image['ImageMimeType'])
-            self.item['fanart'] = url.format(image['Id'], '1280', '720', image['ImageMimeType'])
+                self.item['thumb'] = f"{self.plugin.api_img_base}/{image['Id']}/fill/none/top/none/85/720/404/{image['ImageMimeType']}"
+            self.item['fanart'] = f"{self.plugin.api_img_base}/{image['Id']}/fill/none/top/none/85/1280/720/{image['ImageMimeType']}"
         background = i.get('BackgroundImage', '')
         if background:
-            self.item['fanart'] = url.format(background['Id'], '1280', '720', background['ImageMimeType'])
+            self.item['fanart'] = f"{self.plugin.api_img_base}/{background['Id']}/fill/none/top/none/85/1280/720/{background['ImageMimeType']}"
         promo = i.get('PromoImage', '')
         if promo:
-            self.item['thumb'] = url.format(promo['Id'], '720', '270', promo['ImageMimeType'])
+            self.item['thumb'] = f"{self.plugin.api_img_base}/{promo['Id']}/fill/none/top/none/85/720/270/{promo['ImageMimeType']}"
 
 
     def update_item(self, i):
@@ -90,24 +89,24 @@ class Tiles:
                 sport = self.sport['Title']
             time_ = self.start[11:][:5]
             if self.type == 'Live':
-                self.item['title'] = '[COLOR red]{0}[/COLOR] [COLOR blue]{1}[/COLOR] {2} [COLOR blue]{3}[/COLOR]'.format(time_, sport, self.title, competition)
+                self.item['title'] = f'[COLOR red]{time_}[/COLOR] [COLOR blue]{sport}[/COLOR] {self.title} [COLOR blue]{competition}[/COLOR]'
             else:
-                self.item['title'] = '{0} [COLOR blue]{1}[/COLOR] {2} [COLOR blue]{3}[/COLOR]'.format(time_, sport, self.title, competition)
+                self.item['title'] = f'{time_} [COLOR blue]{sport}[/COLOR] {self.title} [COLOR blue]{competition}[/COLOR]'
         elif (self.type == 'ComingUp' or 'Scheduled' in i.get('Id', '')) or (self.type == 'Highlights' or self.type == 'Condensed'):
             if self.type == 'ComingUp':
                 day = self.plugin.days(self.type, self.now, self.start)
-                sub_title = '{0} {1}'.format(day, self.start[11:][:5])
+                sub_title = f'{day} {self.start[11:][:5]}'
             else:
-                sub_title = self.plugin.get_resource('{0}{1}Title'.format(self.type[0].lower(), self.type[1:]), 'browseui_').get('text')
+                sub_title = self.plugin.get_resource(f'{self.type[0].lower()}{self.type[1:]}Title', 'browseui_').get('text')
                 if sub_title.endswith('Title'):
                     sub_title = self.type
             if sub_title not in self.title:
-                self.item['title'] = '{0} ({1})'.format(self.title, sub_title)
+                self.item['title'] = f'{self.title} ({sub_title})'
 
         if self.entitlement_ids:
             entitlements_found = [entitlement_id for entitlement_id in self.entitlement_ids if entitlement_id in self.user_entitlements]
             if len(entitlements_found) == 0:
-                self.item['title'] = '[COLOR orange]{0}[/COLOR]'.format(self.item['title'])
+                self.item['title'] = f"[COLOR orange]{self.item['title']}[/COLOR]"
 
         if self.start:
             self.item['date'] = self.start[:10]

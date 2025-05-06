@@ -58,7 +58,7 @@ class Common():
         self.user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36'
         self.android_properties = {}
 
-        self.railCache = StorageServer.StorageServer('{0}.rail'.format(self.addon_id), 24 * 7)
+        self.railCache = StorageServer.StorageServer(f'{self.addon_id}.rail', 24 * 7)
 
 
     def log(self, msg):
@@ -133,7 +133,7 @@ class Common():
         if data.get('Strings'):
             strings = data['Strings']
             try:
-                text = strings['{0}{1}'.format(prefix, text.replace(' ', ''))]
+                text = strings[f"{prefix}{text.replace(' ', '')}"]
                 data_found = True
             except KeyError:
                 text = text.replace('_', ' ')
@@ -183,7 +183,7 @@ class Common():
             device_id = str(UUID(md5(self.get_android_uuid().encode('utf-8')).hexdigest()))
 
         if device_id == '':
-            self.log('[{0}] error: failed to get device id ({1})'.format(self.addon_id, str(mac_addr)))
+            self.log(f'[{self.addon_id}] error: failed to get device id ({mac_addr})')
             self.dialog_ok(self.get_resource('error_4005_ConnectionLost').get('text'))
         self.set_setting('device_id', device_id)
         return device_id
@@ -277,7 +277,7 @@ class Common():
                 json_data = load(f)
                 f.close()
             except Exception as e:
-                self.log("[{0}] get cache error: {1}".format(self.addon_id, e))
+                self.log(f'[{self.addon_id}] get cache error: {e}')
         return json_data
 
 
@@ -288,7 +288,7 @@ class Common():
             dump(data, f)
             f.close()
         except Exception as e:
-            self.log("[{0}] cache error: {1}".format(self.addon_id, e))
+            self.log(f'[{self.addon_id}] cache error: {e}')
 
 
     def split_on_uppercase(self, s, keep_contiguous=False):
@@ -337,7 +337,7 @@ class Common():
     def youth_protection_pin(self, verify_age):
         pin = ''
         if verify_age:
-            pin = self.get_dialog().input('{}: {}'.format(self.get_resource('setting_YouthProtection').get('text'), self.get_resource('n2_ageverificationPinEntry_body').get('text')), type=xbmcgui.INPUT_ALPHANUM, option=xbmcgui.ALPHANUM_HIDE_INPUT)
+            pin = self.get_dialog().input(f"{self.get_resource('setting_YouthProtection').get('text')}: {self.get_resource('n2_ageverificationPinEntry_body').get('text')}", type=xbmcgui.INPUT_ALPHANUM, option=xbmcgui.ALPHANUM_HIDE_INPUT)
         return pin
 
 
@@ -457,20 +457,22 @@ class Common():
 
         # android
         if xbmc.getCondVisibility('System.Platform.Android'):
-            user_agent = 'Mozilla/5.0 (Linux; Android {}; {}) {}'.format(
-                    self.get_android_prop('ro.build.version.release', True) or '12',
-                    self.get_android_prop('ro.product.model', True) or 'Pixel 6',
-                    user_agent_suffix)
+            user_agent = (
+                f"Mozilla/5.0 (Linux; Android "
+                f"{self.get_android_prop('ro.build.version.release', True) or '12'}; "
+                f"{self.get_android_prop('ro.product.model', True) or 'Pixel 6'}) "
+                f"{user_agent_suffix}"
+            )
 
         # linux on arm uses widevine from chromeos
         elif os_uname[0] == 'Linux' and os_uname[4].lower().find('arm') != -1:
-            user_agent = 'Mozilla/5.0 (X11; CrOS {} 14268.67.0) {}'.format(os_uname[4], user_agent_suffix)
+            user_agent = f'Mozilla/5.0 (X11; CrOS {os_uname[4]} 14268.67.0) {user_agent_suffix}'
         elif os_uname[0] == 'Linux':
-            user_agent = 'Mozilla/5.0 (X11; Linux {}) {}'.format(os_uname[4], user_agent_suffix)
+            user_agent = f'Mozilla/5.0 (X11; Linux {os_uname[4]}) {user_agent_suffix}'
         elif os_uname[0] == 'Darwin':
-            user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 12_1) {}'.format(user_agent_suffix)
+            user_agent = f'Mozilla/5.0 (Macintosh; Intel Mac OS X 12_1) {user_agent_suffix}'
         else:
-            user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) {}'.format(user_agent_suffix)
+            user_agent = f'Mozilla/5.0 (Windows NT 10.0; Win64; x64) {user_agent_suffix}'
 
         # self.user_agent = user_agent
         return user_agent
@@ -488,9 +490,9 @@ class Common():
                         prop_k_v = prop.split(']: [')
                         if len(prop_k_v) == 2 and prop_k_v[0].startswith('[') and prop_k_v[1].endswith(']'):
                             self.android_properties.update({prop_k_v[0][1:]: prop_k_v[1][:-1]})
-                    self.log('Found android properties {}'.format(self.android_properties))
+                    self.log(f'Found android properties {self.android_properties}')
                 except Exception as e:
-                    self.log('Getting android properties failed with exception: {}'.format(e))
+                    self.log(f'Getting android properties failed with exception: {e}')
 
             if exact_match is True and self.android_properties.get(key, None) is not None:
                 return self.android_properties.get(key)
@@ -508,7 +510,7 @@ class Common():
                         self.android_properties.update({key: prop})
                         return prop
                 except Exception as e:
-                    self.log('Getting android property {} with exception: {}'.format(key, e))
+                    self.log(f'Getting android property {key} with exception: {e}')
 
 
     def get_android_uuid(self):
@@ -517,7 +519,7 @@ class Common():
         values = ''
         try:
             # Due to the new android security we cannot get any type of serials
-            sys_prop = ['ro.product.board', 'ro.product.brand', 'ro.product.device', 'ro.product.locale'
+            sys_prop = ['ro.product.board', 'ro.product.brand', 'ro.product.device', 'ro.product.locale',
                         'ro.product.manufacturer', 'ro.product.model', 'ro.product.platform',
                         'persist.sys.timezone', 'persist.sys.locale', 'net.hostname']
             # Warning net.hostname property starting from android 10 is deprecated return empty

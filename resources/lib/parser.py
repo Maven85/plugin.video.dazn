@@ -79,8 +79,8 @@ class Parser:
             def date_item(day):
                 return {
                     'mode': mode,
-                    'title': '{0} ({1})'.format(self.plugin.get_resource(day.strftime('%A'), prefix='calendar_').get('text'), day.strftime(self.plugin.date_format)),
-                    'plot': '{0} ({1})'.format(self.plugin.get_resource(epg_date.strftime('%A'), prefix='calendar_').get('text'), epg_date.strftime(self.plugin.date_format)),
+                    'title': f"{self.plugin.get_resource(day.strftime('%A'), prefix='calendar_').get('text')} ({day.strftime(self.plugin.date_format)})",
+                    'plot': f"{self.plugin.get_resource(epg_date.strftime('%A'), prefix='calendar_').get('text')} ({epg_date.strftime(self.plugin.date_format)})",
                     'params': day,
                     'cm': cm
                 }

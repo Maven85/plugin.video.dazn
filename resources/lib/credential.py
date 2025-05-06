@@ -39,7 +39,7 @@ class Credential(object):
         if len(id) > 24:
             id = id[:24]
         elif len(id) < 24:
-            id = '{0}{1}'.format(id, (24 - len(id)) * '=')
+            id = f"{id}{(24 - len(id)) * '='}"
 
         return id.encode('utf-8')
 
