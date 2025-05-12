@@ -2,8 +2,6 @@
 
 from __future__ import unicode_literals
 
-from datetime import date
-
 from .context import Context
 from .items import Items
 from .playback import Playback
@@ -26,7 +24,7 @@ class Parser:
                 'mode': 'epg',
                 'title': self.plugin.get_resource('header_schedule').get('text'),
                 'plot': None,
-                'params': str(date.today()),
+                'params': 'today'
             }
             epg['cm'] = Context(self.plugin).highlights(epg, mode='epg_highlights')
             self.items.add_item(epg, True)
@@ -70,7 +68,7 @@ class Parser:
 
 
     def epg_items(self, data, params, mode):
-        update = False if params == str(date.today()) else True
+        update = False if params == 'today' else True
         if data.get('Date'):
             epg_date = self.plugin.epg_date(data['Date'])
             cm = Context(self.plugin).epg_date()
@@ -81,7 +79,7 @@ class Parser:
                     'mode': mode,
                     'title': f"{self.plugin.get_resource(day.strftime('%A'), prefix='calendar_').get('text')} ({day.strftime(self.plugin.date_format)})",
                     'plot': f"{self.plugin.get_resource(epg_date.strftime('%A'), prefix='calendar_').get('text')} ({epg_date.strftime(self.plugin.date_format)})",
-                    'params': day,
+                    'params': day.strftime(self.plugin.date_format),
                     'cm': cm
                 }
 

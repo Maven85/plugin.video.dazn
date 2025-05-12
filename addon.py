@@ -41,10 +41,11 @@ def router(args):
     elif 'rail' in mode:
         parser.rail_items(client.rail(id_, params), mode)
     elif 'epg' in mode:
-        date = params
         if id_ == 'date':
             date = plugin.get_date()
-        parser.epg_items(client.epg(date), date, mode)
+        else:
+            date = plugin.get_today() if params == 'today' else params
+        parser.epg_items(client.epg(date), params, mode)
     elif mode == 'play':
         parser.playback(client.playback(id_, plugin.youth_protection_pin(verify_age)))
     elif 'play_context' in mode:
@@ -54,18 +55,18 @@ def router(args):
         if plugin.logout():
             credential.clear_credentials()
             client.signOut()
-            sys.exit(0)
+            exit(0)
     elif mode == 'is_settings':
         plugin.open_is_settings()
     else:
-        sys.exit(0)
+        exit(0)
 
 
 if __name__ == '__main__':
     if plugin.get_setting('save_login') == 'false' and credential.has_credentials():
         credential.clear_credentials()
 
-    paramstring = sys.argv[2][1:]
+    paramstring = argv[2][1:]
     args = dict(parse_qs(paramstring))
 
     if args.get('mode', ['rails'])[0] != 'logout' and (plugin.startup or not client.TOKEN):

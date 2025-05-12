@@ -225,13 +225,18 @@ class Common():
 
 
     def get_date(self):
-        date = 'today'
         dlg = self.get_dialog().numeric(1, self.get_string(30230))
         if dlg:
             spl = [s.strip() for s in dlg.split('/')]
-            date = '%s-%s-%s' % (spl[2], spl[1], spl[0])
+            date = f'{spl[2]}-{spl[1]}-{spl[0]}' 
             date = self.epg_date(date)
+        else:
+            date = self.get_today()
         return date
+
+
+    def get_today(self):
+        return xbmc.getInfoLabel('System.Date(yyyy-mm-dd)')
 
 
     def get_max_registrable_devices(self, token):
