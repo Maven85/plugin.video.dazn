@@ -19,6 +19,7 @@ class Client:
         self.LANGUAGE = self.plugin.get_setting('language')
         self.PORTABILITY = self.plugin.get_setting('portability')
         self.MAX_REGISTRABLE_DEVICES = self.plugin.get_setting('max_registrable_devices')
+        self.ENTITLEMENT_ID = self.plugin.get_setting('entitlement_id')
         self.ENTITLEMENTS = self.plugin.get_setting('entitlements').split(',')
         self.POST_DATA = {}
         self.ERRORS = 0
@@ -57,6 +58,7 @@ class Client:
         self.PARAMS['country'] = self.COUNTRY
         self.PARAMS['groupId'] = id_
         self.PARAMS['params'] = params
+        self.PARAMS['userEntitlements'] = self.ENTITLEMENT_ID
         content_data = self.content_data(self.RAILS)
         for rail in content_data.get('Rails', []):
             id_ = rail.get('Id')
@@ -166,6 +168,7 @@ class Client:
         if auth and result in ['SignedIn', 'SignedInInactive']:
             self.TOKEN = auth['Token']
             self.MAX_REGISTRABLE_DEVICES = self.plugin.get_max_registrable_devices(self.TOKEN)
+            self.ENTITLEMENT_ID = self.plugin.get_entitlement_id(self.TOKEN)
             self.ENTITLEMENTS = self.plugin.get_entitlements(self.TOKEN)
         else:
             if result in ['HardOffer', 'SignedInPaused']:
@@ -173,6 +176,7 @@ class Client:
             self.signOut()
         self.plugin.set_setting('token', self.TOKEN)
         self.plugin.set_setting('max_registrable_devices', f'{self.MAX_REGISTRABLE_DEVICES}')
+        self.plugin.set_setting('entitlement_id', self.ENTITLEMENT_ID)
         self.plugin.set_setting('entitlements', ','.join(self.ENTITLEMENTS))
 
 

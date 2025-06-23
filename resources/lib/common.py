@@ -55,7 +55,8 @@ class Common():
         self.max_bw = self.addon.getSetting('max_bw')
         self.resources = self.addon.getSetting('api_endpoint_resource_strings')
         self.kodi_version = int(xbmc.getInfoLabel('System.BuildVersion').split('.')[0])
-        self.user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36'
+        self.user_agent_suffix = 'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36'
+        self.user_agent = f'Mozilla/5.0 (Windows NT 10.0; Win64; x64) {self.user_agent_suffix}'
         self.android_properties = {}
 
         self.railCache = StorageServer.StorageServer(f'{self.addon_id}.rail', 24 * 7)
@@ -228,7 +229,7 @@ class Common():
         dlg = self.get_dialog().numeric(1, self.get_string(30230))
         if dlg:
             spl = [s.strip() for s in dlg.split('/')]
-            date = f'{spl[2]}-{spl[1]}-{spl[0]}' 
+            date = f'{spl[2]}-{spl[1]}-{spl[0]}'
             date = self.epg_date(date)
         else:
             date = self.get_today()
@@ -244,6 +245,20 @@ class Common():
         maxRegistrableDevices = token_data.get('entitlements', {}).get('features', {}).get('DEVICE', {}).get('max_registered_devices', 6)
 
         return maxRegistrableDevices
+
+
+    def get_entitlement_id(self, token):
+        entitlement_id = []
+
+        token_data = loads(self.b64dec(token.split('.')[1]))
+        entitlementSets = token_data.get('entitlements', {}).get('entitlementSets', [])
+        if entitlementSets:
+            for entitlementSet in entitlementSets:
+                if entitlementSet.get('id'):
+                    entitlement_id = entitlementSet.get('id')
+                    break
+
+        return entitlement_id
 
 
     def get_entitlements(self, token):
@@ -430,7 +445,7 @@ class Common():
         if streamlabels.get('width') is not None:
             videostream.setWidth(streamlabels.get('width'))
         if streamlabels.get('height') is not None:
-            videoinfotag.setHeight(streamlabels.get('height'))
+            videostream.setHeight(streamlabels.get('height'))
         if streamlabels.get('aspect') is not None:
             videostream.setAspect(streamlabels.get('aspect'))
         if streamlabels.get('duration') is not None:
@@ -458,26 +473,24 @@ class Common():
         except Exception:
             os_uname = ['Linux', 'hostname', 'kernel-ver', 'kernel-sub-ver', 'x86_64']
 
-        user_agent_suffix = 'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36'
-
         # android
         if xbmc.getCondVisibility('System.Platform.Android'):
             user_agent = (
                 f"Mozilla/5.0 (Linux; Android "
-                f"{self.get_android_prop('ro.build.version.release', True) or '12'}; "
-                f"{self.get_android_prop('ro.product.model', True) or 'Pixel 6'}) "
-                f"{user_agent_suffix}"
+                f"{self.get_android_prop('ro.build.version.release', True) or '15'}; "
+                f"{self.get_android_prop('ro.product.model', True) or 'Pixel 9'}) "
+                f"{self.user_agent_suffix}"
             )
 
         # linux on arm uses widevine from chromeos
         elif os_uname[0] == 'Linux' and os_uname[4].lower().find('arm') != -1:
-            user_agent = f'Mozilla/5.0 (X11; CrOS {os_uname[4]} 14268.67.0) {user_agent_suffix}'
+            user_agent = f'Mozilla/5.0 (X11; CrOS {os_uname[4]} 16181.61.0) {self.user_agent_suffix}'
         elif os_uname[0] == 'Linux':
-            user_agent = f'Mozilla/5.0 (X11; Linux {os_uname[4]}) {user_agent_suffix}'
+            user_agent = f'Mozilla/5.0 (X11; Linux {os_uname[4]}) {self.user_agent_suffix}'
         elif os_uname[0] == 'Darwin':
-            user_agent = f'Mozilla/5.0 (Macintosh; Intel Mac OS X 12_1) {user_agent_suffix}'
+            user_agent = f'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) {self.user_agent_suffix}'
         else:
-            user_agent = f'Mozilla/5.0 (Windows NT 10.0; Win64; x64) {user_agent_suffix}'
+            user_agent = f'Mozilla/5.0 (Windows NT 10.0; Win64; x64) {self.user_agent_suffix}'
 
         # self.user_agent = user_agent
         return user_agent
