@@ -57,8 +57,10 @@ class Client:
         self.PARAMS = {}
         self.PARAMS['country'] = self.COUNTRY
         self.PARAMS['groupId'] = id_
-        self.PARAMS['params'] = params
-        self.PARAMS['userEntitlements'] = self.ENTITLEMENT_ID
+        if params:
+            self.PARAMS['params'] = params
+        if self.ENTITLEMENT_ID:
+            self.PARAMS['userEntitlements'] = self.ENTITLEMENT_ID
         content_data = self.content_data(self.RAILS)
         for rail in content_data.get('Rails', []):
             id_ = rail.get('Id')

@@ -248,7 +248,7 @@ class Common():
 
 
     def get_entitlement_id(self, token):
-        entitlement_id = []
+        entitlement_id = ''
 
         token_data = loads(self.b64dec(token.split('.')[1]))
         entitlementSets = token_data.get('entitlements', {}).get('entitlementSets', [])
