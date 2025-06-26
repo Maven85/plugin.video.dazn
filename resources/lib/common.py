@@ -384,7 +384,7 @@ class Common():
                         )
         for key, value in endpoint_def_dict.items():
             endpoint_key_list = list(service_dict.get(value).get('Versions'))
-            endpoint_key_list.sort()
+            endpoint_key_list.sort(key=lambda x: '{0:0>8}'.format(x).lower())
             last_key = endpoint_key_list[-1]
             service_path = service_dict.get(value).get('Versions').get(last_key).get('ServicePath')
             if value == 'UserProfile' and service_path.lower().endswith('/userprofile') == False:
