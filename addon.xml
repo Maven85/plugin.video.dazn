@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.dazn" version="1.4.17+nexus.1" name="DAZN" provider-name="Jin, Maven">
+<addon id="plugin.video.dazn" version="1.4.18+nexus.1" name="DAZN" provider-name="Jin, Maven">
     <requires>
         <import addon="xbmc.python" version="3.0.1"/>
         <import addon="script.module.inputstreamhelper" version="0.5.0"/>
@@ -15,6 +15,9 @@
     <extension point="xbmc.addon.metadata">
         <reuselanguageinvoker>true</reuselanguageinvoker>
         <news>
+V1.4.18
+- fix: improve endpoint key sorting and enhance related item type retrieval
+- feat: add support for Dolby audio and enhance manifest handling in playback
 V1.4.17
 - fix: handle optional params and user entitlements in rails method
 V1.4.16
