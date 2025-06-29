@@ -6,6 +6,7 @@ from ssl import TLSVersion
 from urllib.parse import urlencode
 from urllib3 import PoolManager, ProxyManager
 from urllib3.util import create_urllib3_context
+import xbmc
 
 
 class Request:
@@ -20,12 +21,12 @@ class Request:
         self.proxy_use = proxy_use
         self.proxy_host = addon.getSetting('proxy_host')
         self.proxy_port = addon.getSetting('proxy_port')
-        
+
         self.pool_manager = PoolManager(ssl_context=self.ctx)
         self.proxy_manager = ProxyManager(f'http://{self.proxy_host}:{self.proxy_port}')
 
 
-    def exchange(self, url, params=None, data=None, headers=None, json=None, method=None):
+    def exchange(self, url, headers=None, params=None, data=None, json=None, fields=None, method=None):
         if self.proxy_use == True and url.startswith('https'):
             url = url.replace('https', 'http')
             if not params:
@@ -34,11 +35,13 @@ class Request:
                 params.update({'originschema': 'https'})
 
         with self.proxy_manager if self.proxy_use == True else self.pool_manager as pool:
-            if data or json:
+            if data or json or fields:
                 if params:
                     url = f'{url}?{urlencode(params)}'
                 if json:
                     r = pool.request('POST', url, headers=headers, json=json)
+                elif fields:
+                    r = pool.request_encode_body('POST', url, headers=headers, fields=fields, encode_multipart=False)
                 else:
                     r = pool.request('POST', url, headers=headers, body=data)
             elif method is None:

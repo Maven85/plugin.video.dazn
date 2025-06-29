@@ -36,6 +36,7 @@ def router(args):
     id_ = args.get('id', ['home'])[0]
     params = args.get('params', [''])[0]
     verify_age = True if args.get('verify_age', [''])[0] == 'True' else False
+    dolby = True if args.get('dolby', [''])[0] == 'True' else False
     if mode == 'rails':
         parser.rails_items(client.rails(id_, params), id_)
     elif 'rail' in mode:
@@ -47,7 +48,7 @@ def router(args):
             date = plugin.get_today() if params == 'today' else params
         parser.epg_items(client.epg(date), params, mode)
     elif mode == 'play':
-        parser.playback(client.playback(id_, plugin.youth_protection_pin(verify_age)))
+        parser.playback(client.playback(id_, plugin.youth_protection_pin(verify_age)), context=mode, dolby=dolby)
     elif 'play_context' in mode:
         art = loads(args.get('art', [''])[0].replace('\'', '"'))
         parser.playback(client.playback(id_, plugin.youth_protection_pin(verify_age)), title, art, mode)

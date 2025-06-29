@@ -6,6 +6,7 @@
         <import addon="script.common.plugin.cache" version="2.6.1.1"/>
         <import addon="script.module.urllib3"/>
         <import addon="script.module.bottle"/>
+        <import addon="script.module.xmltodict"/>
     </requires>
     <extension point="xbmc.python.pluginsource" library="addon.py">
         <provides>video</provides>

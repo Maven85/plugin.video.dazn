@@ -90,5 +90,5 @@ class Parser:
         self.items.list_items(upd=update, epg=True)
 
 
-    def playback(self, data, name='', art=None, context=None):
-        self.items.play_item(Playback(self.plugin, self.requests, data), name, art, context)
+    def playback(self, data, name='', art=None, context=None, dolby=None):
+        self.items.play_item(Playback(self.plugin, self.requests, data, context, dolby), name, art, context)

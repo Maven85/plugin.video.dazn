@@ -25,6 +25,7 @@ class Tiles:
         self.verify_age = i.get('VerifyAge', False)
         self.is_linear = i.get('IsLinear', True)
         self.entitlement_ids = i.get('EntitlementIds', [])
+        self.dolby_config = i.get('dolbyConfig', [])
         if self.nav:
             self.mode = 'rails'
             self.id = i['NavigateTo']
@@ -75,6 +76,7 @@ class Tiles:
         self.item['verify_age'] = self.verify_age
         self.item['is_linear'] = self.is_linear
         self.item['entitlement_ids'] = self.entitlement_ids
+        self.item['dolby_config'] = self.dolby_config
 
         if self.params:
             self.item['params'] = self.params

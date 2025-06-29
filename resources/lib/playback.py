@@ -9,9 +9,12 @@ from urllib.parse import quote_plus
 class Playback:
 
 
-    def __init__(self, plugin, requests, data):
+    def __init__(self, plugin, requests, data, context, dolby):
         self.plugin = plugin
         self.requests = requests
+
+        self.context = context
+        self.dolby = dolby
 
         self.ManifestUrl = ''
         self.LaUrl = ''
@@ -46,13 +49,44 @@ class Playback:
     def parse_detail(self, details, cdn=''):
         for i in details:
             if cdn == self.clean_name([i['CdnName']])[0] or not cdn:
-                url = i['ManifestUrl']
-                if i.get('CdnToken'):
-                    url = f"{url}{'&' if url.find('?') > -1 else '?'}{i['CdnToken']['Name']}={quote_plus(i['CdnToken']['Value'])}"
-                res = self.requests.exchange(url, headers={'user-agent': self.plugin.get_user_agent()}, method='HEAD')
-                if res.status == 200 and self.plugin.get_dict_value(res.headers, 'content-type').startswith('application/dash+xml'):
-                    self.ManifestUrl = url
+                manifestUrl = None
+                if i.get('DaiVod') and i.get('DaiVod').get('ContentSourceId') and i.get('DaiVod').get('VideoId'):
+                    contentSourceId = i.get('DaiVod').get('ContentSourceId')
+                    videoId = i.get('DaiVod').get('VideoId')
+                    url = f'https://dai.google.com/ondemand/dash/content/{contentSourceId}/vid/{videoId}/streams'
+                    res = self.requests.exchange(url, headers={'user-agent': self.plugin.get_user_agent()}, method='POST')
+                    if res.status == 201:
+                        manifestUrl = res.json().get('stream_manifest')
+                elif self.context == 'play' and self.dolby == True and i.get('DaiLive') and i.get('DaiLive').get('LiveStreamEventCode') and i.get('DaiLive').get('DaiDlid'):
+                    liveStreamEventCode = i.get('DaiLive').get('LiveStreamEventCode')
+                    url = f'https://dai.google.com/ssai/event/{liveStreamEventCode}/streams'
+                    data = {'dai-dlid': i.get('DaiLive').get('DaiDlid')}
+                    res = self.requests.exchange(url, headers={'user-agent': self.plugin.get_user_agent()}, fields=data)
+                    if res.status == 201:
+                        manifestUrl = res.json().get('stream_manifest')
+                if manifestUrl is None:
+                    url = i['ManifestUrl']
+                    if i.get('CdnToken'):
+                        url = f"{url}{'&' if url.find('?') > -1 else '?'}{i['CdnToken']['Name']}={quote_plus(i['CdnToken']['Value'])}"
+                    res = self.requests.exchange(url, headers={'user-agent': self.plugin.get_user_agent()}, method='HEAD')
+                    if res.status == 200 and self.plugin.get_dict_value(res.headers, 'content-type').startswith('application/dash+xml'):
+                        manifestUrl = url
+                if manifestUrl:
+                    self.ManifestUrl = manifestUrl
                     self.LaUrl = i['LaUrl']
+                    self.requests.exchange(
+                        f"http://"
+                        f"{self.plugin.get_setting('proxy_host') if self.requests.proxy_use == True else 'localhost'}"
+                        f":"
+                        f"{self.plugin.get_setting('proxy_port') if self.requests.proxy_use == True else 8014}"
+                        f"/api/"
+                        f"{self.AssetId}"
+                        f"/"
+                        f"{b64encode(self.ManifestUrl.encode('utf-8')).decode('utf-8')}"
+                        f"/manifesturl",
+                        headers={'user-agent': self.plugin.get_user_agent()},
+                        method='POST'
+                    )
                     self.requests.exchange(
                         f"http://"
                         f"{self.plugin.get_setting('proxy_host') if self.requests.proxy_use == True else 'localhost'}"

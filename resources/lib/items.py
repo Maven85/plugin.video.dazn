@@ -48,7 +48,8 @@ class Items:
             'title': item['title'],
             'id': item.get('id', ''),
             'params': item.get('params', ''),
-            'verify_age': verify_age
+            'verify_age': verify_age,
+            'dolby': True if len(item.get('dolby_config', [])) > 0 else False
         }
 
         art = {
@@ -90,6 +91,15 @@ class Items:
 
 
     def play_item(self, item, name, art, context):
+        # path = (
+        #    f"http://"
+        #    f"{self.plugin.get_setting('proxy_host') if self.plugin.get_setting('proxy_use') == 'true' else 'localhost'}"
+        #    f":"
+        #    f"{self.plugin.get_setting('proxy_port') if self.plugin.get_setting('proxy_use') == 'true' else 8014}"
+        #    f"/api/"
+        #    f"{item.AssetId}"
+        #    f"/manifest"
+        # )
         path = item.ManifestUrl
         resolved = True if path else False
         listitem = xbmcgui.ListItem()
@@ -146,7 +156,7 @@ class Items:
         if item.CdnToken:
             listitem.setProperty('inputstream.adaptive.stream_params', item.CdnToken)
         listitem.setProperty('inputstream.adaptive.chooser_bandwidth_max', self.plugin.get_max_bw())
-        if context and resolved:
+        if context != 'play' and resolved:
             listitem.setArt(art)
             listitem = self.plugin.set_videoinfo(listitem, dict(title=name))
             if 'beginning' in context:
