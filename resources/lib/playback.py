@@ -74,30 +74,24 @@ class Playback:
                 if manifestUrl:
                     self.ManifestUrl = manifestUrl
                     self.LaUrl = i['LaUrl']
-                    self.requests.exchange(
+                    proxy_base_url = (
                         f"http://"
-                        f"{self.plugin.get_setting('proxy_host') if self.requests.proxy_use == True else 'localhost'}"
+                        f"{self.plugin.get_setting('proxy_host') if self.plugin.get_setting('proxy_use') == 'true' else 'localhost'}"
                         f":"
-                        f"{self.plugin.get_setting('proxy_port') if self.requests.proxy_use == True else 8014}"
+                        f"{self.plugin.get_setting('proxy_port') if self.plugin.get_setting('proxy_use') == 'true' else 8014}"
                         f"/api/"
                         f"{self.AssetId}"
-                        f"/"
-                        f"{b64encode(self.ManifestUrl.encode('utf-8')).decode('utf-8')}"
-                        f"/manifesturl",
+                    )
+                    self.requests.exchange(
+                        f"{proxy_base_url}/manifesturl",
                         headers={'user-agent': self.plugin.get_user_agent()},
+                        json={'url': self.ManifestUrl},
                         method='POST'
                     )
                     self.requests.exchange(
-                        f"http://"
-                        f"{self.plugin.get_setting('proxy_host') if self.requests.proxy_use == True else 'localhost'}"
-                        f":"
-                        f"{self.plugin.get_setting('proxy_port') if self.requests.proxy_use == True else 8014}"
-                        f"/api/"
-                        f"{self.AssetId}"
-                        f"/"
-                        f"{b64encode(self.LaUrl.encode('utf-8')).decode('utf-8')}"
-                        f"/licenseurl",
+                        f"{proxy_base_url}/licenseurl",
                         headers={'user-agent': self.plugin.get_user_agent()},
+                        json={'url': self.LaUrl},
                         method='POST'
                     )
                     if i.get('CdnToken'):

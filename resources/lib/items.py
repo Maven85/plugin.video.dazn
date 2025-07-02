@@ -91,15 +91,15 @@ class Items:
 
 
     def play_item(self, item, name, art, context):
-        # path = (
-        #    f"http://"
-        #    f"{self.plugin.get_setting('proxy_host') if self.plugin.get_setting('proxy_use') == 'true' else 'localhost'}"
-        #    f":"
-        #    f"{self.plugin.get_setting('proxy_port') if self.plugin.get_setting('proxy_use') == 'true' else 8014}"
-        #    f"/api/"
-        #    f"{item.AssetId}"
-        #    f"/manifest"
-        # )
+        proxy_base_url = (
+            f"http://"
+            f"{self.plugin.get_setting('proxy_host') if self.plugin.get_setting('proxy_use') == 'true' else 'localhost'}"
+            f":"
+            f"{self.plugin.get_setting('proxy_port') if self.plugin.get_setting('proxy_use') == 'true' else 8014}"
+            f"/api/"
+            f"{item.AssetId}"
+        )
+        # path = f'{proxy_base_url}/manifest'
         path = item.ManifestUrl
         resolved = True if path else False
         listitem = xbmcgui.ListItem()
@@ -111,15 +111,7 @@ class Items:
             'content-type': 'application/octet-stream',
             'user-agent': self.plugin.get_user_agent()
         })
-        license_url = (
-            f"http://"
-            f"{self.plugin.get_setting('proxy_host') if self.plugin.get_setting('proxy_use') == 'true' else 'localhost'}"
-            f":"
-            f"{self.plugin.get_setting('proxy_port') if self.plugin.get_setting('proxy_use') == 'true' else 8014}"
-            f"/api/"
-            f"{item.AssetId}"
-            f"/license"
-        )
+        license_url = f'{proxy_base_url}/license'
         kodi_version = self.plugin.get_kodi_version()
         if kodi_version >= 22:
             drm_cfg = {

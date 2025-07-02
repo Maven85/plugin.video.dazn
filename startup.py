@@ -49,17 +49,19 @@ class WebServer():
         self.requests.exchange(f'http://localhost:{self.port}')
 
 
-@route('/api/<asset_id>/<manifest_url>/manifesturl', method='POST')
-def proxy_manifest_url(asset_id, manifest_url):
+@route('/api/<asset_id>/manifesturl', method='POST')
+def proxy_manifest_url(asset_id):
+    manifest_url = loads(request.body.read()).get('url')
     response.set_header('content-type', 'application/json')
-    w.mUrls.update({asset_id: b64decode(manifest_url).decode('utf-8')})
+    w.mUrls.update({asset_id: manifest_url})
     return dumps({'success': True})
 
 
-@route('/api/<asset_id>/<license_url>/licenseurl', method='POST')
-def proxy_license_url(asset_id, license_url):
+@route('/api/<asset_id>/licenseurl', method='POST')
+def proxy_license_url(asset_id):
+    license_url = loads(request.body.read()).get('url')
     response.set_header('content-type', 'application/json')
-    w.laUrls.update({asset_id: b64decode(license_url).decode('utf-8')})
+    w.laUrls.update({asset_id: license_url})
     return dumps({'success': True})
 
 
@@ -92,17 +94,42 @@ def content_manifest(asset_id, manifest_headers):
             except:
                 pass
             xml = xmltodict.parse(res.data)
+            manifest_base_url = manifest_url.rsplit('/', 1)[0]
+            baseurl_found = False
             if xml.get('MPD').get('BaseURL'):
+                baseurl_found = True
                 if xml.get('MPD').get('BaseURL').startswith('http') == False:
-                    xml['MPD']['BaseURL'] = f"{manifest_url.split('/web', 1)[0]}/{xml.get('MPD').get('BaseURL')}"
+                    xml['MPD']['BaseURL'] = build_url(manifest_base_url, xml.get('MPD').get('BaseURL'))
             elif xml.get('MPD').get('Period'):
                 if type(xml.get('MPD').get('Period')) == list:
                     for i in xml.get('MPD').get('Period'):
-                        if i.get('BaseURL') and i.get('BaseURL').startswith('http') == False:
-                            i['BaseURL'] = f"{manifest_url.split('/web', 1)[0]}/{i.get('BaseURL')}"
-                else:
+                        if i.get('BaseURL'):
+                            baseurl_found = True
+                            if i.get('BaseURL').startswith('http') == False:
+                                i['BaseURL'] = build_url(manifest_base_url, i.get('BaseURL'))
+                elif xml.get('MPD').get('Period').get('BaseURL'):
+                    baseurl_found = True
                     if xml.get('MPD').get('Period').get('BaseURL').startswith('http') == False:
-                        xml['MPD']['Period']['BaseURL'] = f"{manifest_url.split('/web', 1)[0]}/{xml.get('MPD').get('Period').get('BaseURL')}"
+                        xml['MPD']['Period']['BaseURL'] = build_url(manifest_base_url, xml.get('MPD').get('Period').get('BaseURL'))
+            if baseurl_found == False and xml.get('MPD').get('Period'):
+                if xml.get('MPD').get('Period').get('AdaptationSet') and type(xml.get('MPD').get('Period').get('AdaptationSet')) == list:
+                    for i in xml.get('MPD').get('Period').get('AdaptationSet'):
+                        if i.get('Representation'):
+                            if type(i.get('Representation')) == list:
+                                for j in i.get('Representation'):
+                                    if j.get('SegmentTemplate'):
+                                        if j.get('SegmentTemplate').get('@media') and j.get('SegmentTemplate').get('@media').startswith('http') == False:
+                                            j.get('SegmentTemplate')['@media'] = build_url(manifest_base_url, j.get('SegmentTemplate')['@media'])
+                                        if j.get('SegmentTemplate').get('@initialization') and j.get('SegmentTemplate').get('@initialization').startswith('http') == False:
+                                            j.get('SegmentTemplate')['@initialization'] = build_url(manifest_base_url, j.get('SegmentTemplate')['@initialization'])
+                            else:
+                                if i.get('Representation').get('SegmentTemplate'):
+                                    if i.get('Representation').get('SegmentTemplate').get('@media') and i.get('Representation').get('SegmentTemplate').get('@media').startswith('http') == False:
+                                        i.get('Representation').get('SegmentTemplate')['@media'] = build_url(manifest_base_url, i.get('Representation').get('SegmentTemplate')['@media'])
+                                    if i.get('Representation').get('SegmentTemplate').get('@initialization') and i.get('Representation').get('SegmentTemplate').get('@initialization').startswith('http') == False:
+                                        i.get('Representation').get('SegmentTemplate')['@initialization'] = build_url(manifest_base_url, i.get('Representation').get('SegmentTemplate')['@initialization'])
+
+            # xbmc.log(f'{xmltodict.unparse(xml, pretty=True)}')
             return xmltodict.unparse(xml, pretty=True)
         except Exception as e:
             xbmc.log(f'exception = {e}')
@@ -128,9 +155,18 @@ def content_license(asset_id, license_headers, cdm_payload):
                 pass
             return cdm_request.data
         except Exception as e:
+            xbmc.log(f'exception = {e}')
             pass
     xbmcgui.Dialog().notification(w.addonname, f'No license url found for asset id {asset_id}.', xbmcgui.NOTIFICATION_ERROR)
     return
+
+
+def build_url(manifest_base_url, relative_url):
+    while relative_url.startswith('../'):
+        manifest_base_url = manifest_base_url.rsplit('/', 1)[0]
+        relative_url = relative_url.replace('../', '', 1)
+
+    return f'{manifest_base_url}/{relative_url}'
 
 
 #
