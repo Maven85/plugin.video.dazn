@@ -246,10 +246,12 @@ class Client:
     def initStartupData(self):
         self.POST_DATA = {
             'LandingPageKey': 'generic',
-            'Languages': f'{self.plugin.gui_language()}, {self.LANGUAGE}',
-            'Platform': 'web',
+            'Languages': f'{self.LANGUAGE}-{self.COUNTRY}',
             'Manufacturer': '',
-            'PromoCode': ''
+            'Platform': 'web',
+            'PlatformAttributes': {},
+            'PromoCode': '',
+            'Version': '2'
         }
         return self.request(self.STARTUP)
 
