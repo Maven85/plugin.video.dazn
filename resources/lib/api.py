@@ -4,9 +4,10 @@ from __future__ import unicode_literals
 
 from ssl import TLSVersion
 from urllib.parse import urlencode
-from urllib3 import PoolManager, ProxyManager
-from urllib3.util import create_urllib3_context
 import xbmc
+
+from ..modules.urllib3 import PoolManager, ProxyManager
+from ..modules.urllib3.util import create_urllib3_context
 
 
 class Request:
@@ -15,7 +16,6 @@ class Request:
     def __init__(self, addon, proxy_use):
         self.ctx = create_urllib3_context()
         self.ctx.load_default_certs()
-        self.ctx.maximum_version = TLSVersion.TLSv1_2
         self.ctx.post_handshake_auth = True if addon.getSetting('verify_ssl_certificates') == 'true' else False
 
         self.proxy_use = proxy_use
@@ -28,11 +28,11 @@ class Request:
 
     def exchange(self, url, headers=None, params=None, data=None, json=None, fields=None, method=None):
         if self.proxy_use == True and url.startswith('https'):
-            url = url.replace('https', 'http')
-            if not params:
-                url = f"{url}{'&' if url.find('?') > -1 else '?'}originschema=https"
-            else:
-                params.update({'originschema': 'https'})
+                url = url.replace('https', 'http')
+                if not params:
+                    url = f"{url}{'&' if url.find('?') > -1 else '?'}originschema=https"
+                else:
+                    params.update({'originschema': 'https'})
 
         with self.proxy_manager if self.proxy_use == True else self.pool_manager as pool:
             if data or json or fields:
