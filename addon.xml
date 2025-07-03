@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.dazn" version="1.4.18+nexus.1" name="DAZN" provider-name="Jin, Maven">
+<addon id="plugin.video.dazn" version="1.4.19+nexus.1" name="DAZN" provider-name="Jin, Maven">
     <requires>
         <import addon="xbmc.python" version="3.0.1"/>
-        <import addon="script.module.inputstreamhelper" version="0.5.0"/>
-        <import addon="script.common.plugin.cache" version="2.6.1.1"/>
-        <import addon="script.module.urllib3"/>
+        <import addon="script.module.inputstreamhelper"/>
+        <import addon="script.common.plugin.cache"/>
         <import addon="script.module.bottle"/>
         <import addon="script.module.xmltodict"/>
     </requires>
@@ -15,6 +14,12 @@
     <extension point="xbmc.addon.metadata">
         <reuselanguageinvoker>true</reuselanguageinvoker>
         <news>
+V1.4.19
+- feat: update proxy handling and manifest URL processing
+- feat: enhance initStartupData with improved language formatting and additional attributes
+- feat: added urllib3 module to lib
+- refactor: remove TLS version handling from request methods
+- feat: support for EPG endpoint with date range
 V1.4.18
 - fix: improve endpoint key sorting and enhance related item type retrieval
 - feat: add support for Dolby audio and enhance manifest handling in playback
