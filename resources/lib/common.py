@@ -372,7 +372,7 @@ class Common():
         endpoint_def_dict = dict(
                         api_endpoint_rail='Rail',
                         api_endpoint_rails='Rails',
-                        api_endpoint_epg='Epg',
+                        api_endpoint_epg='EpgWithDateRange',
                         api_endpoint_event='Event',
                         api_endpoint_playback='Playback',
                         api_endpoint_signin='SignIn',

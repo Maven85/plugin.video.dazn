@@ -69,8 +69,8 @@ class Parser:
 
     def epg_items(self, data, params, mode):
         update = False if params == 'today' else True
-        if data.get('Date'):
-            epg_date = self.plugin.epg_date(data['Date'])
+        if data.get('StartDate'):
+            epg_date = self.plugin.epg_date(data['StartDate'])
             cm = Context(self.plugin).epg_date()
 
 

@@ -92,7 +92,8 @@ class Client:
         self.PARAMS = {}
         self.PARAMS['languageCode'] = self.LANGUAGE
         self.PARAMS['country'] = self.COUNTRY
-        self.PARAMS['date'] = params
+        self.PARAMS['startDate'] = params
+        self.PARAMS['endDate'] = params
         return self.content_data(self.EPG)
 
 
