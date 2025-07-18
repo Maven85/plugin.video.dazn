@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 
 from ssl import TLSVersion
 from urllib.parse import urlencode
-import xbmc
 
 from ..modules.urllib3 import PoolManager, ProxyManager
 from ..modules.urllib3.util import create_urllib3_context
