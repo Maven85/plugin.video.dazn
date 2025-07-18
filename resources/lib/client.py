@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 from json import dumps
+from xbmc import Monitor
 
 
 class Client:
@@ -23,6 +24,7 @@ class Client:
         self.ENTITLEMENTS = self.plugin.get_setting('entitlements').split(',')
         self.POST_DATA = {}
         self.ERRORS = 0
+        self.MONITOR = Monitor()
 
         self.HEADERS = {
             'Content-Type': 'application/json',
@@ -94,7 +96,13 @@ class Client:
         self.PARAMS['country'] = self.COUNTRY
         self.PARAMS['startDate'] = params
         self.PARAMS['endDate'] = params
-        return self.content_data(self.EPG)
+        epg_data = {}
+        i = 0
+        while i < 2 and not self.MONITOR.abortRequested():
+            epg_data = self.content_data(self.EPG)
+            i += 1
+            self.MONITOR.waitForAbort(1)
+        return epg_data
 
 
     def event(self, id_):
