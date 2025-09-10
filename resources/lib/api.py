@@ -15,7 +15,6 @@ class Request:
     def __init__(self, addon, proxy_use):
         self.ctx = create_urllib3_context()
         self.ctx.load_default_certs()
-        self.ctx.post_handshake_auth = True if addon.getSetting('verify_ssl_certificates') == 'true' else False
 
         self.proxy_use = proxy_use
         self.proxy_host = addon.getSetting('proxy_host')
