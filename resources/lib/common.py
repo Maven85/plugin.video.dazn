@@ -338,13 +338,14 @@ class Common():
 
 
     def get_cdn(self, cdns):
-        if self.select_cdn:
-            ret = self.get_dialog().select(self.get_string(30023), cdns)
-            if not ret == -1:
-                self.preferred_cdn = cdns[ret]
-                self.set_setting('preferred_cdn', self.preferred_cdn)
-                self.set_setting('select_cdn', 'false')
-        return self.preferred_cdn
+        if not self.select_cdn:
+            return ''
+
+        ret = self.get_dialog().select(self.get_string(30023), cdns)
+        if not ret == -1:
+            return cdns[ret]
+        else:
+            return None
 
 
     def validate_pin(self, pin):

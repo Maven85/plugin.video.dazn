@@ -38,7 +38,7 @@
         <setting label="30021" type="action" id="is_settings" action="RunPlugin(plugin://plugin.video.dazn/?mode=is_settings)" option="close"/>
         <setting label="30022" type="number" id="max_bw" default="0"/>
         <setting label="30023" type="bool" id="select_cdn" default="false"/>
-        <setting label="30024" type="text" id="preferred_cdn" enable="false" default=""/>
+        <setting label="30024" type="text" id="preferred_cdn" enable="false" default="" visible="false"/>
     </category>
     <category label="30030">
 		<setting label="30031" type="bool" id="verify_ssl_certificates" default="true" enable="eq(2,false)" visible="false"/>

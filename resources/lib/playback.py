@@ -25,7 +25,7 @@ class Playback:
 
 
     def clean_name(self, cdns):
-        return [cdn.replace('live', '').replace('vod', '') for cdn in cdns]
+        return [cdn.replace('live', '').replace('vod', '').rstrip('-') for cdn in cdns]
 
 
     def get_detail(self, asset, precision, details):
@@ -35,18 +35,11 @@ class Playback:
             self.Cdns = self.clean_name(precision['Cdns'])
         if self.Cdns:
             cdn = self.plugin.get_cdn(self.Cdns)
-            if cdn:
+            if cdn is not None:
                 self.parse_detail(details, cdn)
-            else:
-                for i in self.Cdns:
-                    self.parse_detail(details, i)
-                    if self.ManifestUrl:
-                        break
-        if not self.ManifestUrl:
-            self.parse_detail(details)
 
 
-    def parse_detail(self, details, cdn=''):
+    def parse_detail(self, details, cdn):
         for i in details:
             if cdn == self.clean_name([i['CdnName']])[0] or not cdn:
                 manifestUrl = None
