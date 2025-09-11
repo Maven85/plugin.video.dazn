@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.dazn" version="1.4.20+nexus.1" name="DAZN" provider-name="Jin, Maven">
+<addon id="plugin.video.dazn" version="1.4.21+nexus.1" name="DAZN" provider-name="Jin, Maven">
     <requires>
         <import addon="xbmc.python" version="3.0.1"/>
         <import addon="script.module.inputstreamhelper"/>
@@ -12,6 +12,8 @@
     <extension point="xbmc.addon.metadata">
         <reuselanguageinvoker>true</reuselanguageinvoker>
         <news>
+V1.4.21
+- fix: improve CDN selection logic
 V1.4.20
 - refactor: remove unused import
 - fix: retrieve EPG data twice, as data may not be correct the first time
