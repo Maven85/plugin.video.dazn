@@ -15,16 +15,18 @@ class Request:
     def __init__(self, addon, proxy_use):
         self.ctx = create_urllib3_context()
         self.ctx.load_default_certs()
+        self.ctx.post_handshake_auth = False
 
         self.proxy_use = proxy_use
         self.proxy_host = addon.getSetting('proxy_host')
         self.proxy_port = addon.getSetting('proxy_port')
 
-        self.pool_manager = PoolManager(ssl_context=self.ctx)
+        self.pool_manager_1 = PoolManager()
+        self.pool_manager_2 = PoolManager(ssl_context=self.ctx)
         self.proxy_manager = ProxyManager(f'http://{self.proxy_host}:{self.proxy_port}')
 
 
-    def exchange(self, url, headers=None, params=None, data=None, json=None, fields=None, method=None):
+    def exchange(self, url, headers=None, params=None, data=None, json=None, fields=None, method=None, verify_ssl_certs=True):
         if self.proxy_use == True and url.startswith('https'):
                 url = url.replace('https', 'http')
                 if not params:
@@ -32,7 +34,7 @@ class Request:
                 else:
                     params.update({'originschema': 'https'})
 
-        with self.proxy_manager if self.proxy_use == True else self.pool_manager as pool:
+        with self.proxy_manager if self.proxy_use == True else self.pool_manager_1 if verify_ssl_certs else self.pool_manager_2 as pool:
             if data or json or fields:
                 if params:
                     url = f'{url}?{urlencode(params)}'

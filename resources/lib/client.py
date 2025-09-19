@@ -22,7 +22,6 @@ class Client:
         self.MAX_REGISTRABLE_DEVICES = self.plugin.get_setting('max_registrable_devices')
         self.ENTITLEMENT_ID = self.plugin.get_setting('entitlement_id')
         self.ENTITLEMENTS = self.plugin.get_setting('entitlements').split(',')
-        self.POST_DATA = {}
         self.ERRORS = 0
         self.MONITOR = Monitor()
 
@@ -31,8 +30,6 @@ class Client:
             'Referer': self.plugin.api_base,
             'User-Agent': self.plugin.get_user_agent()
         }
-
-        self.PARAMS = {}
 
         self.STARTUP = 'https://startup.core.indazn.com/v1/main/web'
         self.RAIL = self.plugin.get_setting('api_endpoint_rail')
@@ -48,28 +45,28 @@ class Client:
         self.DEVICES = self.plugin.get_setting('api_endpoint_devices')
 
 
-    def content_data(self, url):
-        data = self.request(url)
+    def content_data(self, url, params={}, headers={}):
+        data = self.request(url, params=params, headers=headers)
         if data.get('odata.error', None):
             self.errorHandler(data)
         return data
 
 
-    def rails(self, id_, params=''):
-        self.PARAMS = {}
-        self.PARAMS['country'] = self.COUNTRY
-        self.PARAMS['groupId'] = id_
-        if params:
-            self.PARAMS['params'] = params
+    def rails(self, id_, params_=''):
+        params = {}
+        params['country'] = self.COUNTRY
+        params['groupId'] = id_
+        if params_:
+            params['params'] = params_
         if self.ENTITLEMENT_ID:
-            self.PARAMS['userEntitlements'] = self.ENTITLEMENT_ID
-        content_data = self.content_data(self.RAILS)
+            params['userEntitlements'] = self.ENTITLEMENT_ID
+        content_data = self.content_data(self.RAILS, params=params, headers=self.HEADERS)
         for rail in content_data.get('Rails', []):
             id_ = rail.get('Id')
             resource = self.plugin.get_resource(id_, prefix='browseui_railHeader')
             title = resource.get('text')
             if resource.get('found') == False:
-                rail_data = self.railFromCache(id_, rail.get('Params', params))
+                rail_data = self.railFromCache(id_, rail.get('Params', params_))
                 title = rail_data.get('Title', rail.get('Id')) if isinstance(rail_data, dict) else rail.get('Id')
             else:
                 title = resource.get('text')
@@ -77,68 +74,69 @@ class Client:
         return content_data
 
 
-    def railFromCache(self, id_, params=''):
-        return self.plugin.railCache.cacheFunction(self.rail, id_, params)
+    def railFromCache(self, id_, params_=''):
+        return self.plugin.railCache.cacheFunction(self.rail, id_, params_)
 
 
-    def rail(self, id_, params=''):
-        self.PARAMS = {}
-        self.PARAMS['languageCode'] = self.LANGUAGE
-        self.PARAMS['country'] = self.COUNTRY
-        self.PARAMS['id'] = id_
-        self.PARAMS['params'] = params
-        return self.content_data(self.RAIL)
+    def rail(self, id_, params_=''):
+        params = {}
+        params['languageCode'] = self.LANGUAGE
+        params['country'] = self.COUNTRY
+        params['id'] = id_
+        params['params'] = params_
+        return self.content_data(self.RAIL, params=params, headers=self.HEADERS)
 
 
-    def epg(self, params):
-        self.PARAMS = {}
-        self.PARAMS['languageCode'] = self.LANGUAGE
-        self.PARAMS['country'] = self.COUNTRY
-        self.PARAMS['startDate'] = params
-        self.PARAMS['endDate'] = params
+    def epg(self, params_):
+        params = {}
+        params['languageCode'] = self.LANGUAGE
+        params['country'] = self.COUNTRY
+        params['startDate'] = params_
+        params['endDate'] = params_
         epg_data = {}
         i = 0
         while i < 2 and not self.MONITOR.abortRequested():
-            epg_data = self.content_data(self.EPG)
+            epg_data = self.content_data(self.EPG, params=params, headers=self.HEADERS)
             i += 1
             self.MONITOR.waitForAbort(1)
         return epg_data
 
 
     def event(self, id_):
-        self.PARAMS = {}
-        self.PARAMS['languageCode'] = self.LANGUAGE
-        self.PARAMS['country'] = self.COUNTRY
-        self.PARAMS['id'] = id_
-        return self.content_data(self.EVENT)
+        params = {}
+        params['languageCode'] = self.LANGUAGE
+        params['country'] = self.COUNTRY
+        params['id'] = id_
+        return self.content_data(self.EVENT, params=params, headers=self.HEADERS)
 
 
     def resources(self):
-        self.PARAMS = {}
-        self.PARAMS['languageCode'] = self.LANGUAGE
-        self.PARAMS['region'] = self.COUNTRY
-        self.PARAMS['platform'] = 'web'
-        self.plugin.cache(self.RESOURCES, self.content_data(self.RESOURCES))
+        params = {}
+        params['languageCode'] = self.LANGUAGE
+        params['region'] = self.COUNTRY
+        params['platform'] = 'web'
+        self.plugin.cache(self.RESOURCES, self.content_data(self.RESOURCES, params=params, headers=self.HEADERS))
 
 
     def playback_data(self, id_):
-        self.HEADERS['authorization'] = f'Bearer {self.TOKEN}'
-        self.HEADERS['x-dazn-device'] = self.DEVICE_ID
-        self.PARAMS = {}
-        self.PARAMS['AppVersion'] = '0.70.2'
-        self.PARAMS['DrmType'] = 'WIDEVINE'
-        self.PARAMS['Format'] = 'MPEG-DASH'
-        self.PARAMS['PlayerId'] = '@dazn/peng-html5-core/web/web'
-        self.PARAMS['Platform'] = 'web'
-        self.PARAMS['LanguageCode'] = self.LANGUAGE
-        self.PARAMS['Model'] = 'unknown'
-        self.PARAMS['Secure'] = 'true'
-        self.PARAMS['Manufacturer'] = 'unknown'
-        self.PARAMS['PlayReadyInitiator'] = 'false'
-        self.PARAMS['Capabilities'] = 'mta'
-        self.PARAMS['MtaLanguageCode'] = ''
-        self.PARAMS['AssetId'] = id_
-        return self.request(self.PLAYBACK)
+        headers = self.HEADERS.copy()
+        headers['authorization'] = f'Bearer {self.TOKEN}'
+        headers['x-dazn-device'] = self.DEVICE_ID
+        params = {}
+        params['AppVersion'] = '0.70.2'
+        params['DrmType'] = 'WIDEVINE'
+        params['Format'] = 'MPEG-DASH'
+        params['PlayerId'] = '@dazn/peng-html5-core/web/web'
+        params['Platform'] = 'web'
+        params['LanguageCode'] = self.LANGUAGE
+        params['Model'] = 'unknown'
+        params['Secure'] = 'true'
+        params['Manufacturer'] = 'unknown'
+        params['PlayReadyInitiator'] = 'false'
+        params['Capabilities'] = 'mta'
+        params['MtaLanguageCode'] = ''
+        params['AssetId'] = id_
+        return self.request(self.PLAYBACK, params=params, headers=headers)
 
 
     def playback(self, id_, pin):
@@ -153,8 +151,9 @@ class Client:
 
 
     def userProfile(self):
-        self.HEADERS['authorization'] = f'Bearer {self.TOKEN}'
-        data = self.request(self.PROFILE)
+        headers = self.HEADERS.copy()
+        headers['authorization'] = f'Bearer {self.TOKEN}'
+        data = self.request(self.PROFILE, headers=headers)
         if data.get('odata.error', None):
             self.errorHandler(data)
         else:
@@ -194,14 +193,15 @@ class Client:
     def signIn(self):
         credentials = self.credential.get_credentials()
         if credentials:
-            self.HEADERS['x-dazn-ua'] = f'{self.plugin.get_user_agent()} signin/4.53.12-reset-flow.0.17300 hyper/0.14.0 (web; production; de)'
-            self.POST_DATA = {
+            headers = self.HEADERS.copy()
+            headers['x-dazn-ua'] = f'{self.plugin.get_user_agent()} signin/4.59.26.22300 hyper/0.14.0 (web; production; de)'
+            data = {
                 'Email': credentials['email'],
                 'Password': credentials['password'],
                 'DeviceId': self.DEVICE_ID,
                 'Platform': 'web'
             }
-            data = self.request(self.SIGNIN)
+            data = self.request(self.SIGNIN, data=data, headers=headers, verify_ssl_certs=False)
             if data.get('odata.error', None):
                 self.errorHandler(data)
             else:
@@ -214,22 +214,24 @@ class Client:
 
     def signOut(self):
         if self.TOKEN:
-            self.HEADERS['authorization'] = f'Bearer {self.TOKEN}'
-            self.POST_DATA = {
+            headers = self.HEADERS.copy()
+            headers['authorization'] = f'Bearer {self.TOKEN}'
+            data = {
                 'DeviceId': self.DEVICE_ID
             }
-            r = self.request(self.SIGNOUT)
+            r = self.request(self.SIGNOUT, data=data, headers=headers)
         self.TOKEN = ''
         self.plugin.set_setting('token', self.TOKEN)
         self.plugin.set_setting('device_id', '')
 
 
     def refreshToken(self):
-        self.HEADERS['authorization'] = f'Bearer {self.TOKEN}'
-        self.POST_DATA = {
+        headers = self.HEADERS.copy()
+        headers['authorization'] = f'Bearer {self.TOKEN}'
+        data = {
             'DeviceId': self.DEVICE_ID
         }
-        data = self.request(self.REFRESH)
+        data = self.request(self.REFRESH, data=data, headers=headers)
         if data.get('odata.error', None):
             self.signOut()
             self.errorHandler(data)
@@ -238,8 +240,9 @@ class Client:
 
 
     def playableDevices(self):
-        self.HEADERS['authorization'] = f'Bearer {self.TOKEN}'
-        data = self.request(self.DEVICES)
+        headers = self.HEADERS.copy()
+        headers['authorization'] = f'Bearer {self.TOKEN}'
+        data = self.request(self.DEVICES, headers=headers)
         if data.get('odata.error', None):
             self.errorHandler(data)
             return None
@@ -253,12 +256,12 @@ class Client:
 
 
     def initStartupData(self):
-        self.POST_DATA = {
+        params = {
             'Platform': 'web',
             'LandingPageKey': 'generic',
             'Brand': 'dazn'
         }
-        return self.request(self.STARTUP)
+        return self.request(self.STARTUP, params=params, headers=self.HEADERS)
 
 
     def initApiEndpoints(self, endpoints_dict):
@@ -298,11 +301,8 @@ class Client:
             self.plugin.dialog_ok(self.plugin.get_resource('error_2003_notAvailableInCountry').get('text'))
 
 
-    def request(self, url):
-        res = self.requests.exchange(url, params=self.PARAMS, json=self.POST_DATA, headers=self.HEADERS)
-
-        if self.POST_DATA:
-            self.POST_DATA = {}
+    def request(self, url, params={}, data={}, headers={}, verify_ssl_certs=True):
+        res = self.requests.exchange(url, params=params, json=data, headers=headers, verify_ssl_certs=verify_ssl_certs)
 
         if res.data and self.plugin.get_dict_value(res.headers, 'content-type').startswith('application/json'):
             return res.json()
@@ -329,7 +329,9 @@ class Client:
         elif (code == '401' or code == '10033') and self.ERRORS < 3:
             self.signIn()
         elif code == '3001':
-            self.startUp()
+            startup_data = self.initStartupData()
+            region = self.initRegion(startup_data)
+            self.startUp(region)
         elif code == '10049':
             self.plugin.dialog_ok(self.plugin.get_resource('signin_errormessage').get('text'))
         elif code == '10450' and self.ERRORS < 3:
