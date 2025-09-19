@@ -34,7 +34,7 @@ class Client:
 
         self.PARAMS = {}
 
-        self.STARTUP = 'https://startup.core.indazn.com/misl/v5/Startup'
+        self.STARTUP = 'https://startup.core.indazn.com/v1/main/web'
         self.RAIL = self.plugin.get_setting('api_endpoint_rail')
         self.RAILS = self.plugin.get_setting('api_endpoint_rails')
         self.EPG = self.plugin.get_setting('api_endpoint_epg')
@@ -254,13 +254,9 @@ class Client:
 
     def initStartupData(self):
         self.POST_DATA = {
-            'LandingPageKey': 'generic',
-            'Languages': f'{self.LANGUAGE}-{self.COUNTRY}',
-            'Manufacturer': '',
             'Platform': 'web',
-            'PlatformAttributes': {},
-            'PromoCode': '',
-            'Version': '2'
+            'LandingPageKey': 'generic',
+            'Brand': 'dazn'
         }
         return self.request(self.STARTUP)
 
