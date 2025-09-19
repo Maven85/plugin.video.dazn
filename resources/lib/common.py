@@ -55,7 +55,7 @@ class Common():
         self.max_bw = self.addon.getSetting('max_bw')
         self.resources = self.addon.getSetting('api_endpoint_resource_strings')
         self.kodi_version = int(xbmc.getInfoLabel('System.BuildVersion').split('.')[0])
-        self.user_agent_suffix = 'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36'
+        self.user_agent_suffix = 'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36'
         self.user_agent = f'Mozilla/5.0 (Windows NT 10.0; Win64; x64) {self.user_agent_suffix}'
         self.android_properties = {}
 
@@ -369,6 +369,9 @@ class Common():
 
 
     def init_api_endpoints(self, service_dict):
+        from ..modules.urllib3 import PoolManager
+        pool_manager = PoolManager()
+
         endpoint_dict = dict()
         endpoint_def_dict = dict(
                         api_endpoint_rail='Rail',
@@ -383,17 +386,30 @@ class Common():
                         api_endpoint_resource_strings='ResourceStrings',
                         api_endpoint_devices='Devices'
                         )
-        for key, value in endpoint_def_dict.items():
-            endpoint_key_list = list(service_dict.get(value).get('Versions'))
-            endpoint_key_list.sort(key=lambda x: '{0:0>8}'.format(x).lower())
-            last_key = endpoint_key_list[-1]
-            service_path = service_dict.get(value).get('Versions').get(last_key).get('ServicePath')
-            if value == 'UserProfile' and service_path.lower().endswith('/userprofile') == False:
-                service_path += 'userprofile' if service_path.endswith('/') else '/userprofile'
-            self.set_setting(key, service_path)
-            endpoint_dict.update({key: service_path})
-            if key == 'api_endpoint_resource_strings':
-                self.resources = service_path
+        with pool_manager as pool:
+            for key, value in endpoint_def_dict.items():
+                endpoint_key_list = list(service_dict.get(value).get('Versions'))
+                endpoint_key_list.sort(key=lambda x: '{0:0>8}'.format(x).lower())
+                index = -1
+                service_path = None
+                while service_path is None:
+                    last_key = endpoint_key_list[index]
+                    service_path = service_dict.get(value).get('Versions').get(last_key).get('ServicePath')
+                    if value == 'UserProfile' and service_path.lower().endswith('/userprofile') == False:
+                        service_path += 'userprofile' if service_path.endswith('/') else '/userprofile'
+                    # if self.get_setting(key) != service_path:
+                    if key in ['api_endpoint_signout', 'api_endpoint_refresh_access_token']:
+                        method = 'POST'
+                    else:
+                        method = 'GET'
+                    res = pool.request(method, service_path)
+                    if res.status == 404:
+                        index -= 1
+                        service_path = None
+                self.set_setting(key, service_path)
+                endpoint_dict.update({key: service_path})
+                if key == 'api_endpoint_resource_strings':
+                    self.resources = service_path
 
         return endpoint_dict
 

@@ -270,7 +270,7 @@ class Client:
         self.RAILS = endpoints_dict.get('api_endpoint_rails')
         self.EPG = endpoints_dict.get('api_endpoint_epg')
         self.EVENT = endpoints_dict.get('api_endpoint_event')
-        self.PLAYBACK = self.plugin.get_setting('api_endpoint_playback')
+        self.PLAYBACK = endpoints_dict.get('api_endpoint_playback')
         self.SIGNIN = endpoints_dict.get('api_endpoint_signin')
         self.SIGNOUT = endpoints_dict.get('api_endpoint_signout')
         self.REFRESH = endpoints_dict.get('api_endpoint_refresh_access_token')
