@@ -1,50 +1,519 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<settings>
-    <category label="30000">
-    	<setting label="30001" type="bool" id="save_login" default="false"/>
-        <setting label="30002" type="action" id="logout" action="RunPlugin(plugin://plugin.video.dazn/?mode=logout)" option="close"/>
-        <setting label="country" type="text" id="country" default="" visible="false"/>
-        <setting label="language" type="text" id="language" default="en" visible="false"/>
-        <setting label="device_id" type="text" id="device_id" default="" visible="false"/>
-        <setting label="viewer_id" type="text" id="viewer_id" default="" visible="false"/>
-        <setting label="portability" type="text" id="portability" default="" visible="false"/>
-        <setting label="token" type="text" id="token" default="" visible="false"/>
-        <setting label="api_endpoint_rail" type="text" id="api_endpoint_rail" default="" visible="false"/>
-        <setting label="api_endpoint_rails" type="text" id="api_endpoint_rails" default="" visible="false"/>
-        <setting label="api_endpoint_epg" type="text" id="api_endpoint_epg" default="" visible="false"/>
-        <setting label="api_endpoint_event" type="text" id="api_endpoint_event" default="" visible="false"/>
-        <setting label="api_endpoint_playback" type="text" id="api_endpoint_playback" default="" visible="false"/>
-        <setting label="api_endpoint_signin" type="text" id="api_endpoint_signin" default="" visible="false"/>
-        <setting label="api_endpoint_signout" type="text" id="api_endpoint_signout" default="" visible="false"/>
-        <setting label="api_endpoint_refresh_access_token" type="text" id="api_endpoint_refresh_access_token" default="" visible="false"/>
-        <setting label="api_endpoint_userprofile" type="text" id="api_endpoint_userprofile" default="" visible="false"/>
-        <setting label="api_endpoint_resource_strings" type="text" id="api_endpoint_resource_strings" default="" visible="false"/>
-        <setting label="api_endpoint_devices" type="text" id="api_endpoint_devices" default="" visible="false"/>
-        <setting label="startup" type="bool" id="startup" default="true" visible="false"/>
-        <setting label="email" type="text" id="email" default="" visible="false"/>
-        <setting label="password" type="text" id="password" default="" visible="false"/>
-        <setting label="max_registrable_devices" type="text" id="max_registrable_devices" default="" visible="false"/>
-        <setting label="entitlement_id" type="text" id="entitlement_id" default="" visible="false"/>
-        <setting label="entitlements" type="text" id="entitlements" default="" visible="false"/>
-    </category>
-    <category label="30010">
-        <setting label="30011" type="bool" id="force_view" default="false"/>
-        <setting label="30012" type="select" id="content" enable="eq(-1,true)" values="videos|movies|tvshows|episodes|musicvideos" default="videos"/>
-        <setting label="30013" type="number" id="view_id" enable="eq(-2,true)" default="55"/>
-        <setting label="30014" type="number" id="view_id_videos" enable="eq(-3,true)" default="55"/>
-        <setting label="30015" type="number" id="view_id_epg" enable="eq(-4,true)" default="55"/>
-    </category>
-    <category label="30020">
-        <setting label="30021" type="action" id="is_settings" action="RunPlugin(plugin://plugin.video.dazn/?mode=is_settings)" option="close"/>
-        <setting label="30022" type="number" id="max_bw" default="0"/>
-        <setting label="30023" type="bool" id="select_cdn" default="false"/>
-        <setting label="30024" type="text" id="preferred_cdn" enable="false" default="" visible="false"/>
-    </category>
-    <category label="30030">
-		<setting label="30031" type="bool" id="verify_ssl_certificates" default="true" enable="eq(2,false)" visible="false"/>
-		<setting type="sep"/>
-		<setting label="30032" type="bool" id="proxy_use" default="false"/>
-		<setting label="30033" type="ipaddress" id="proxy_host" default="127.0.0.1" visible="eq(-1,true)"/>
-		<setting label="30034" type="number" id="proxy_port" default="8012" visible="eq(-2,true)"/>
-	</category>
+<?xml version="1.0" ?>
+<settings version="1">
+	<section id="plugin.video.dazn">
+		<category id="account" label="30000" help="">
+			<group id="1">
+				<setting id="save_login" type="boolean" label="30001" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="logout" type="action" label="30002" help="">
+					<level>0</level>
+					<data>RunPlugin(plugin://plugin.video.dazn/?mode=logout)</data>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="button" format="action">
+						<close>true</close>
+					</control>
+				</setting>
+				<setting id="country" type="string" label="country" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>country</heading>
+					</control>
+				</setting>
+				<setting id="language" type="string" label="language" help="">
+					<level>0</level>
+					<default>en</default>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>language</heading>
+					</control>
+				</setting>
+				<setting id="device_id" type="string" label="device_id" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>device_id</heading>
+					</control>
+				</setting>
+				<setting id="viewer_id" type="string" label="viewer_id" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>viewer_id</heading>
+					</control>
+				</setting>
+				<setting id="portability" type="string" label="portability" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>portability</heading>
+					</control>
+				</setting>
+				<setting id="token" type="string" label="token" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>token</heading>
+					</control>
+				</setting>
+				<setting id="api_endpoint_rail" type="string" label="api_endpoint_rail" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>api_endpoint_rail</heading>
+					</control>
+				</setting>
+				<setting id="api_endpoint_rails" type="string" label="api_endpoint_rails" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>api_endpoint_rails</heading>
+					</control>
+				</setting>
+				<setting id="api_endpoint_epg" type="string" label="api_endpoint_epg" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>api_endpoint_epg</heading>
+					</control>
+				</setting>
+				<setting id="api_endpoint_event" type="string" label="api_endpoint_event" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>api_endpoint_event</heading>
+					</control>
+				</setting>
+				<setting id="api_endpoint_playback" type="string" label="api_endpoint_playback" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>api_endpoint_playback</heading>
+					</control>
+				</setting>
+				<setting id="api_endpoint_signin" type="string" label="api_endpoint_signin" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>api_endpoint_signin</heading>
+					</control>
+				</setting>
+				<setting id="api_endpoint_signout" type="string" label="api_endpoint_signout" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>api_endpoint_signout</heading>
+					</control>
+				</setting>
+				<setting id="api_endpoint_refresh_access_token" type="string" label="api_endpoint_refresh_access_token" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>api_endpoint_refresh_access_token</heading>
+					</control>
+				</setting>
+				<setting id="api_endpoint_userprofile" type="string" label="api_endpoint_userprofile" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>api_endpoint_userprofile</heading>
+					</control>
+				</setting>
+				<setting id="api_endpoint_resource_strings" type="string" label="api_endpoint_resource_strings" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>api_endpoint_resource_strings</heading>
+					</control>
+				</setting>
+				<setting id="api_endpoint_devices" type="string" label="api_endpoint_devices" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>api_endpoint_devices</heading>
+					</control>
+				</setting>
+				<setting id="startup" type="boolean" label="startup" help="">
+					<level>0</level>
+					<default>true</default>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="email" type="string" label="email" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>email</heading>
+					</control>
+				</setting>
+				<setting id="password" type="string" label="password" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>password</heading>
+					</control>
+				</setting>
+				<setting id="max_registrable_devices" type="string" label="max_registrable_devices" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>max_registrable_devices</heading>
+					</control>
+				</setting>
+				<setting id="entitlement_id" type="string" label="entitlement_id" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>entitlement_id</heading>
+					</control>
+				</setting>
+				<setting id="entitlements" type="string" label="entitlements" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>entitlements</heading>
+					</control>
+				</setting>
+			</group>
+		</category>
+		<category id="view" label="30010" help="">
+			<group id="1">
+				<setting id="force_view" type="boolean" label="30011" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="content" type="string" label="30012" help="">
+					<level>0</level>
+					<default>videos</default>
+					<constraints>
+						<options>
+							<option>videos</option>
+							<option>movies</option>
+							<option>tvshows</option>
+							<option>episodes</option>
+							<option>musicvideos</option>
+						</options>
+					</constraints>
+					<dependencies>
+						<dependency type="enable">
+							<condition operator="is" setting="force_view">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="list" format="string">
+						<heading>30012</heading>
+					</control>
+				</setting>
+				<setting id="view_id" type="integer" label="30013" help="">
+					<level>0</level>
+					<default>55</default>
+					<dependencies>
+						<dependency type="enable">
+							<condition operator="is" setting="force_view">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="integer">
+						<heading>30013</heading>
+					</control>
+				</setting>
+				<setting id="view_id_videos" type="integer" label="30014" help="">
+					<level>0</level>
+					<default>55</default>
+					<dependencies>
+						<dependency type="enable">
+							<condition operator="is" setting="force_view">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="integer">
+						<heading>30014</heading>
+					</control>
+				</setting>
+				<setting id="view_id_epg" type="integer" label="30015" help="">
+					<level>0</level>
+					<default>55</default>
+					<dependencies>
+						<dependency type="enable">
+							<condition operator="is" setting="force_view">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="integer">
+						<heading>30015</heading>
+					</control>
+				</setting>
+			</group>
+		</category>
+		<category id="videoplayer" label="30020" help="">
+			<group id="1">
+				<setting id="is_settings" type="action" label="30021" help="">
+					<level>0</level>
+					<data>RunPlugin(plugin://plugin.video.dazn/?mode=is_settings)</data>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="button" format="action">
+						<close>true</close>
+					</control>
+				</setting>
+				<setting id="max_bw" type="integer" label="30022" help="">
+					<level>0</level>
+					<default>0</default>
+					<control type="edit" format="integer">
+						<heading>30022</heading>
+					</control>
+				</setting>
+				<setting id="select_cdn" type="boolean" label="30023" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="preferred_cdn" type="string" label="30024" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="enable">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>30024</heading>
+					</control>
+				</setting>
+			</group>
+		</category>
+		<category id="proxy" label="30030" help="">
+			<group id="1">
+				<setting id="verify_ssl_certificates" type="boolean" label="30031" help="">
+					<level>0</level>
+					<default>true</default>
+					<dependencies>
+						<dependency type="enable">
+							<condition operator="is" setting="proxy_use">false</condition>
+						</dependency>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+			</group>
+			<group id="2">
+				<setting id="proxy_use" type="boolean" label="30032" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="proxy_host" type="string" label="30033" help="">
+					<level>0</level>
+					<default>127.0.0.1</default>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="proxy_use">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="ip">
+						<heading>30033</heading>
+					</control>
+				</setting>
+				<setting id="proxy_port" type="integer" label="30034" help="">
+					<level>0</level>
+					<default>8012</default>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="proxy_use">true</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="integer">
+						<heading>30034</heading>
+					</control>
+				</setting>
+			</group>
+		</category>
+	</section>
 </settings>
