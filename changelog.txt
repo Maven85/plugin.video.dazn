@@ -1,0 +1,19 @@
+1.4.22
+- chore: update settings.xml structure
+- refactor: request handling
+- feat: update startup URL and modify initStartupData payload
+- fix: improve API endpoint initialization
+1.4.21
+- fix: improve CDN selection logic
+1.4.20
+- fix: enable SSL certificate verification by default
+- refactor: proxy handling
+- fix: retrieve EPG data twice, as data may not be correct the first
+- refactor: remove unused import
+1.4.19
+- feat: support for EPG endpoint with date range
+- refactor: remove TLS version handling from request methods
+- feat: added urllib3 module
+- feat: enhance initStartupData with improved language formatting and
+additional attributes
+- feat: update proxy handling and manifest URL processing
