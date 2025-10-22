@@ -38,7 +38,13 @@ def router(args):
     verify_age = True if args.get('verify_age', [''])[0] == 'True' else False
     dolby = True if args.get('dolby', [''])[0] == 'True' else False
     if mode == 'rails':
-        parser.rails_items(client.rails(id_, params), id_)
+        entries = None
+        content_id = 'Home' if id_.lower() == 'home' else None
+        if params and id_.lower() == 'competition':
+                content_id = [i.split(':')[1] for i in params.split(';') if i.startswith('ContentType')][0] + ':' + [i.split(':')[1] for i in params.split(';') if i.startswith('ContentId')][0]
+        if content_id:
+            entries = client.entries(content_id, 'CatalogueBanners')
+        parser.rails_items(client.rails(id_, params), id_, entries)
     elif 'rail' in mode:
         parser.rail_items(client.rail(id_, params), mode)
     elif 'epg' in mode:

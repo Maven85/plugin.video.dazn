@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 from .context import Context
+from .entry import Entry
 from .items import Items
 from .playback import Playback
 from .rails import Rails
@@ -18,7 +19,7 @@ class Parser:
         self.items = Items(self.plugin)
 
 
-    def rails_items(self, data, id_):
+    def rails_items(self, data, id_, entry_data):
         if id_ == 'home':
             epg = {
                 'mode': 'epg',
@@ -28,6 +29,11 @@ class Parser:
             }
             epg['cm'] = Context(self.plugin).highlights(epg, mode='epg_highlights')
             self.items.add_item(epg, True)
+        if entry_data:
+            for i in entry_data.get('includes', {}).get('Entry', []):
+                item = Entry(self.plugin, i['fields']).item
+                if item.get('id') and item.get('title'):
+                    self.items.add_item(item)
         for i in data.get('Rails', []):
             item = Rails(self.plugin, i).item
             if item.get('id', '') == 'CatchUp':

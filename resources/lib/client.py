@@ -32,6 +32,7 @@ class Client:
         }
 
         self.STARTUP = 'https://startup.core.indazn.com/v1/main/web'
+        self.ENTRIES = 'https://dazn-content-proxy.sd.indazn.com/spaces/vhp9jnid12wf/environments/master/entries'
         self.RAIL = self.plugin.get_setting('api_endpoint_rail')
         self.RAILS = self.plugin.get_setting('api_endpoint_rails')
         self.EPG = self.plugin.get_setting('api_endpoint_epg')
@@ -85,6 +86,20 @@ class Client:
         params['id'] = id_
         params['params'] = params_
         return self.content_data(self.RAIL, params=params, headers=self.HEADERS)
+
+
+    def entries(self, id_, type):
+        params = {}
+        params['content_type'] = type
+        params['locale'] = f'{self.LANGUAGE.lower()}-{self.COUNTRY.upper()}'
+        params['include'] = '10'
+        params['limit'] = '1000'
+        params['fields.platform[in]'] = 'Web'
+        params['fields.countries[in]'] = self.COUNTRY.upper()
+        params['fields.pageIds[in]'] = id_
+        params['select'] = 'fields.loggedInBannerItems,fields.slideIntervalDuration,sys.id,sys.type'
+        params['fields.environment'] = 'Prod'
+        return self.content_data(self.ENTRIES, params=params, headers=self.HEADERS)
 
 
     def epg(self, params_):
@@ -304,7 +319,9 @@ class Client:
     def request(self, url, params={}, data={}, headers={}, verify_ssl_certs=True):
         res = self.requests.exchange(url, params=params, json=data, headers=headers, verify_ssl_certs=verify_ssl_certs)
 
-        if res.data and self.plugin.get_dict_value(res.headers, 'content-type').startswith('application/json'):
+        if res.data and \
+                (self.plugin.get_dict_value(res.headers, 'content-type').startswith('application/json') or \
+                 self.plugin.get_dict_value(res.headers, 'content-type').startswith('application/vnd.contentful.delivery.v1+json')):
             return res.json()
         else:
             if not res.status == 204:
