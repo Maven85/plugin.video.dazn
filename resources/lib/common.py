@@ -397,15 +397,15 @@ class Common():
                     service_path = service_dict.get(value).get('Versions').get(last_key).get('ServicePath')
                     if value == 'UserProfile' and service_path.lower().endswith('/userprofile') == False:
                         service_path += 'userprofile' if service_path.endswith('/') else '/userprofile'
-                    # if self.get_setting(key) != service_path:
-                    if key in ['api_endpoint_signout', 'api_endpoint_refresh_access_token']:
-                        method = 'POST'
-                    else:
-                        method = 'GET'
-                    res = pool.request(method, service_path)
-                    if res.status == 404:
-                        index -= 1
-                        service_path = None
+                    if self.get_setting(key) != service_path:
+                        if key in ['api_endpoint_signout', 'api_endpoint_refresh_access_token']:
+                            method = 'POST'
+                        else:
+                            method = 'GET'
+                        res = pool.request(method, service_path)
+                        if res.status == 404:
+                            index -= 1
+                            service_path = None
                 self.set_setting(key, service_path)
                 endpoint_dict.update({key: service_path})
                 if key == 'api_endpoint_resource_strings':
