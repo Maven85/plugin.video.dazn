@@ -55,13 +55,14 @@ class Client:
 
 
     def rails(self, id_, params_=''):
-        params = {}
-        params['country'] = self.COUNTRY
-        params['groupId'] = id_
+        params = {
+            'country': self.COUNTRY,
+            'groupId': id_
+        }
         if params_:
-            params['params'] = params_
+            params.update({'params': params_})
         if self.ENTITLEMENT_ID:
-            params['userEntitlements'] = self.ENTITLEMENT_ID
+            params.update({'userEntitlements': self.ENTITLEMENT_ID})
         content_data = self.content_data(self.RAILS, params=params, headers=self.HEADERS)
         for rail in content_data.get('Rails', []):
             id_ = rail.get('Id')
@@ -81,34 +82,37 @@ class Client:
 
 
     def rail(self, id_, params_=''):
-        params = {}
-        params['languageCode'] = self.LANGUAGE
-        params['country'] = self.COUNTRY
-        params['id'] = id_
-        params['params'] = params_
+        params = {
+            'languageCode': self.LANGUAGE,
+            'country': self.COUNTRY,
+            'id': id_,
+            'params': params_
+        }
         return self.content_data(self.RAIL, params=params, headers=self.HEADERS)
 
 
     def entries(self, id_, type):
-        params = {}
-        params['content_type'] = type
-        params['locale'] = f'{self.LANGUAGE.lower()}-{self.COUNTRY.upper()}'
-        params['include'] = '10'
-        params['limit'] = '1000'
-        params['fields.platform[in]'] = 'Web'
-        params['fields.countries[in]'] = self.COUNTRY.upper()
-        params['fields.pageIds[in]'] = id_
-        params['select'] = 'fields.loggedInBannerItems,fields.slideIntervalDuration,sys.id,sys.type'
-        params['fields.environment'] = 'Prod'
+        params = {
+            'content_type': type,
+            'locale': f'{self.LANGUAGE.lower()}-{self.COUNTRY.upper()}',
+            'include': '10',
+            'limit': '1000',
+            'fields.platform[in]': 'Web',
+            'fields.countries[in]': self.COUNTRY.upper(),
+            'fields.pageIds[in]': id_,
+            'select': 'fields.loggedInBannerItems,fields.slideIntervalDuration,sys.id,sys.type',
+            'fields.environment': 'Prod'
+        }
         return self.content_data(self.ENTRIES, params=params, headers=self.HEADERS)
 
 
     def epg(self, params_):
-        params = {}
-        params['languageCode'] = self.LANGUAGE
-        params['country'] = self.COUNTRY
-        params['startDate'] = params_
-        params['endDate'] = params_
+        params = {
+            'languageCode': self.LANGUAGE,
+            'country': self.COUNTRY,
+            'startDate': params_,
+            'endDate': params_
+        }
         epg_data = {}
         i = 0
         while i < 2 and not self.MONITOR.abortRequested():
@@ -119,46 +123,51 @@ class Client:
 
 
     def event(self, id_):
-        params = {}
-        params['languageCode'] = self.LANGUAGE
-        params['country'] = self.COUNTRY
-        params['id'] = id_
+        params = {
+            'languageCode': self.LANGUAGE,
+            'country': self.COUNTRY,
+            'id': id_
+        }
         return self.content_data(self.EVENT, params=params, headers=self.HEADERS)
 
 
     def resources(self):
-        params = {}
-        params['languageCode'] = self.LANGUAGE
-        params['region'] = self.COUNTRY
-        params['platform'] = 'web'
+        params = {
+            'languageCode': self.LANGUAGE,
+            'region': self.COUNTRY,
+            'platform': 'web'
+        }
         self.plugin.cache(self.RESOURCES, self.content_data(self.RESOURCES, params=params, headers=self.HEADERS))
 
 
-    def playback_data(self, id_):
+    def playback_data(self, id_, pin):
         headers = self.HEADERS.copy()
-        headers['authorization'] = f'Bearer {self.TOKEN}'
-        headers['x-dazn-device'] = self.DEVICE_ID
-        params = {}
-        params['AppVersion'] = '0.70.2'
-        params['DrmType'] = 'WIDEVINE'
-        params['Format'] = 'MPEG-DASH'
-        params['PlayerId'] = '@dazn/peng-html5-core/web/web'
-        params['Platform'] = 'web'
-        params['LanguageCode'] = self.LANGUAGE
-        params['Model'] = 'unknown'
-        params['Secure'] = 'true'
-        params['Manufacturer'] = 'unknown'
-        params['PlayReadyInitiator'] = 'false'
-        params['Capabilities'] = 'mta'
-        params['MtaLanguageCode'] = ''
-        params['AssetId'] = id_
+        headers.update({
+            'authorization': f'Bearer {self.TOKEN}',
+            'x-dazn-device': self.DEVICE_ID
+        })
+        if self.plugin.validate_pin(pin):
+            headers.update({'x-age-verification-pin': pin})
+        params = {
+            'AppVersion': '0.70.2',
+            'DrmType': 'WIDEVINE',
+            'Format': 'MPEG-DASH',
+            'PlayerId': '@dazn/peng-html5-core/web/web',
+            'Platform': 'web',
+            'LanguageCode': self.LANGUAGE,
+            'Model': 'unknown',
+            'Secure': 'true',
+            'Manufacturer': 'unknown',
+            'PlayReadyInitiator': 'false',
+            'Capabilities': 'mta',
+            'MtaLanguageCode': '',
+            'AssetId': id_
+        }
         return self.request(self.PLAYBACK, params=params, headers=headers)
 
 
     def playback(self, id_, pin):
-        if self.plugin.validate_pin(pin):
-            self.HEADERS['x-age-verification-pin'] = pin
-        data = self.playback_data(id_)
+        data = self.playback_data(id_, pin)
         if data.get('odata.error', None):
             self.errorHandler(data)
             if self.TOKEN:
@@ -168,7 +177,7 @@ class Client:
 
     def userProfile(self):
         headers = self.HEADERS.copy()
-        headers['authorization'] = f'Bearer {self.TOKEN}'
+        headers.update({'authorization': f'Bearer {self.TOKEN}'})
         data = self.request(self.PROFILE, headers=headers)
         if data.get('odata.error', None):
             self.errorHandler(data)
@@ -210,7 +219,7 @@ class Client:
         credentials = self.credential.get_credentials()
         if credentials:
             headers = self.HEADERS.copy()
-            headers['x-dazn-ua'] = f'{self.plugin.get_user_agent()} signin/4.59.26.22300 hyper/0.14.0 (web; production; de)'
+            headers.update({'x-dazn-ua': f'{self.plugin.get_user_agent()} signin/4.59.26.22300 hyper/0.14.0 (web; production; de)'})
             data = {
                 'Email': credentials['email'],
                 'Password': credentials['password'],
@@ -231,7 +240,7 @@ class Client:
     def signOut(self):
         if self.TOKEN:
             headers = self.HEADERS.copy()
-            headers['authorization'] = f'Bearer {self.TOKEN}'
+            headers.update({'authorization': f'Bearer {self.TOKEN}'})
             data = {
                 'DeviceId': self.DEVICE_ID
             }
@@ -243,7 +252,7 @@ class Client:
 
     def refreshToken(self):
         headers = self.HEADERS.copy()
-        headers['authorization'] = f'Bearer {self.TOKEN}'
+        headers.update({'authorization': f'Bearer {self.TOKEN}'})
         data = {
             'DeviceId': self.DEVICE_ID
         }
@@ -257,7 +266,7 @@ class Client:
 
     def playableDevices(self):
         headers = self.HEADERS.copy()
-        headers['authorization'] = f'Bearer {self.TOKEN}'
+        headers.update({'authorization': f'Bearer {self.TOKEN}'})
         data = self.request(self.DEVICES, headers=headers)
         if data.get('odata.error', None):
             self.errorHandler(data)

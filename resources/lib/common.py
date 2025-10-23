@@ -363,7 +363,7 @@ class Common():
 
 
     def dialog_search(self):
-        return self.get_dialog().input(f"{self.get_resource('search_placeholder').get('text')}", type=xbmcgui.INPUT_ALPHANUM)
+        return self.get_dialog().input(self.get_resource('search_placeholder').get('text'), type=xbmcgui.INPUT_ALPHANUM)
 
 
     def get_dict_value(self, dict, key):
