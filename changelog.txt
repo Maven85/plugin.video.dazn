@@ -1,3 +1,8 @@
+1.4.23
+- feat: add catalogue banner to rails handling
+- refactor: service path handling
+- feat: implement search functionality
+- refactor: streamline parameter initialization in client methods
 1.4.22
 - chore: update settings.xml structure
 - refactor: request handling
