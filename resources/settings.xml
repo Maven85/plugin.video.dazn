@@ -270,6 +270,21 @@
 						<heading>api_endpoint_devices</heading>
 					</control>
 				</setting>
+				<setting id="api_endpoint_search" type="string" label="api_endpoint_search" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>api_endpoint_search</heading>
+					</control>
+				</setting>
 				<setting id="startup" type="boolean" label="startup" help="">
 					<level>0</level>
 					<default>true</default>

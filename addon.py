@@ -6,6 +6,7 @@ from json import loads
 from sys import argv, exit
 from urllib.parse import parse_qs
 
+from xbmc import executebuiltin
 import xbmcaddon
 
 from resources.lib.api import Request
@@ -37,6 +38,7 @@ def router(args):
     params = args.get('params', [''])[0]
     verify_age = True if args.get('verify_age', [''])[0] == 'True' else False
     dolby = True if args.get('dolby', [''])[0] == 'True' else False
+    searchterm = args.get('searchterm', [''])[0]
     if mode == 'rails':
         entries = None
         content_id = 'Home' if id_.lower() == 'home' else None
@@ -58,6 +60,15 @@ def router(args):
     elif 'play_context' in mode:
         art = loads(args.get('art', [''])[0].replace('\'', '"'))
         parser.playback(client.playback(id_, plugin.youth_protection_pin(verify_age)), title, art, mode)
+    elif 'search' in mode:
+        if searchterm == '':
+            searchterm = plugin.dialog_search()
+            if searchterm == '':
+                exit(0)
+            executebuiltin(f'Container.Update({plugin.build_url(dict(mode=mode,searchterm=searchterm))}, replace)')
+        else:
+            items = client.search(searchterm)
+            parser.search_items(items)
     elif mode == 'logout':
         if plugin.logout():
             credential.clear_credentials()

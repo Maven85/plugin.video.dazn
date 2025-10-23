@@ -39,6 +39,14 @@ class Parser:
             if item.get('id', '') == 'CatchUp':
                 item['cm'] = Context(self.plugin).highlights(item, mode='rail_highlights')
             self.items.add_item(item)
+        if id_ == 'home':
+            search = {
+                'mode': 'search',
+                'title': self.plugin.get_resource('search_title').get('text'),
+                'plot': None
+            }
+            self.plugin.build_url(search)
+            self.items.add_item(search)
         self.items.list_items()
 
 
@@ -94,6 +102,20 @@ class Parser:
             self.rail_items(data, mode, list_=False, epg_=True)
             self.items.add_item(date_item(self.plugin.get_next_day(epg_date)))
         self.items.list_items(upd=update, epg=True)
+
+
+    def search_items(self, data):
+        for i in data.get('Results', []):
+            if len(i.get('Tiles', [])) > 0:
+                item = {
+                    'mode': 'play',
+                    'title': f"[COLOR gold]{self.plugin.get_resource(i['Id']).get('text')} ({len(i['Tiles'])})[/COLOR]",
+                    'plot': None
+                }
+                self.items.add_item(item)
+                self.rail_items(i, '', list_=False)
+
+        self.items.list_items()
 
 
     def playback(self, data, name='', art=None, context=None, dolby=None):

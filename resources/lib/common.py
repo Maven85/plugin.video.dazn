@@ -362,6 +362,10 @@ class Common():
         return pin
 
 
+    def dialog_search(self):
+        return self.get_dialog().input(f"{self.get_resource('search_placeholder').get('text')}", type=xbmcgui.INPUT_ALPHANUM)
+
+
     def get_dict_value(self, dict, key):
         key = key.lower()
         result = [dict[k] for k in dict if k.lower() == key]
@@ -384,7 +388,8 @@ class Common():
                         api_endpoint_refresh_access_token='RefreshAccessToken',
                         api_endpoint_userprofile='UserProfile',
                         api_endpoint_resource_strings='ResourceStrings',
-                        api_endpoint_devices='Devices'
+                        api_endpoint_devices='Devices',
+                        api_endpoint_search='SearchV2'
                         )
         with pool_manager as pool:
             for key, value in endpoint_def_dict.items():

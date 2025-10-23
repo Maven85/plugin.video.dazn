@@ -44,6 +44,7 @@ class Client:
         self.PROFILE = self.plugin.get_setting('api_endpoint_userprofile')
         self.RESOURCES = self.plugin.get_setting('api_endpoint_resource_strings')
         self.DEVICES = self.plugin.get_setting('api_endpoint_devices')
+        self.SEARCH = self.plugin.get_setting('api_endpoint_search')
 
 
     def content_data(self, url, params={}, headers={}):
@@ -291,6 +292,7 @@ class Client:
         self.PROFILE = endpoints_dict.get('api_endpoint_userprofile')
         self.RESOURCES = endpoints_dict.get('api_endpoint_resource_strings')
         self.DEVICES = endpoints_dict.get('api_endpoint_devices')
+        self.SEARCH = endpoints_dict.get('api_endpoint_search')
 
 
     def initRegion(self, startup_data):
@@ -314,6 +316,15 @@ class Client:
             self.TOKEN = ''
             self.plugin.log(f'[{self.plugin.addon_id}] version: {self.plugin.addon_version} region: {region}')
             self.plugin.dialog_ok(self.plugin.get_resource('error_2003_notAvailableInCountry').get('text'))
+
+
+    def search(self, searchterm):
+        params = {
+            'searchTerm': searchterm,
+            'langCode': self.LANGUAGE,
+            'country': self.COUNTRY
+        }
+        return self.request(self.SEARCH, params, headers=self.HEADERS)
 
 
     def request(self, url, params={}, data={}, headers={}, verify_ssl_certs=True):

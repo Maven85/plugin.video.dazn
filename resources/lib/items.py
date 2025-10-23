@@ -81,6 +81,8 @@ class Items:
             folder = False
             listitem = self.plugin.set_streaminfo(listitem, {'duration': item.get('duration', 0)})
             listitem.setProperty('IsPlayable', item.get('playable', 'false'))
+        elif 'search' in item['mode']:
+            folder = False
         else:
             folder = True
 
