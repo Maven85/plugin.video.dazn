@@ -171,7 +171,7 @@ class Client:
         if data.get('odata.error', None):
             self.errorHandler(data)
             if self.TOKEN:
-                data = self.playback_data(id_)
+                data = self.playback_data(id_, pin)
         return data
 
 
