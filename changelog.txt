@@ -1,3 +1,6 @@
+1.4.24
+- fix: license could not be received
+- feat: add setting to show only playable content
 1.4.23
 - feat: add catalogue banner to rails handling
 - refactor: service path handling
