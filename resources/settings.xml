@@ -436,6 +436,11 @@
 						<heading>30015</heading>
 					</control>
 				</setting>
+				<setting id="show_only_playable_content" type="boolean" label="30016" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
 			</group>
 		</category>
 		<category id="videoplayer" label="30020" help="">

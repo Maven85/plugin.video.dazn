@@ -108,6 +108,8 @@ class Tiles:
         if self.entitlement_ids:
             entitlements_found = [entitlement_id for entitlement_id in self.entitlement_ids if entitlement_id in self.user_entitlements]
             if len(entitlements_found) == 0:
+                if self.plugin.get_setting('show_only_playable_content') == 'true':
+                    self.item['skip'] = True
                 self.item['title'] = f"[COLOR orange]{self.item['title']}[/COLOR]"
 
         if self.start:

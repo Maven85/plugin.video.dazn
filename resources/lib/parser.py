@@ -53,6 +53,8 @@ class Parser:
     def rail_items(self, data, mode, list_=True, epg_=False):
         for i in data.get('Tiles', []):
             item = Tiles(self.plugin, i).item
+            if item.get('skip'):
+                continue
             if 'highlights' in mode:
                 if item['type'] == 'Highlights':
                     item['cm'] = Context(self.plugin).goto(item)

@@ -48,6 +48,10 @@ msgctxt "#30015"
 msgid "View: Schedule"
 msgstr "Ansicht: Vorschau"
 
+msgctxt "#30016"
+msgid "Show only playable content"
+msgstr "Nur abspielbaren Inhalt anzeigen"
+
 msgctxt "#30020"
 msgid "Video Player"
 msgstr "Video Player"

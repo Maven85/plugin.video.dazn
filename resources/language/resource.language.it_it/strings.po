@@ -48,6 +48,10 @@ msgctxt "#30015"
 msgid "View: Schedule"
 msgstr "Vista: Calendario"
 
+msgctxt "#30016"
+msgid "Show only playable content"
+msgstr "Mostra solo i contenuti riproducibili"
+
 msgctxt "#30020"
 msgid "Video Player"
 msgstr "Lettore Video"
