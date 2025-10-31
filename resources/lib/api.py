@@ -12,18 +12,23 @@ from ..modules.urllib3.util import create_urllib3_context
 class Request:
 
 
-    def __init__(self, addon, proxy_use):
-        self.ctx = create_urllib3_context()
-        self.ctx.load_default_certs()
-        self.ctx.post_handshake_auth = False
+    def __init__(self, addon, proxy_use, max_tls_version=TLSVersion.TLSv1_3):
 
         self.proxy_use = proxy_use
         self.proxy_host = addon.getSetting('proxy_host')
         self.proxy_port = addon.getSetting('proxy_port')
-
-        self.pool_manager_1 = PoolManager()
-        self.pool_manager_2 = PoolManager(ssl_context=self.ctx)
         self.proxy_manager = ProxyManager(f'http://{self.proxy_host}:{self.proxy_port}')
+
+        self.ctx = create_urllib3_context()
+        self.ctx.load_default_certs()
+        self.ctx.maximum_version = max_tls_version
+        self.pool_manager_1 = PoolManager(ssl_context=self.ctx)
+
+        self.ctx = create_urllib3_context()
+        self.ctx.load_default_certs()
+        self.ctx.post_handshake_auth = False
+        self.ctx.maximum_version = max_tls_version
+        self.pool_manager_2 = PoolManager(ssl_context=self.ctx)  
 
 
     def exchange(self, url, headers=None, params=None, data=None, json=None, fields=None, method=None, verify_ssl_certs=True):

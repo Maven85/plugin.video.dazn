@@ -4,6 +4,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from json import dumps, loads
 from threading import Thread
 from socketserver import ThreadingMixIn
+from ssl import TLSVersion
 import xbmc, xbmcaddon, xbmcgui
 
 from resources.lib.api import Request
@@ -14,7 +15,7 @@ class RequestHandler(BaseHTTPRequestHandler):
     addon = xbmcaddon.Addon()
     addon_id = addon.getAddonInfo('id')
     addonname = addon.getAddonInfo('name')
-    requests = Request(addon, False)
+    requests = Request(addon, False, TLSVersion.TLSv1_2)
     mUrls = {}
     laUrls = {}
 
@@ -57,17 +58,14 @@ class RequestHandler(BaseHTTPRequestHandler):
                     license_headers = dict(self.headers)
                     license_headers.pop('host') if 'host' in license_headers else license_headers.pop('Host')
                     cdm_request = self.requests.exchange(self.laUrls[asset_id], data=body, headers=license_headers)
-                    try:
-                        j = loads(cdm_request.data)
-                        if j.get('odata.error'):
-                            xbmcgui.Dialog().notification(self.addonname, f"{j.get('odata.error').get('message', {}).get('value', 'unknown')}", xbmcgui.NOTIFICATION_ERROR)
-                            raise Exception(f"ERROR: {j.get('odata.error').get('message', {}).get('value', 'unknown')}")
-                    except:
-                        pass
+                    if cdm_request.status != 200:
+                        xbmcgui.Dialog().notification(self.addonname, 'License request failed', xbmcgui.NOTIFICATION_ERROR)
+                        raise Exception('License request failed')
+
                     content_type = 'application/dash+xml'
                     res_body = cdm_request.data
                 except Exception as e:
-                    xbmc.log(f'exception = {e}')
+                    xbmc.log(f'exception = {e}', xbmc.LOGERROR)
                     self.send_response(500)
                     self.end_headers()
                     return
