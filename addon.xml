@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.dazn" version="1.3.27+matrix.1" name="DAZN" provider-name="Jin, Maven">
+<addon id="plugin.video.dazn" version="1.3.28+matrix.1" name="DAZN" provider-name="Jin, Maven">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.inputstreamhelper" version="0.5.0"/>
@@ -12,8 +12,11 @@
     </extension>
     <extension point="xbmc.service" library="startup.py"/>
     <extension point="xbmc.addon.metadata">
+    	<lifecyclestate type="broken" lang="en_GB">Kodi Nexus is required</lifecyclestate>
         <reuselanguageinvoker>true</reuselanguageinvoker>
         <news>
+V1.3.28
+- mark as broken
 V1.3.27
 - backport from "Nexus"
 V1.3.26
