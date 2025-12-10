@@ -149,7 +149,7 @@ class Client:
         if self.plugin.validate_pin(pin):
             headers.update({'x-age-verification-pin': pin})
         params = {
-            'AppVersion': '0.70.2',
+            'AppVersion': '0.104.0',
             'DrmType': 'WIDEVINE',
             'Format': 'MPEG-DASH',
             'PlayerId': '@dazn/peng-html5-core/web/web',
@@ -226,7 +226,7 @@ class Client:
                 'DeviceId': self.DEVICE_ID,
                 'Platform': 'web'
             }
-            data = self.request(self.SIGNIN, data=data, headers=headers, verify_ssl_certs=False)
+            data = self.request(self.SIGNIN, data=data, headers=headers)
             if data.get('odata.error', None):
                 self.errorHandler(data)
             else:

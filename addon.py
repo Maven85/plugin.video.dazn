@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 from json import loads
+from ssl import TLSVersion
 from sys import argv, exit
 from urllib.parse import parse_qs
 
@@ -24,7 +25,7 @@ plugin = Common(
     addon_handle=handle_,
     addon_url=url_
 )
-requests = Request(addon_, plugin.get_setting('proxy_use') == 'true')
+requests = Request(addon_, plugin.get_setting('proxy_use') == 'true', TLSVersion.TLSv1_2)
 credential = Credential(plugin)
 client = Client(plugin, credential, requests)
 parser = Parser(plugin, requests)

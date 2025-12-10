@@ -55,7 +55,7 @@ class Common():
         self.max_bw = self.addon.getSetting('max_bw')
         self.resources = self.addon.getSetting('api_endpoint_resource_strings')
         self.kodi_version = int(xbmc.getInfoLabel('System.BuildVersion').split('.')[0])
-        self.user_agent_suffix = 'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36'
+        self.user_agent_suffix = 'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36'
         self.user_agent = f'Mozilla/5.0 (Windows NT 10.0; Win64; x64) {self.user_agent_suffix}'
         self.android_properties = {}
 
