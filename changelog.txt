@@ -1,3 +1,5 @@
+1.4.26
+- feat: enhance related items display and update tile information
 1.4.25
 - fix: streams cannot be played
 1.4.24
