@@ -69,8 +69,6 @@ class Items:
             labels['mpaa'] = 'PG-18'
 
         title = item['title']
-        if epg == False and item.get('type', None) in ['CatchUp', 'Highlights', 'OnDemand'] and item.get('articlenav') != 'Show' and item.get('date', None):
-            title = f"{title} ({item['date']})"
         listitem = xbmcgui.ListItem(title)
         listitem.setArt(art)
         listitem = self.plugin.set_videoinfo(listitem, labels)

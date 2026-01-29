@@ -26,6 +26,8 @@ class Tiles:
         self.is_linear = i.get('IsLinear', True)
         self.entitlement_ids = i.get('EntitlementIds', [])
         self.dolby_config = i.get('dolbyConfig', [])
+        self.displaytype = i.get('DisplayType', '')
+        self.displaytypelabel = i.get('DisplayTypeLabel', '')
         if self.nav:
             self.mode = 'rails'
             self.id = i['NavigateTo']
@@ -77,12 +79,17 @@ class Tiles:
         self.item['is_linear'] = self.is_linear
         self.item['entitlement_ids'] = self.entitlement_ids
         self.item['dolby_config'] = self.dolby_config
+        self.item['displaytype'] = self.displaytype
+        self.item['displaytypelabel'] = self.displaytypelabel
 
         if self.params:
             self.item['params'] = self.params
 
         if self.videos:
             self.item['playable'] = 'true'
+
+        if self.start:
+            self.item['date'] = self.start[:10]
 
         if 'Epg' in i.get('Id', ''):
             if self.competition:
@@ -105,15 +112,18 @@ class Tiles:
             if sub_title not in self.title:
                 self.item['title'] = f'{self.title} ({sub_title})'
 
+        if self.displaytypelabel:
+            self.item['title'] = f"{self.item['title']} | {self.displaytypelabel}"
+
+        if 'Epg' not in i.get('Id', '') and self.type in ['CatchUp', 'Highlights', 'OnDemand'] and self.articlenav != 'Show' and self.item.get('date'):
+            self.item['title'] = f"{self.item['title']} ({self.item['date']})"
+
         if self.entitlement_ids:
             entitlements_found = [entitlement_id for entitlement_id in self.entitlement_ids if entitlement_id in self.user_entitlements]
             if len(entitlements_found) == 0:
                 if self.plugin.get_setting('show_only_playable_content') == 'true':
                     self.item['skip'] = True
                 self.item['title'] = f"[COLOR orange]{self.item['title']}[/COLOR]"
-
-        if self.start:
-            self.item['date'] = self.start[:10]
 
         self.item['related'] = self.related
         self.item['sport'] = self.sport

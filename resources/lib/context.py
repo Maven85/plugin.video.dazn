@@ -48,13 +48,16 @@ class Context:
 
     def related(self, cm_items):
         for i in cm_items:
-            type_ = self.plugin.get_resource(f"{i['type'].lower()}Title", 'browseui_')
-            if type_.get('found') == False:
-                type_ = self.plugin.get_resource(f"{i['type'].lower()}", 'browseui_')
-            if type_.get('found'):
-                type_ = type_.get('text')
+            if(i['displaytypelabel']):
+                type_ = i['displaytypelabel']
             else:
-                type_ = i.get('type')
+                type_ = self.plugin.get_resource(f"{i['displaytype'].lower()}Title", 'browseui_')
+                if type_.get('found') == False:
+                    type_ = self.plugin.get_resource(f"{i['displaytype'].lower()}", 'browseui_')
+                if type_.get('found'):
+                    type_ = type_.get('text')
+                else:
+                    type_ = i.get('displaytype')
 
             d = {
                 'mode': 'play_context',
