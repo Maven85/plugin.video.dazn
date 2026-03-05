@@ -1,3 +1,6 @@
+1.4.47
+- chore: update user-agent
+- fix: login is broken
 1.4.26
 - feat: enhance related items display and update tile information
 1.4.25
