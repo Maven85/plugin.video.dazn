@@ -219,7 +219,11 @@ class Client:
         credentials = self.credential.get_credentials()
         if credentials:
             headers = self.HEADERS.copy()
-            headers.update({'x-dazn-ua': f'{self.plugin.get_user_agent()} signin/4.59.26.22300 hyper/0.14.0 (web; production; de)'})
+            headers.update({
+                'x-dazn-ua': f'{self.plugin.get_user_agent()} signin/undefined hyper/0.14.0 (web; production; de)',
+                'accept-language': 'de-DE,de;q=0.9',
+                'origin': self.plugin.api_base[0:-1]
+            })
             data = {
                 'Email': credentials['email'],
                 'Password': credentials['password'],
