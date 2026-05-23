@@ -26,9 +26,16 @@ class Client:
         self.MONITOR = Monitor()
 
         self.HEADERS = {
-            'Content-Type': 'application/json',
-            'Referer': self.plugin.api_base,
-            'User-Agent': self.plugin.get_user_agent()
+            'content-type': 'application/json',
+            'referer': self.plugin.api_base,
+            'user-agent': self.plugin.get_user_agent(),
+            'accept-language': 'de-DE,de;q=0.9',
+            'sec-ch-ua': self.plugin.get_user_agent_client_hint(),
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': '\"Windows\"',
+            'sec-fetch-dest': 'empty',
+            'sec-fetch-mode': 'cors',
+            'sec-fetch-site': 'cross-site'
         }
 
         self.STARTUP = 'https://startup.core.indazn.com/v1/main/web'
@@ -144,12 +151,12 @@ class Client:
         headers = self.HEADERS.copy()
         headers.update({
             'authorization': f'Bearer {self.TOKEN}',
-            'x-dazn-device': self.DEVICE_ID
+            'x-dazn-device': self.DEVICE_ID,
         })
         if self.plugin.validate_pin(pin):
             headers.update({'x-age-verification-pin': pin})
         params = {
-            'AppVersion': '0.104.0',
+            'AppVersion': '0.134.1-hotfix.f49d418a4',
             'DrmType': 'WIDEVINE',
             'Format': 'MPEG-DASH',
             'PlayerId': '@dazn/peng-html5-core/web/web',
@@ -159,7 +166,7 @@ class Client:
             'Secure': 'true',
             'Manufacturer': 'unknown',
             'PlayReadyInitiator': 'false',
-            'Capabilities': 'mta',
+            'Capabilities': 'hcst,mta',
             'MtaLanguageCode': '',
             'AssetId': id_
         }
