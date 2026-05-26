@@ -1,3 +1,5 @@
+1.4.30
+- fix: streams stop after 5 minutes
 1.4.29
 - refactor: streamline HTTP headers management
 1.4.28
