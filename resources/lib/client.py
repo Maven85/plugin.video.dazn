@@ -25,18 +25,8 @@ class Client:
         self.ERRORS = 0
         self.MONITOR = Monitor()
 
-        self.HEADERS = {
-            'content-type': 'application/json',
-            'referer': self.plugin.api_base,
-            'user-agent': self.plugin.get_user_agent(),
-            'accept-language': 'de-DE,de;q=0.9',
-            'sec-ch-ua': self.plugin.get_user_agent_client_hint(),
-            'sec-ch-ua-mobile': '?0',
-            'sec-ch-ua-platform': '\"Windows\"',
-            'sec-fetch-dest': 'empty',
-            'sec-fetch-mode': 'cors',
-            'sec-fetch-site': 'cross-site'
-        }
+        self.HEADERS = self.plugin.get_basic_request_headers().copy()
+        self.HEADERS.update({'content-type': 'application/json'})
 
         self.STARTUP = 'https://startup.core.indazn.com/v1/main/web'
         self.ENTRIES = 'https://dazn-content-proxy.sd.indazn.com/spaces/vhp9jnid12wf/environments/master/entries'

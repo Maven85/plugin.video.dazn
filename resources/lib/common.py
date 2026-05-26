@@ -55,10 +55,20 @@ class Common():
         self.max_bw = self.addon.getSetting('max_bw')
         self.resources = self.addon.getSetting('api_endpoint_resource_strings')
         self.kodi_version = int(xbmc.getInfoLabel('System.BuildVersion').split('.')[0])
-        self.user_agent_suffix = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36'
+        self.user_agent_suffix = 'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36'
         self.user_agent = f'Mozilla/5.0 (Windows NT 10.0; Win64; x64) {self.user_agent_suffix}'
         self.user_agent_client_hint = '\"Chromium\";v=\"148\", \"Google Chrome\";v=\"148\", \"Not-A.Brand\";v=\"99\"'
         self.android_properties = {}
+        self.basic_request_headers = {
+            'referer': self.api_base,
+            'user-agent': self.user_agent,
+            'sec-ch-ua': self.user_agent_client_hint,
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': '\"Windows\"',
+            'sec-fetch-dest': 'empty',
+            'sec-fetch-mode': 'cors',
+            'sec-fetch-site': 'cross-site'
+        }
 
         self.railCache = StorageServer.StorageServer(f'{self.addon_id}.rail', 24 * 7)
 
@@ -584,5 +594,5 @@ class Common():
         return self.kodi_version
 
 
-    def get_user_agent_client_hint(self):
-        return self.user_agent_client_hint
+    def get_basic_request_headers(self):
+        return self.basic_request_headers

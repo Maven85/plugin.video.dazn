@@ -106,11 +106,13 @@ class Items:
         listitem.setContentLookup(False)
         listitem.setMimeType('application/dash+xml')
         listitem.setProperty('inputstream', 'inputstream.adaptive')
-        license_headers = urlencode({
+        common_headers = urlencode(self.plugin.get_basic_request_headers().copy())
+        license_headers = self.plugin.get_basic_request_headers().copy()
+        license_headers.update({
             'authorization': f"Bearer {self.plugin.get_setting('token')}",
-            'content-type': 'application/octet-stream',
-            'user-agent': self.plugin.get_user_agent()
+            'content-type': 'application/octet-stream'
         })
+        license_headers = urlencode(license_headers)
         license_url = f'{proxy_base_url}/license'
         kodi_version = self.plugin.get_kodi_version()
         if kodi_version >= 22:
@@ -141,10 +143,10 @@ class Items:
             listitem.setProperty('inputstream.adaptive.license_key', '|'.join(drm_cfg.values()))
             listitem.setProperty('inputstream.adaptive.manifest_type', 'mpd')
         if kodi_version >= 22:
-            listitem.setProperty('inputstream.adaptive.common_headers', urlencode({'user-agent': self.plugin.get_user_agent()}))
+            listitem.setProperty('inputstream.adaptive.common_headers', common_headers)
         else:
-            listitem.setProperty('inputstream.adaptive.manifest_headers', urlencode({'user-agent': self.plugin.get_user_agent()}))
-            listitem.setProperty('inputstream.adaptive.stream_headers', urlencode({'user-agent': self.plugin.get_user_agent()}))
+            listitem.setProperty('inputstream.adaptive.manifest_headers', common_headers)
+            listitem.setProperty('inputstream.adaptive.stream_headers', common_headers)
         if item.CdnToken:
             listitem.setProperty('inputstream.adaptive.stream_params', item.CdnToken)
         listitem.setProperty('inputstream.adaptive.chooser_bandwidth_max', self.plugin.get_max_bw())
