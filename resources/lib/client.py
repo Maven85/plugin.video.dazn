@@ -156,7 +156,7 @@ class Client:
             'Secure': 'true',
             'Manufacturer': 'unknown',
             'PlayReadyInitiator': 'false',
-            'Capabilities': 'hcst,mta',
+            'Capabilities': 'mta',
             'MtaLanguageCode': '',
             'AssetId': id_
         }
