@@ -47,7 +47,8 @@ class Tiles:
         elif 'Live' in self.type:
             self.start = self.now
         if self.start and self.end:
-            self.item['duration'] = self.plugin.timedelta_total_seconds(self.plugin.time_stamp(self.end) - self.plugin.time_stamp(self.start))
+            if not self.plugin.hide_total_playtime:
+                self.item['duration'] = self.plugin.timedelta_total_seconds(self.plugin.time_stamp(self.end) - self.plugin.time_stamp(self.start))
 
 
     def add_thumb(self, i):

@@ -49,6 +49,7 @@ class Common():
         self.view_id_videos = self.addon.getSetting('view_id_videos')
         self.view_id_epg = self.addon.getSetting('view_id_epg')
         self.force_view = self.addon.getSetting('force_view') == 'true'
+        self.hide_total_playtime = self.addon.getSetting('hide_total_playtime') == 'true'
         self.startup = self.addon.getSetting('startup') == 'true'
         self.select_cdn = self.addon.getSetting('select_cdn') == 'true'
         self.preferred_cdn = self.addon.getSetting('preferred_cdn')
