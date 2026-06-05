@@ -150,7 +150,7 @@ class Client:
             'DrmType': 'WIDEVINE',
             'Format': 'MPEG-DASH',
             'PlayerId': '@dazn/peng-html5-core/web/web',
-            'Platform': 'web',
+            'Platform': 'smarttv',
             'LanguageCode': self.LANGUAGE,
             'Model': 'unknown',
             'Secure': 'true',
