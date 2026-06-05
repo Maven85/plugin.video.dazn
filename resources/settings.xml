@@ -440,6 +440,11 @@
 					<level>0</level>
 					<default>false</default>
 					<control type="toggle"/>
+				</setting>				
+				<setting id="hide_total_playtime" type="boolean" label="30025" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
 				</setting>
 			</group>
 		</category>

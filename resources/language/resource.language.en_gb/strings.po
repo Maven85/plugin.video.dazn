@@ -72,6 +72,10 @@ msgctxt "#30024"
 msgid "Preferred CDN"
 msgstr ""
 
+msgctxt "#30025"
+msgid "Hide total playtime for replays"
+msgstr ""
+
 msgctxt "#30030"
 msgid "Connection"
 msgstr ""
