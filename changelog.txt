@@ -1,3 +1,6 @@
+1.4.31
+- feat: add option to hide playtime for replays
+- fix: streams stop after 5 minutes
 1.4.30
 - fix: streams stop after 5 minutes
 1.4.29
