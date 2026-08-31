@@ -29,6 +29,12 @@ class Parser:
             }
             epg['cm'] = Context(self.plugin).highlights(epg, mode='epg_highlights')
             self.items.add_item(epg, True)
+            live_tv = {
+                'mode': 'live-tv',
+                'title': 'Live-TV',
+                'plot': None
+            }
+            self.items.add_item(live_tv, False)
         if entry_data:
             for i in entry_data.get('includes', {}).get('Entry', []):
                 item = Entry(self.plugin, i['fields']).item
@@ -104,6 +110,28 @@ class Parser:
             self.rail_items(data, mode, list_=False, epg_=True)
             self.items.add_item(date_item(self.plugin.get_next_day(epg_date)))
         self.items.list_items(upd=update, epg=True)
+
+
+    def live_tv_items(self, data, mode, list_=True, epg_=False):
+        for i in data.get('Tiles', []):
+            item = Tiles(self.plugin, i).item
+            if item.get('skip'):
+                continue
+
+            context = Context(self.plugin)
+            if item.get('type') == 'Live' and item.get('is_linear') == False:
+                context.live(item)
+            if item.get('related', []):
+                cm_items = []
+                for i in item['related']:
+                    if i.get('Videos', []):
+                        cm_items.append(Tiles(self.plugin, i).item)
+                context.related(cm_items)
+            item['cm'] = context.goto(item)
+            self.items.add_item(item, epg_)
+        if list_:
+            focus = data.get('StartPosition', False)
+            self.items.list_items(focus)
 
 
     def search_items(self, data):

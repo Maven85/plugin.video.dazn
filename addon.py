@@ -56,6 +56,8 @@ def router(args):
         else:
             date = plugin.get_today() if params == 'today' else params
         parser.epg_items(client.epg(date), params, mode)
+    elif 'live-tv' in mode:
+        parser.live_tv_items(client.live_tv(), params, mode)
     elif mode == 'play':
         parser.playback(client.playback(id_, plugin.youth_protection_pin(verify_age)), context=mode, dolby=dolby)
     elif 'play_context' in mode:

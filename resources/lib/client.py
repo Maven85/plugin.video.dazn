@@ -119,6 +119,18 @@ class Client:
         return epg_data
 
 
+    def live_tv(self):
+        params = {
+            'platform': 'web',
+            'id': 'Livetvschedule',
+            'languageCode': self.LANGUAGE,
+            'country': self.COUNTRY,
+            'brand': 'dazn'
+        }
+        live_tv_data = self.content_data(self.RAIL, params=params, headers=self.HEADERS)
+        return live_tv_data
+
+
     def event(self, id_):
         params = {
             'languageCode': self.LANGUAGE,
