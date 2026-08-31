@@ -56,26 +56,12 @@ class Common():
         self.max_bw = self.addon.getSetting('max_bw')
         self.resources = self.addon.getSetting('api_endpoint_resource_strings')
         self.kodi_version = int(xbmc.getInfoLabel('System.BuildVersion').split('.')[0])
-        # DAZN blocks requests to the playback and the license endpoint that
-        # identify as a desktop browser but do not carry a browser challenge
-        # token. Such requests never reach the api, they are answered with an
-        # html 403 by the cdn in front of it. Identify as a smart tv instead,
-        # which matches the 'Platform' the playback request already sends.
-        # Do not change this back to a desktop browser or a desktop platform,
-        # it breaks playback.
-        self.user_agent_suffix = 'AppleWebKit/537.36 (KHTML, like Gecko) 76.0.3809.146 TV Safari/537.36'
-        self.user_agent = f'Mozilla/5.0 (SMART-TV; LINUX; Tizen 6.0) {self.user_agent_suffix}'
-        self.user_agent_client_hint = '\"Chromium\";v=\"76\", \"Not-A.Brand\";v=\"99\"'
+        self.user_agent_suffix = 'AppleWebKit/537.36 (KHTML, like Gecko) 130.0.6723.116/10.0 TV Safari/537.36'
+        self.user_agent = f'Mozilla/5.0 (SMART-TV; LINUX; Tizen 10.0) {self.user_agent_suffix}'
         self.android_properties = {}
         self.basic_request_headers = {
             'referer': self.api_base,
-            'user-agent': self.user_agent,
-            'sec-ch-ua': self.user_agent_client_hint,
-            'sec-ch-ua-mobile': '?0',
-            'sec-ch-ua-platform': '\"Linux\"',
-            'sec-fetch-dest': 'empty',
-            'sec-fetch-mode': 'cors',
-            'sec-fetch-site': 'cross-site'
+            'user-agent': self.user_agent
         }
 
         self.railCache = StorageServer.StorageServer(f'{self.addon_id}.rail', 24 * 7)
