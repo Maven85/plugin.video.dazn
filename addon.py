@@ -88,7 +88,8 @@ if __name__ == '__main__':
     paramstring = argv[2][1:]
     args = dict(parse_qs(paramstring))
 
-    if args.get('mode', ['rails'])[0] != 'logout' and (plugin.startup or not client.TOKEN):
+    mode = args.get('mode', ['rails'])[0]
+    if mode != 'logout' and (plugin.startup or not client.TOKEN):
         startup_data = client.initStartupData()
         endpoint_dict = plugin.init_api_endpoints(startup_data.get('ServiceDictionary'))
         client.initApiEndpoints(endpoint_dict)
@@ -103,7 +104,7 @@ if __name__ == '__main__':
         else:
             client.TOKEN = ''
 
-    if client.TOKEN and client.DEVICE_ID:
+    if (client.TOKEN and client.DEVICE_ID) or mode == 'logout':
         router(args)
     else:
         exit(0)
