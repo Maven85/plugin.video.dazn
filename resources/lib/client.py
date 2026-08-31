@@ -146,7 +146,7 @@ class Client:
         if self.plugin.validate_pin(pin):
             headers.update({'x-age-verification-pin': pin})
         params = {
-            'AppVersion': '0.134.1-hotfix.f49d418a4',
+            'AppVersion': '0.144.3',
             'DrmType': 'WIDEVINE',
             'Format': 'MPEG-DASH',
             'PlayerId': '@dazn/peng-html5-core/web/web',
