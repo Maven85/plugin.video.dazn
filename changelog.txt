@@ -1,3 +1,9 @@
+1.4.32
+- fix: streams cannot be played
+- chore: update AppVersion for playback request
+- fix: call logout even if the token or device ID is undefined
+- chore: disable CatalogueBanners for home section
+- feat: add live TV section
 1.4.31
 - feat: add option to hide playtime for replays
 - fix: streams stop after 5 minutes
