@@ -42,7 +42,7 @@ def router(args):
     searchterm = args.get('searchterm', [''])[0]
     if mode == 'rails':
         entries = None
-        content_id = 'Home' if id_.lower() == 'home' else None
+        content_id = None  # 'Home' if id_.lower() == 'home' else None
         if params and id and id_.lower() == 'competition':
                 content_id = [i.split(':')[1] for i in params.split(';') if i.startswith('ContentType')][0] + ':' + [i.split(':')[1] for i in params.split(';') if i.startswith('ContentId')][0]
         if content_id:
