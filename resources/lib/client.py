@@ -218,7 +218,13 @@ class Client:
             'region': self.COUNTRY,
             'platform': 'web'
         }
-        self.plugin.cache(self.RESOURCES, self.content_data(self.RESOURCES, params=params, headers=self.HEADERS))
+        data = self.content_data(self.RESOURCES, params=params, headers=self.HEADERS)
+        # Only replace the cached copy with something usable. A failed request
+        # used to overwrite a good file with an empty one, which left every
+        # label in the ui as its raw key until the next successful fetch.
+        if data.get('Strings'):
+            self.plugin.cache(self.RESOURCES, data)
+            self.plugin.set_setting('resources_language', self.LANGUAGE)
 
 
     def playback_data(self, id_, pin):
@@ -276,7 +282,8 @@ class Client:
 
     def setLanguage(self, languages):
         self.LANGUAGE = self.plugin.language(self.LANGUAGE, languages)
-        self.resources()
+        if self.plugin.resources_outdated(self.LANGUAGE):
+            self.resources()
 
 
     def setToken(self, auth, result):

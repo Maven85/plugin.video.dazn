@@ -11,7 +11,7 @@ from json import dump, load, loads
 from os.path import join
 from platform import uname
 from string import capwords
-from time import mktime, sleep, strptime
+from time import mktime, sleep, strptime, time
 from urllib.parse import urlencode
 from uuid import UUID
 
@@ -32,6 +32,10 @@ import xbmcvfs
 # switch still takes effect.
 _file_cache = {}
 _resource_cache = {}
+
+# How long a cached copy of the resource strings is used before it is
+# fetched again.
+RESOURCES_MAX_AGE = 7 * 24 * 3600
 
 
 class Common():
@@ -164,6 +168,24 @@ class Common():
             resource = {'text': self.initcap(text), 'found': data_found}
             _resource_cache[key] = resource
         return resource.copy()
+
+
+    def resources_outdated(self, language):
+        # The startup service sets 'startup' on every kodi start, so the
+        # startup block ran through setLanguage() and refetched the resource
+        # strings every time. That is a 2 mb download for a file that rarely
+        # changes, and it made the first page after a restart the slowest one.
+        # Fetch it when the language changed, when it is gone or unusable, or
+        # when the copy got old.
+        if not self.get_setting('resources_language') == language:
+            return True
+        file_ = self.get_filepath(self.resources)
+        if not xbmcvfs.exists(file_):
+            return True
+        stamp = self.cache_stamp(file_)
+        if stamp < 0 or (time() - stamp) > RESOURCES_MAX_AGE:
+            return True
+        return not self.get_cache(self.resources).get('Strings')
 
 
     def logout(self):
