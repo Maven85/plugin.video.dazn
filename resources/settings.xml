@@ -370,6 +370,21 @@
 						<heading>entitlements</heading>
 					</control>
 				</setting>
+				<setting id="resources_language" type="string" label="resources_language" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>resources_language</heading>
+					</control>
+				</setting>
 			</group>
 		</category>
 		<category id="view" label="30010" help="">
@@ -442,6 +457,11 @@
 					<control type="toggle"/>
 				</setting>				
 				<setting id="hide_total_playtime" type="boolean" label="30025" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="cache_directories" type="boolean" label="30026" help="">
 					<level>0</level>
 					<default>false</default>
 					<control type="toggle"/>
