@@ -63,6 +63,8 @@ class Common():
         self.force_view = self.addon.getSetting('force_view') == 'true'
         self.hide_total_playtime = self.addon.getSetting('hide_total_playtime') == 'true'
         self.cache_directories = self.addon.getSetting('cache_directories') == 'true'
+        self.entitlements = None
+        self.only_playable = None
         self.startup = self.addon.getSetting('startup') == 'true'
         self.select_cdn = self.addon.getSetting('select_cdn') == 'true'
         self.preferred_cdn = self.addon.getSetting('preferred_cdn')
@@ -117,6 +119,20 @@ class Common():
 
     def get_setting(self, key):
         return self.get_addon().getSetting(key)
+
+
+    def user_entitlements(self):
+        # Read once instead of once per tile. Lazy on purpose: the setting is
+        # written by setToken() during startup, after this object was built.
+        if self.entitlements is None:
+            self.entitlements = self.get_setting('entitlements').split(',')
+        return self.entitlements
+
+
+    def only_playable_content(self):
+        if self.only_playable is None:
+            self.only_playable = self.get_setting('show_only_playable_content') == 'true'
+        return self.only_playable
 
 
     def get_string(self, id_):

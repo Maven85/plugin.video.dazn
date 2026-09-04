@@ -3,7 +3,6 @@
 from __future__ import unicode_literals
 
 from concurrent.futures import ThreadPoolExecutor
-from json import dumps
 from time import time
 from xbmc import Monitor
 

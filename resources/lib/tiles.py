@@ -9,7 +9,7 @@ class Tiles:
     def __init__(self, plugin, i):
         self.item = {}
         self.plugin = plugin
-        self.user_entitlements = self.plugin.get_setting('entitlements').split(',')
+        self.user_entitlements = self.plugin.user_entitlements()
         self.title = i['Title']
         self.subtitle = i.get('SubTitle', '')
         self.description = i['Description']
@@ -122,7 +122,7 @@ class Tiles:
         if self.entitlement_ids:
             entitlements_found = [entitlement_id for entitlement_id in self.entitlement_ids if entitlement_id in self.user_entitlements]
             if len(entitlements_found) == 0:
-                if self.plugin.get_setting('show_only_playable_content') == 'true':
+                if self.plugin.only_playable_content():
                     self.item['skip'] = True
                 self.item['title'] = f"[COLOR orange]{self.item['title']}[/COLOR]"
 
