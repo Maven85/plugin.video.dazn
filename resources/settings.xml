@@ -461,6 +461,11 @@
 					<default>false</default>
 					<control type="toggle"/>
 				</setting>
+				<setting id="cache_directories" type="boolean" label="30026" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
 			</group>
 		</category>
 		<category id="videoplayer" label="30020" help="">
