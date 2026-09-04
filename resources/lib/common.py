@@ -420,7 +420,9 @@ class Common():
 
     def init_api_endpoints(self, service_dict):
         from ..modules.urllib3 import PoolManager
-        pool_manager = PoolManager()
+        # Not used as a context manager on purpose, that closed the connection
+        # after every probed endpoint and made each one handshake again.
+        pool = PoolManager()
 
         endpoint_dict = dict()
         endpoint_def_dict = dict(
@@ -437,30 +439,29 @@ class Common():
                         api_endpoint_devices='Devices',
                         api_endpoint_search='SearchV2'
                         )
-        with pool_manager as pool:
-            for key, value in endpoint_def_dict.items():
-                endpoint_key_list = list(service_dict.get(value).get('Versions'))
-                endpoint_key_list.sort(key=lambda x: '{0:0>8}'.format(x).lower())
-                index = -1
-                service_path = None
-                while service_path is None:
-                    last_key = endpoint_key_list[index]
-                    service_path = service_dict.get(value).get('Versions').get(last_key).get('ServicePath')
-                    if value == 'UserProfile' and service_path.lower().endswith('/userprofile') == False:
-                        service_path += 'userprofile' if service_path.endswith('/') else '/userprofile'
-                    if self.get_setting(key) != service_path:
-                        if key in ['api_endpoint_signout', 'api_endpoint_refresh_access_token']:
-                            method = 'POST'
-                        else:
-                            method = 'GET'
-                        res = pool.request(method, service_path)
-                        if res.status == 404:
-                            index -= 1
-                            service_path = None
-                self.set_setting(key, service_path)
-                endpoint_dict.update({key: service_path})
-                if key == 'api_endpoint_resource_strings':
-                    self.resources = service_path
+        for key, value in endpoint_def_dict.items():
+            endpoint_key_list = list(service_dict.get(value).get('Versions'))
+            endpoint_key_list.sort(key=lambda x: '{0:0>8}'.format(x).lower())
+            index = -1
+            service_path = None
+            while service_path is None:
+                last_key = endpoint_key_list[index]
+                service_path = service_dict.get(value).get('Versions').get(last_key).get('ServicePath')
+                if value == 'UserProfile' and service_path.lower().endswith('/userprofile') == False:
+                    service_path += 'userprofile' if service_path.endswith('/') else '/userprofile'
+                if self.get_setting(key) != service_path:
+                    if key in ['api_endpoint_signout', 'api_endpoint_refresh_access_token']:
+                        method = 'POST'
+                    else:
+                        method = 'GET'
+                    res = pool.request(method, service_path)
+                    if res.status == 404:
+                        index -= 1
+                        service_path = None
+            self.set_setting(key, service_path)
+            endpoint_dict.update({key: service_path})
+            if key == 'api_endpoint_resource_strings':
+                self.resources = service_path
 
         return endpoint_dict
 
