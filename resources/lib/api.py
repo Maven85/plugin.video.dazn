@@ -57,7 +57,7 @@ class Request:
         return pool_manager
 
 
-    def exchange(self, url, headers=None, params=None, data=None, json=None, fields=None, method=None, verify_ssl_certs=True):
+    def exchange(self, url, headers=None, params=None, data=None, json=None, fields=None, method=None, verify_ssl_certs=True, timeout=None, retries=None):
         if self.proxy_use == True and url.startswith('https'):
                 url = url.replace('https', 'http')
                 if not params:
@@ -66,18 +66,26 @@ class Request:
                     params.update({'originschema': 'https'})
 
         pool = self.pool(verify_ssl_certs)
+        # Both default to what urllib3 uses. A connect attempt that gets no
+        # answer costs seconds and is retried three times on top, so a caller
+        # whose request is not worth waiting for can cap it.
+        options = {}
+        if timeout is not None:
+            options.update({'timeout': timeout})
+        if retries is not None:
+            options.update({'retries': retries})
         if data or json or fields:
             if params:
                 url = f'{url}?{urlencode(params)}'
             if json:
-                r = pool.request('POST', url, headers=headers, json=json)
+                r = pool.request('POST', url, headers=headers, json=json, **options)
             elif fields:
-                r = pool.request_encode_body('POST', url, headers=headers, fields=fields, encode_multipart=False)
+                r = pool.request_encode_body('POST', url, headers=headers, fields=fields, encode_multipart=False, **options)
             else:
-                r = pool.request('POST', url, headers=headers, body=data)
+                r = pool.request('POST', url, headers=headers, body=data, **options)
         elif method is None:
-            r = pool.request('GET', url, fields=params, headers=headers)
+            r = pool.request('GET', url, fields=params, headers=headers, **options)
         else:
-            r = pool.request(method, url, fields=params, headers=headers)
+            r = pool.request(method, url, fields=params, headers=headers, **options)
 
         return r

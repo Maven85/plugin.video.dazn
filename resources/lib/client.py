@@ -2,8 +2,20 @@
 
 from __future__ import unicode_literals
 
+from concurrent.futures import ThreadPoolExecutor
 from json import dumps
+from time import time
 from xbmc import Monitor
+
+
+# A rail whose header is not in the resource strings only carries its title
+# in the rail itself, which costs one request per rail just for a heading.
+RAIL_TITLE_CACHE_TTL = 7 * 24 * 3600
+RAIL_TITLE_WORKERS = 6
+# A heading is not worth stalling the whole directory for, so cap the wait
+# instead of letting urllib3 retry a dead connection three times.
+RAIL_TITLE_TIMEOUT = 5
+RAIL_TITLE_RETRIES = 0
 
 
 class Client:
@@ -61,21 +73,67 @@ class Client:
         if self.ENTITLEMENT_ID:
             params.update({'userEntitlements': self.ENTITLEMENT_ID})
         content_data = self.content_data(self.RAILS, params=params, headers=self.HEADERS)
-        for rail in content_data.get('Rails', []):
-            id_ = rail.get('Id')
-            resource = self.plugin.get_resource(id_, prefix='browseui_railHeader')
-            title = resource.get('text')
-            if resource.get('found') == False:
-                rail_data = self.railFromCache(id_, rail.get('Params', params_))
-                title = rail_data.get('Title', rail.get('Id')) if isinstance(rail_data, dict) else rail.get('Id')
-            else:
-                title = resource.get('text')
-            rail['Title'] = title
+        self.railTitles(content_data.get('Rails', []), params_)
         return content_data
 
 
-    def railFromCache(self, id_, params_=''):
-        return self.plugin.railCache.cacheFunction(self.rail, id_, params_)
+    def railTitles(self, rails, params_):
+        missing = []
+        for rail in rails:
+            resource = self.plugin.get_resource(rail.get('Id'), prefix='browseui_railHeader')
+            if resource.get('found'):
+                rail['Title'] = resource.get('text')
+            else:
+                rail['Title'] = rail.get('Id')
+                missing.append(rail)
+        if not missing:
+            return
+
+        cached = self.plugin.get_cache(self.plugin.rail_cache)
+        now = time()
+        outdated = []
+        for rail in missing:
+            key = f"{rail.get('Id')}|{rail.get('Params', params_)}"
+            entry = cached.get(key, {})
+            if entry.get('title') and entry.get('stamp', 0) > now - RAIL_TITLE_CACHE_TTL:
+                rail['Title'] = entry['title']
+            else:
+                outdated.append((key, rail))
+        if not outdated:
+            return
+
+        # These used to run one after the other while the directory was
+        # already waiting on them, so fetch them concurrently.
+        with ThreadPoolExecutor(max_workers=min(RAIL_TITLE_WORKERS, len(outdated))) as pool:
+            titles = list(pool.map(lambda i: self.railTitle(i[1].get('Id'), i[1].get('Params', params_)), outdated))
+
+        entries = {k: v for k, v in cached.items() if v.get('stamp', 0) > now - RAIL_TITLE_CACHE_TTL}
+        for (key, rail), title in zip(outdated, titles):
+            if title:
+                rail['Title'] = title
+                entries[key] = {'title': title, 'stamp': now}
+        if not entries == cached:
+            self.plugin.cache(self.plugin.rail_cache, entries)
+
+
+    def railTitle(self, id_, params_=''):
+        params = {
+            'languageCode': self.LANGUAGE,
+            'country': self.COUNTRY,
+            'id': id_,
+            'params': params_
+        }
+        try:
+            # Deliberately without errorHandler(): this runs off the main
+            # thread, where opening a dialog or refreshing the token is not
+            # safe. A failed lookup falls back to the rail id, which is what
+            # the sequential version did as well.
+            data = self.request(self.RAIL, params=params, headers=self.HEADERS,
+                                timeout=RAIL_TITLE_TIMEOUT, retries=RAIL_TITLE_RETRIES)
+        except Exception as e:
+            self.plugin.log(f'[{self.plugin.addon_id}] rail title error: {id_} ({e})')
+            return None
+        return data.get('Title') if isinstance(data, dict) else None
 
 
     def rail(self, id_, params_=''):
@@ -349,8 +407,8 @@ class Client:
         return self.request(self.SEARCH, params, headers=self.HEADERS)
 
 
-    def request(self, url, params={}, data={}, headers={}, verify_ssl_certs=True):
-        res = self.requests.exchange(url, params=params, json=data, headers=headers, verify_ssl_certs=verify_ssl_certs)
+    def request(self, url, params={}, data={}, headers={}, verify_ssl_certs=True, timeout=None, retries=None):
+        res = self.requests.exchange(url, params=params, json=data, headers=headers, verify_ssl_certs=verify_ssl_certs, timeout=timeout, retries=retries)
 
         if res.data and \
                 (self.plugin.get_dict_value(res.headers, 'content-type').startswith('application/json') or \

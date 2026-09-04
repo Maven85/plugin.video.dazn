@@ -20,21 +20,16 @@ import xbmcaddon
 import xbmcgui
 import xbmcvfs
 
-try:
-    import StorageServer
-except:
-    import storageserverdummy as StorageServer
 
-
-# The resource strings are a single json file of ~2 mb with ~18k entries.
-# Reading and parsing it once per label made building a directory take
-# seconds, so keep the parsed file and the resolved labels in memory.
-# These live on module level on purpose: addon.xml sets
-# reuselanguageinvoker, so they survive between plugin invocations and a
-# page only pays for the parse once per kodi session.
-# Both caches are keyed on the file its modification time and are dropped
-# whenever the file is re-read or rewritten, so a language switch still
-# takes effect.
+# Cache for the parsed json cache files, and for the labels resolved out of
+# the resource strings. The resource strings alone are a single file of ~2 mb
+# with ~18k entries, and reading and parsing it once per label made building
+# a directory take seconds.
+# These live on module level on purpose: addon.xml sets reuselanguageinvoker,
+# so they survive between plugin invocations and a page only pays for the
+# parse once per kodi session. Entries are keyed on the modification time of
+# their file and dropped whenever it is re-read or rewritten, so a language
+# switch still takes effect.
 _file_cache = {}
 _resource_cache = {}
 
@@ -69,6 +64,7 @@ class Common():
         self.max_bw = self.addon.getSetting('max_bw')
         self.resources = self.addon.getSetting('api_endpoint_resource_strings')
         self.resources_checked = False
+        self.rail_cache = 'rails.json'
         self.kodi_version = int(xbmc.getInfoLabel('System.BuildVersion').split('.')[0])
         self.user_agent_suffix = 'AppleWebKit/537.36 (KHTML, like Gecko) 130.0.6723.116/10.0 TV Safari/537.36'
         self.user_agent = f'Mozilla/5.0 (SMART-TV; LINUX; Tizen 10.0) {self.user_agent_suffix}'
@@ -77,8 +73,6 @@ class Common():
             'referer': self.api_base,
             'user-agent': self.user_agent
         }
-
-        self.railCache = StorageServer.StorageServer(f'{self.addon_id}.rail', 24 * 7)
 
 
     def log(self, msg):
@@ -319,6 +313,13 @@ class Common():
         return country
 
 
+    def drop_resource_cache(self, file_):
+        # Only the resource strings feed the label cache, so a write to any
+        # other cache file must not throw the resolved labels away.
+        if file_ == self.get_filepath(self.resources):
+            _resource_cache.clear()
+
+
     def cache_stamp(self, file_):
         try:
             return int(xbmcvfs.Stat(file_).st_mtime())
@@ -341,7 +342,7 @@ class Common():
             except Exception as e:
                 self.log(f'[{self.addon_id}] get cache error: {e}')
             _file_cache[file_] = (stamp, json_data)
-            _resource_cache.clear()
+            self.drop_resource_cache(file_)
         return json_data
 
 
@@ -352,7 +353,7 @@ class Common():
             dump(data, f)
             f.close()
             _file_cache[file_] = (self.cache_stamp(file_), data)
-            _resource_cache.clear()
+            self.drop_resource_cache(file_)
         except Exception as e:
             self.log(f'[{self.addon_id}] cache error: {e}')
 
