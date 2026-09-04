@@ -93,19 +93,25 @@ class Tiles:
             self.item['date'] = self.start[:10]
 
         if 'Epg' in i.get('Id', ''):
-            if self.competition:
-                competition = self.competition['Title']
-            if self.sport:
-                sport = self.sport['Title']
-            time_ = self.start[11:][:5]
-            if self.type == 'Live':
-                self.item['title'] = f'[COLOR red]{time_}[/COLOR] [COLOR blue]{sport}[/COLOR] {self.title} [COLOR blue]{competition}[/COLOR]'
-            else:
-                self.item['title'] = f'{time_} [COLOR blue]{sport}[/COLOR] {self.title} [COLOR blue]{competition}[/COLOR]'
+            # Sport, competition and a usable start are not always there.
+            # They were read unguarded, and sport and competition were only
+            # bound inside their own condition, so a tile missing any of them
+            # raised and took the whole directory with it. Leave out what is
+            # missing instead of rendering an empty colour tag for it.
+            time_ = self.start[11:][:5] if self.start else ''
+            if self.type == 'Live' and time_:
+                time_ = f'[COLOR red]{time_}[/COLOR]'
+            parts = [
+                time_,
+                f"[COLOR blue]{self.sport['Title']}[/COLOR]" if self.sport else '',
+                self.title,
+                f"[COLOR blue]{self.competition['Title']}[/COLOR]" if self.competition else ''
+            ]
+            self.item['title'] = ' '.join([part for part in parts if part])
         elif (self.type == 'ComingUp' or 'Scheduled' in i.get('Id', '')) or (self.type == 'Highlights' or self.type == 'Condensed'):
             if self.type == 'ComingUp':
                 day = self.plugin.days(self.type, self.now, self.start)
-                sub_title = f'{day} {self.start[11:][:5]}'
+                sub_title = f'{day} {self.start[11:][:5]}' if self.start else day
             else:
                 sub_title = self.plugin.get_resource(f'{self.type[0].lower()}{self.type[1:]}Title', 'browseui_').get('text')
                 if sub_title.endswith('Title'):
