@@ -17,6 +17,10 @@ RAIL_TITLE_WORKERS = 6
 RAIL_TITLE_TIMEOUT = 5
 RAIL_TITLE_RETRIES = 0
 
+# The epg endpoint sometimes answers with data that is not usable yet.
+EPG_TRIES = 2
+EPG_RETRY_WAIT = 1
+
 
 class Client:
 
@@ -168,12 +172,22 @@ class Client:
             'startDate': params_,
             'endDate': params_
         }
+        # The endpoint can answer with data that is not usable yet, so the
+        # request is retried once. It used to be retried unconditionally and
+        # waited a second after both tries, which cost every epg page a
+        # second request plus two seconds of waiting even when the first
+        # answer was already complete. Retry only when it was not, and skip
+        # the wait after the last try. parser.epg_items() needs StartDate to
+        # build the page at all and Tiles to put anything in it.
         epg_data = {}
         i = 0
-        while i < 2 and not self.MONITOR.abortRequested():
+        while i < EPG_TRIES and not self.MONITOR.abortRequested():
             epg_data = self.content_data(self.EPG, params=params, headers=self.HEADERS)
             i += 1
-            self.MONITOR.waitForAbort(1)
+            if epg_data.get('StartDate') and epg_data.get('Tiles'):
+                break
+            if i < EPG_TRIES:
+                self.MONITOR.waitForAbort(EPG_RETRY_WAIT)
         return epg_data
 
 
