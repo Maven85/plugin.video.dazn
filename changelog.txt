@@ -1,3 +1,14 @@
+1.4.32+nexus.3
+- perf: cache resource strings in memory instead of parsing the 2 mb json
+file for every label
+- perf: keep http connections alive instead of handshaking per request
+- perf: look up rail titles concurrently and cache them in a file
+- perf: only retry the epg request when the answer is not usable
+- perf: only fetch the resource strings when the language changed
+- perf: read the per tile settings once instead of once per tile
+- feat: add setting to cache directories for faster back navigation
+- fix: a failed resource string request no longer empties the cached file
+- fix: epg tiles without sport, competition or start crash the directory
 1.4.32
 - fix: streams cannot be played
 - chore: update AppVersion for playback request
