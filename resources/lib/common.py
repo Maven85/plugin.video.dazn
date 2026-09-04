@@ -26,6 +26,19 @@ except:
     import storageserverdummy as StorageServer
 
 
+# The resource strings are a single json file of ~2 mb with ~18k entries.
+# Reading and parsing it once per label made building a directory take
+# seconds, so keep the parsed file and the resolved labels in memory.
+# These live on module level on purpose: addon.xml sets
+# reuselanguageinvoker, so they survive between plugin invocations and a
+# page only pays for the parse once per kodi session.
+# Both caches are keyed on the file its modification time and are dropped
+# whenever the file is re-read or rewritten, so a language switch still
+# takes effect.
+_file_cache = {}
+_resource_cache = {}
+
+
 class Common():
 
 
@@ -55,6 +68,7 @@ class Common():
         self.preferred_cdn = self.addon.getSetting('preferred_cdn')
         self.max_bw = self.addon.getSetting('max_bw')
         self.resources = self.addon.getSetting('api_endpoint_resource_strings')
+        self.resources_checked = False
         self.kodi_version = int(xbmc.getInfoLabel('System.BuildVersion').split('.')[0])
         self.user_agent_suffix = 'AppleWebKit/537.36 (KHTML, like Gecko) 130.0.6723.116/10.0 TV Safari/537.36'
         self.user_agent = f'Mozilla/5.0 (SMART-TV; LINUX; Tizen 10.0) {self.user_agent_suffix}'
@@ -134,16 +148,28 @@ class Common():
 
 
     def get_resource(self, text, prefix=''):
-        data_found = False
-        data = self.get_cache(self.resources)
-        if data.get('Strings'):
-            strings = data['Strings']
-            try:
-                text = strings[f"{prefix}{text.replace(' ', '')}"]
-                data_found = True
-            except KeyError:
-                text = text.replace('_', ' ')
-        return {'text': self.initcap(text), 'found': data_found}
+        if not self.resources_checked:
+            # Revalidate the parsed file once per invocation. The label cache
+            # below is only dropped when the file is re-read, so without this
+            # a rewrite from another invocation would keep serving the labels
+            # of the previous language until kodi is restarted.
+            self.get_cache(self.resources)
+            self.resources_checked = True
+        key = (prefix, text)
+        resource = _resource_cache.get(key)
+        if resource is None:
+            data_found = False
+            data = self.get_cache(self.resources)
+            if data.get('Strings'):
+                strings = data['Strings']
+                try:
+                    text = strings[f"{prefix}{text.replace(' ', '')}"]
+                    data_found = True
+                except KeyError:
+                    text = text.replace('_', ' ')
+            resource = {'text': self.initcap(text), 'found': data_found}
+            _resource_cache[key] = resource
+        return resource.copy()
 
 
     def logout(self):
@@ -293,16 +319,29 @@ class Common():
         return country
 
 
+    def cache_stamp(self, file_):
+        try:
+            return int(xbmcvfs.Stat(file_).st_mtime())
+        except Exception:
+            return -1
+
+
     def get_cache(self, file_name):
         json_data = {}
         file_ = self.get_filepath(file_name)
         if xbmcvfs.exists(file_):
+            stamp = self.cache_stamp(file_)
+            cached = _file_cache.get(file_)
+            if cached and cached[0] == stamp:
+                return cached[1]
             try:
                 f = xbmcvfs.File(file_, 'r')
                 json_data = load(f)
                 f.close()
             except Exception as e:
                 self.log(f'[{self.addon_id}] get cache error: {e}')
+            _file_cache[file_] = (stamp, json_data)
+            _resource_cache.clear()
         return json_data
 
 
@@ -312,6 +351,8 @@ class Common():
             f = xbmcvfs.File(file_, 'w')
             dump(data, f)
             f.close()
+            _file_cache[file_] = (self.cache_stamp(file_), data)
+            _resource_cache.clear()
         except Exception as e:
             self.log(f'[{self.addon_id}] cache error: {e}')
 
