@@ -1,3 +1,6 @@
+1.4.33+nexus.1
+- feat: add playback platform settings and user agent handling
+- fix: update playback parameter
 1.4.32+nexus.3
 - perf: cache resource strings in memory instead of parsing the 2 mb json
 file for every label
