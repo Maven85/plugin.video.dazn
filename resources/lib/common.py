@@ -20,7 +20,6 @@ import xbmcaddon
 import xbmcgui
 import xbmcvfs
 
-
 # Cache for the parsed json cache files, and for the labels resolved out of
 # the resource strings. The resource strings alone are a single file of ~2 mb
 # with ~18k entries, and reading and parsing it once per label made building

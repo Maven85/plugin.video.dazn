@@ -6,7 +6,6 @@ from concurrent.futures import ThreadPoolExecutor
 from time import time
 from xbmc import Monitor
 
-
 # A rail whose header is not in the resource strings only carries its title
 # in the rail itself, which costs one request per rail just for a heading.
 RAIL_TITLE_CACHE_TTL = 7 * 24 * 3600
@@ -235,11 +234,11 @@ class Client:
         if self.plugin.validate_pin(pin):
             headers.update({'x-age-verification-pin': pin})
         params = {
-            'AppVersion': '0.144.3',
+            'AppVersion': '0.150.1-hotfix.f8b078689',
             'DrmType': 'WIDEVINE',
             'Format': 'MPEG-DASH',
             'PlayerId': '@dazn/peng-html5-core/web/web',
-            'Platform': 'smarttv',
+            'Platform': 'web',
             'LanguageCode': self.LANGUAGE,
             'Model': 'unknown',
             'Secure': 'true',
