@@ -76,6 +76,10 @@ msgctxt "#30025"
 msgid "Hide total playtime for replays"
 msgstr "Masquer la durée totale de jeu pour les rediffusions"
 
+msgctxt "#30026"
+msgid "Cache directories for faster back navigation"
+msgstr "Mettre les répertoires en cache pour un retour plus rapide"
+
 msgctxt "#30030"
 msgid "Connection"
 msgstr "Connexion"

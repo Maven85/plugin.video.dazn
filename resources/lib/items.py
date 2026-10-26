@@ -74,7 +74,11 @@ class Items:
         listitem = self.plugin.set_videoinfo(listitem, labels)
 
         if 'play' in item['mode']:
-            self.cache = False
+            # A list with a playable item in it is not cached by kodi, so
+            # every step back rebuilds the whole directory from the api.
+            # Optional because it trades freshness for speed: a cached list
+            # keeps showing the state it had when it was built.
+            self.cache = self.plugin.cache_directories
             self.video = True
             folder = False
             listitem = self.plugin.set_streaminfo(listitem, {'duration': item.get('duration', 0)})

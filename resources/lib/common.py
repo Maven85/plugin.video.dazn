@@ -11,7 +11,7 @@ from json import dump, load, loads
 from os.path import join
 from platform import uname
 from string import capwords
-from time import mktime, sleep, strptime
+from time import mktime, sleep, strptime, time
 from urllib.parse import urlencode
 from uuid import UUID
 
@@ -20,10 +20,22 @@ import xbmcaddon
 import xbmcgui
 import xbmcvfs
 
-try:
-    import StorageServer
-except:
-    import storageserverdummy as StorageServer
+
+# Cache for the parsed json cache files, and for the labels resolved out of
+# the resource strings. The resource strings alone are a single file of ~2 mb
+# with ~18k entries, and reading and parsing it once per label made building
+# a directory take seconds.
+# These live on module level on purpose: addon.xml sets reuselanguageinvoker,
+# so they survive between plugin invocations and a page only pays for the
+# parse once per kodi session. Entries are keyed on the modification time of
+# their file and dropped whenever it is re-read or rewritten, so a language
+# switch still takes effect.
+_file_cache = {}
+_resource_cache = {}
+
+# How long a cached copy of the resource strings is used before it is
+# fetched again.
+RESOURCES_MAX_AGE = 7 * 24 * 3600
 
 
 class Common():
@@ -50,11 +62,16 @@ class Common():
         self.view_id_epg = self.addon.getSetting('view_id_epg')
         self.force_view = self.addon.getSetting('force_view') == 'true'
         self.hide_total_playtime = self.addon.getSetting('hide_total_playtime') == 'true'
+        self.cache_directories = self.addon.getSetting('cache_directories') == 'true'
+        self.entitlements = None
+        self.only_playable = None
         self.startup = self.addon.getSetting('startup') == 'true'
         self.select_cdn = self.addon.getSetting('select_cdn') == 'true'
         self.preferred_cdn = self.addon.getSetting('preferred_cdn')
         self.max_bw = self.addon.getSetting('max_bw')
         self.resources = self.addon.getSetting('api_endpoint_resource_strings')
+        self.resources_checked = False
+        self.rail_cache = 'rails.json'
         self.kodi_version = int(xbmc.getInfoLabel('System.BuildVersion').split('.')[0])
         self.user_agent_suffix = 'AppleWebKit/537.36 (KHTML, like Gecko) 130.0.6723.116/10.0 TV Safari/537.36'
         self.user_agent = f'Mozilla/5.0 (SMART-TV; LINUX; Tizen 10.0) {self.user_agent_suffix}'
@@ -63,8 +80,6 @@ class Common():
             'referer': self.api_base,
             'user-agent': self.user_agent
         }
-
-        self.railCache = StorageServer.StorageServer(f'{self.addon_id}.rail', 24 * 7)
 
 
     def log(self, msg):
@@ -106,6 +121,20 @@ class Common():
         return self.get_addon().getSetting(key)
 
 
+    def user_entitlements(self):
+        # Read once instead of once per tile. Lazy on purpose: the setting is
+        # written by setToken() during startup, after this object was built.
+        if self.entitlements is None:
+            self.entitlements = self.get_setting('entitlements').split(',')
+        return self.entitlements
+
+
+    def only_playable_content(self):
+        if self.only_playable is None:
+            self.only_playable = self.get_setting('show_only_playable_content') == 'true'
+        return self.only_playable
+
+
     def get_string(self, id_):
         if id_ < 30000:
             src = xbmc
@@ -134,16 +163,46 @@ class Common():
 
 
     def get_resource(self, text, prefix=''):
-        data_found = False
-        data = self.get_cache(self.resources)
-        if data.get('Strings'):
-            strings = data['Strings']
-            try:
-                text = strings[f"{prefix}{text.replace(' ', '')}"]
-                data_found = True
-            except KeyError:
-                text = text.replace('_', ' ')
-        return {'text': self.initcap(text), 'found': data_found}
+        if not self.resources_checked:
+            # Revalidate the parsed file once per invocation. The label cache
+            # below is only dropped when the file is re-read, so without this
+            # a rewrite from another invocation would keep serving the labels
+            # of the previous language until kodi is restarted.
+            self.get_cache(self.resources)
+            self.resources_checked = True
+        key = (prefix, text)
+        resource = _resource_cache.get(key)
+        if resource is None:
+            data_found = False
+            data = self.get_cache(self.resources)
+            if data.get('Strings'):
+                strings = data['Strings']
+                try:
+                    text = strings[f"{prefix}{text.replace(' ', '')}"]
+                    data_found = True
+                except KeyError:
+                    text = text.replace('_', ' ')
+            resource = {'text': self.initcap(text), 'found': data_found}
+            _resource_cache[key] = resource
+        return resource.copy()
+
+
+    def resources_outdated(self, language):
+        # The startup service sets 'startup' on every kodi start, so the
+        # startup block ran through setLanguage() and refetched the resource
+        # strings every time. That is a 2 mb download for a file that rarely
+        # changes, and it made the first page after a restart the slowest one.
+        # Fetch it when the language changed, when it is gone or unusable, or
+        # when the copy got old.
+        if not self.get_setting('resources_language') == language:
+            return True
+        file_ = self.get_filepath(self.resources)
+        if not xbmcvfs.exists(file_):
+            return True
+        stamp = self.cache_stamp(file_)
+        if stamp < 0 or (time() - stamp) > RESOURCES_MAX_AGE:
+            return True
+        return not self.get_cache(self.resources).get('Strings')
 
 
     def logout(self):
@@ -293,16 +352,36 @@ class Common():
         return country
 
 
+    def drop_resource_cache(self, file_):
+        # Only the resource strings feed the label cache, so a write to any
+        # other cache file must not throw the resolved labels away.
+        if file_ == self.get_filepath(self.resources):
+            _resource_cache.clear()
+
+
+    def cache_stamp(self, file_):
+        try:
+            return int(xbmcvfs.Stat(file_).st_mtime())
+        except Exception:
+            return -1
+
+
     def get_cache(self, file_name):
         json_data = {}
         file_ = self.get_filepath(file_name)
         if xbmcvfs.exists(file_):
+            stamp = self.cache_stamp(file_)
+            cached = _file_cache.get(file_)
+            if cached and cached[0] == stamp:
+                return cached[1]
             try:
                 f = xbmcvfs.File(file_, 'r')
                 json_data = load(f)
                 f.close()
             except Exception as e:
                 self.log(f'[{self.addon_id}] get cache error: {e}')
+            _file_cache[file_] = (stamp, json_data)
+            self.drop_resource_cache(file_)
         return json_data
 
 
@@ -312,6 +391,8 @@ class Common():
             f = xbmcvfs.File(file_, 'w')
             dump(data, f)
             f.close()
+            _file_cache[file_] = (self.cache_stamp(file_), data)
+            self.drop_resource_cache(file_)
         except Exception as e:
             self.log(f'[{self.addon_id}] cache error: {e}')
 
@@ -379,7 +460,9 @@ class Common():
 
     def init_api_endpoints(self, service_dict):
         from ..modules.urllib3 import PoolManager
-        pool_manager = PoolManager()
+        # Not used as a context manager on purpose, that closed the connection
+        # after every probed endpoint and made each one handshake again.
+        pool = PoolManager()
 
         endpoint_dict = dict()
         endpoint_def_dict = dict(
@@ -396,30 +479,29 @@ class Common():
                         api_endpoint_devices='Devices',
                         api_endpoint_search='SearchV2'
                         )
-        with pool_manager as pool:
-            for key, value in endpoint_def_dict.items():
-                endpoint_key_list = list(service_dict.get(value).get('Versions'))
-                endpoint_key_list.sort(key=lambda x: '{0:0>8}'.format(x).lower())
-                index = -1
-                service_path = None
-                while service_path is None:
-                    last_key = endpoint_key_list[index]
-                    service_path = service_dict.get(value).get('Versions').get(last_key).get('ServicePath')
-                    if value == 'UserProfile' and service_path.lower().endswith('/userprofile') == False:
-                        service_path += 'userprofile' if service_path.endswith('/') else '/userprofile'
-                    if self.get_setting(key) != service_path:
-                        if key in ['api_endpoint_signout', 'api_endpoint_refresh_access_token']:
-                            method = 'POST'
-                        else:
-                            method = 'GET'
-                        res = pool.request(method, service_path)
-                        if res.status == 404:
-                            index -= 1
-                            service_path = None
-                self.set_setting(key, service_path)
-                endpoint_dict.update({key: service_path})
-                if key == 'api_endpoint_resource_strings':
-                    self.resources = service_path
+        for key, value in endpoint_def_dict.items():
+            endpoint_key_list = list(service_dict.get(value).get('Versions'))
+            endpoint_key_list.sort(key=lambda x: '{0:0>8}'.format(x).lower())
+            index = -1
+            service_path = None
+            while service_path is None:
+                last_key = endpoint_key_list[index]
+                service_path = service_dict.get(value).get('Versions').get(last_key).get('ServicePath')
+                if value == 'UserProfile' and service_path.lower().endswith('/userprofile') == False:
+                    service_path += 'userprofile' if service_path.endswith('/') else '/userprofile'
+                if self.get_setting(key) != service_path:
+                    if key in ['api_endpoint_signout', 'api_endpoint_refresh_access_token']:
+                        method = 'POST'
+                    else:
+                        method = 'GET'
+                    res = pool.request(method, service_path)
+                    if res.status == 404:
+                        index -= 1
+                        service_path = None
+            self.set_setting(key, service_path)
+            endpoint_dict.update({key: service_path})
+            if key == 'api_endpoint_resource_strings':
+                self.resources = service_path
 
         return endpoint_dict
 
