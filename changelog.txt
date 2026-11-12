@@ -1,3 +1,5 @@
+1.4.33+nexus.2
+- fix: update service path handling
 1.4.33+nexus.1
 - feat: add playback platform settings and user agent handling
 - fix: update playback parameter
