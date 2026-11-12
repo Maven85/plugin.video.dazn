@@ -80,6 +80,18 @@ msgctxt "#30026"
 msgid "Cache directories for faster back navigation"
 msgstr "Mettre les répertoires en cache pour un retour plus rapide"
 
+msgctxt "#30027"
+msgid "Playback platform"
+msgstr "Plateforme de lecture"
+
+msgctxt "#30028"
+msgid "Web"
+msgstr "Web"
+
+msgctxt "#30029"
+msgid "Smart TV"
+msgstr "Smart TV"
+
 msgctxt "#30030"
 msgid "Connection"
 msgstr "Connexion"
@@ -99,6 +111,70 @@ msgstr "Hôte proxy"
 msgctxt "#30034"
 msgid "Proxy port"
 msgstr "Port proxy"
+
+msgctxt "#30035"
+msgid "User-Agent"
+msgstr "User-Agent"
+
+msgctxt "#30036"
+msgid "Platform"
+msgstr "Plateforme"
+
+msgctxt "#30037"
+msgid "Browser"
+msgstr "Navigateur"
+
+msgctxt "#30038"
+msgid "Automatic (detect from system)"
+msgstr "Automatique (détecter depuis le système)"
+
+msgctxt "#30039"
+msgid "Smart TV (Tizen)"
+msgstr "Smart TV (Tizen)"
+
+msgctxt "#30040"
+msgid "Android"
+msgstr "Android"
+
+msgctxt "#30041"
+msgid "Linux"
+msgstr "Linux"
+
+msgctxt "#30042"
+msgid "Chrome OS"
+msgstr "Chrome OS"
+
+msgctxt "#30043"
+msgid "macOS"
+msgstr "macOS"
+
+msgctxt "#30044"
+msgid "Windows"
+msgstr "Windows"
+
+msgctxt "#30045"
+msgid "Samsung TV Browser"
+msgstr "Navigateur Samsung TV"
+
+msgctxt "#30046"
+msgid "Chrome"
+msgstr "Chrome"
+
+msgctxt "#30047"
+msgid "Edge"
+msgstr "Edge"
+
+msgctxt "#30048"
+msgid "Firefox"
+msgstr "Firefox"
+
+msgctxt "#30049"
+msgid "Safari"
+msgstr "Safari"
+
+msgctxt "#30050"
+msgid "Warning: DAZN often blocks desktop platforms (Linux, macOS, Windows, Chrome OS) with a 403 error during playback. Smart TV with the Samsung TV Browser is recommended."
+msgstr "Attention : DAZN bloque souvent les plateformes de bureau (Linux, macOS, Windows, Chrome OS) avec une erreur 403 lors de la lecture. Smart TV avec le navigateur Samsung TV est recommandé."
 
 msgctxt "#30214"
 msgid "Switch to Sport"

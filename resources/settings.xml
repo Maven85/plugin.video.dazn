@@ -510,6 +510,19 @@
 						<heading>30024</heading>
 					</control>
 				</setting>
+				<setting id="playback_platform" type="string" label="30027" help="">
+					<level>0</level>
+					<default>web</default>
+					<constraints>
+						<options>
+							<option label="30028">web</option>
+							<option label="30029">smarttv</option>
+						</options>
+					</constraints>
+					<control type="list" format="string">
+						<heading>30027</heading>
+					</control>
+				</setting>
 			</group>
 		</category>
 		<category id="proxy" label="30030" help="">
@@ -556,6 +569,91 @@
 					</dependencies>
 					<control type="edit" format="integer">
 						<heading>30034</heading>
+					</control>
+				</setting>
+			</group>
+			<group id="3" label="30035">
+				<setting id="ua_platform" type="string" label="30036" help="30050">
+					<level>0</level>
+					<default>windows</default>
+					<constraints>
+						<options>
+							<option label="30038">auto</option>
+							<option label="30039">smarttv</option>
+							<option label="30040">android</option>
+							<option label="30041">linux</option>
+							<option label="30042">chromeos</option>
+							<option label="30043">macos</option>
+							<option label="30044">windows</option>
+						</options>
+					</constraints>
+					<control type="list" format="string">
+						<heading>30036</heading>
+					</control>
+				</setting>
+				<setting id="ua_browser" type="string" label="30037" help="30050">
+					<level>0</level>
+					<default>firefox</default>
+					<constraints>
+						<options>
+							<option label="30046">chrome</option>
+							<option label="30047">edge</option>
+							<option label="30048">firefox</option>
+						</options>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<or>
+								<condition operator="is" setting="ua_platform">android</condition>
+								<condition operator="is" setting="ua_platform">linux</condition>
+								<condition operator="is" setting="ua_platform">chromeos</condition>
+							</or>
+						</dependency>
+					</dependencies>
+					<control type="list" format="string">
+						<heading>30037</heading>
+					</control>
+				</setting>
+				<setting id="ua_browser_windows" type="string" label="30037" help="30050">
+					<level>0</level>
+					<default>firefox</default>
+					<constraints>
+						<options>
+							<option label="30048">firefox</option>
+							<option label="30046">chrome</option>
+							<option label="30047">edge</option>
+						</options>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition operator="is" setting="ua_platform">windows</condition>
+						</dependency>
+					</dependencies>
+					<control type="list" format="string">
+						<heading>30037</heading>
+					</control>
+				</setting>
+				<setting id="ua_browser_macos" type="string" label="30037" help="30050">
+					<level>0</level>
+					<default>safari</default>
+					<constraints>
+						<options>
+							<option label="30049">safari</option>
+							<option label="30046">chrome</option>
+							<option label="30047">edge</option>
+							<option label="30048">firefox</option>
+						</options>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<or>
+								<condition operator="is" setting="ua_platform">macos</condition>
+								<condition operator="is" setting="ua_platform">auto</condition>
+							</or>
+						</dependency>
+					</dependencies>
+					<control type="list" format="string">
+						<heading>30037</heading>
 					</control>
 				</setting>
 			</group>

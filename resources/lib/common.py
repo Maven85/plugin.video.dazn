@@ -36,6 +36,49 @@ _resource_cache = {}
 # fetched again.
 RESOURCES_MAX_AGE = 7 * 24 * 3600
 
+FIREFOX_VERSION = '160.0'
+DEFAULT_UA_PLATFORM = 'smarttv'
+DEFAULT_UA_BROWSER = 'tizen'
+
+# Browser part of the user agent, keyed on the 'ua_browser' setting. The
+# system part is picked by the 'ua_platform' setting in get_user_agent().
+USER_AGENT_BROWSERS = {
+    'tizen': 'AppleWebKit/537.36 (KHTML, like Gecko) 130.0.6723.116/10.0 TV Safari/537.36',
+    'chrome': 'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36',
+    'edge': 'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36 Edg/157.0.0.0',
+    'firefox': f'Gecko/20100101 Firefox/{FIREFOX_VERSION}',
+    'safari': 'AppleWebKit/605.1.15 (KHTML, like Gecko) Version/27.0 Safari/605.1.15'
+}
+
+# 'sec-ch-ua' per browser. Only chromium based browsers send client hints,
+# firefox and safari do not. The versions have to match the user agent.
+USER_AGENT_CLIENT_HINTS = {
+    'tizen': '"Chromium";v="130", "Not-A.Brand";v="99"',
+    'chrome': '"Chromium";v="157", "Google Chrome";v="157", "Not-A.Brand";v="99"',
+    'edge': '"Chromium";v="157", "Microsoft Edge";v="157", "Not-A.Brand";v="99"'
+}
+
+# Browsers that exist on a platform, the first one is the fallback if the
+# selected browser is not available there.
+USER_AGENT_PLATFORM_BROWSERS = {
+    'smarttv': ['tizen'],
+    'android': ['chrome', 'edge', 'firefox'],
+    'chromeos': ['chrome', 'edge', 'firefox'],
+    'linux': ['chrome', 'edge', 'firefox'],
+    'macos': ['safari', 'chrome', 'edge', 'firefox'],
+    'windows': ['firefox', 'chrome', 'edge']
+}
+
+# 'sec-ch-ua-platform' per platform
+USER_AGENT_CLIENT_HINT_PLATFORMS = {
+    'smarttv': 'Linux',
+    'android': 'Android',
+    'chromeos': 'Chrome OS',
+    'linux': 'Linux',
+    'macos': 'macOS',
+    'windows': 'Windows'
+}
+
 
 class Common():
 
@@ -72,13 +115,23 @@ class Common():
         self.resources_checked = False
         self.rail_cache = 'rails.json'
         self.kodi_version = int(xbmc.getInfoLabel('System.BuildVersion').split('.')[0])
-        self.user_agent_suffix = 'AppleWebKit/537.36 (KHTML, like Gecko) 130.0.6723.116/10.0 TV Safari/537.36'
-        self.user_agent = f'Mozilla/5.0 (SMART-TV; LINUX; Tizen 10.0) {self.user_agent_suffix}'
+        self.ua_platform = self.addon.getSetting('ua_platform') or DEFAULT_UA_PLATFORM
+        # The browser list shown in the settings depends on the platform, macos
+        # (and auto, which may resolve to it) offers safari additionally.
+        if self.ua_platform in ('macos', 'auto'):
+            ua_browser_setting = 'ua_browser_macos'
+        elif self.ua_platform == 'windows':
+            ua_browser_setting = 'ua_browser_windows'
+        else:
+            ua_browser_setting = 'ua_browser'
+        self.ua_browser = self.addon.getSetting(ua_browser_setting) or DEFAULT_UA_BROWSER
         self.android_properties = {}
+        self.user_agent = None
         self.basic_request_headers = {
             'referer': self.api_base,
-            'user-agent': self.user_agent
+            'user-agent': self.get_user_agent()
         }
+        self.basic_request_headers.update(self.get_browser_headers())
 
 
     def log(self, msg):
@@ -570,38 +623,92 @@ class Common():
         return listitem
 
 
+    def get_os_uname(self):
+        # Fails on some systems
+        try:
+            return list(uname())
+        except Exception:
+            return ['Linux', 'hostname', 'kernel-ver', 'kernel-sub-ver', 'x86_64']
+
+
+    def detect_ua_platform(self):
+        if xbmc.getCondVisibility('System.Platform.Android'):
+            return 'android'
+        os_uname = self.get_os_uname()
+        # linux on arm uses widevine from chromeos
+        if os_uname[0] == 'Linux' and os_uname[4].lower().find('arm') != -1:
+            return 'chromeos'
+        if os_uname[0] == 'Linux':
+            return 'linux'
+        if os_uname[0] == 'Darwin':
+            return 'macos'
+        return 'windows'
+
+
+    def get_ua_platform(self):
+        platform = self.ua_platform
+        if platform == 'auto':
+            platform = self.detect_ua_platform()
+        return platform if platform in USER_AGENT_CLIENT_HINT_PLATFORMS else DEFAULT_UA_PLATFORM
+
+
+    def get_ua_browser(self):
+        browsers = USER_AGENT_PLATFORM_BROWSERS[self.get_ua_platform()]
+        return self.ua_browser if self.ua_browser in browsers else browsers[0]
+
+
+    def get_browser_headers(self):
+        browser = self.get_ua_browser()
+        headers = {}
+        if browser in USER_AGENT_CLIENT_HINTS:
+            headers.update({
+                'sec-ch-ua': USER_AGENT_CLIENT_HINTS[browser],
+                'sec-ch-ua-mobile': '?1' if self.get_ua_platform() == 'android' else '?0',
+                'sec-ch-ua-platform': f'"{USER_AGENT_CLIENT_HINT_PLATFORMS[self.get_ua_platform()]}"'
+            })
+        headers.update({
+            'sec-fetch-dest': 'empty',
+            'sec-fetch-mode': 'cors',
+            'sec-fetch-site': 'cross-site'
+        })
+        return headers
+
+
     def get_user_agent(self):
 
         if self.user_agent:
             return self.user_agent
 
-        # Fails on some systems
-        try:
-            os_uname = list(uname())
-        except Exception:
-            os_uname = ['Linux', 'hostname', 'kernel-ver', 'kernel-sub-ver', 'x86_64']
+        platform = self.get_ua_platform()
 
-        # android
-        if xbmc.getCondVisibility('System.Platform.Android'):
-            user_agent = (
-                f"Mozilla/5.0 (Linux; Android "
-                f"{self.get_android_prop('ro.build.version.release', True) or '15'}; "
-                f"{self.get_android_prop('ro.product.model', True) or 'Pixel 9'}) "
-                f"{self.user_agent_suffix}"
-            )
+        arch = self.get_os_uname()[4] or 'x86_64'
+        # Windows and some arm systems report an architecture name that no
+        # linux browser would send.
+        arch = {'amd64': 'x86_64', 'x64': 'x86_64', 'arm64': 'aarch64'}.get(arch.lower(), arch)
 
-        # linux on arm uses widevine from chromeos
-        elif os_uname[0] == 'Linux' and os_uname[4].lower().find('arm') != -1:
-            user_agent = f'Mozilla/5.0 (X11; CrOS {os_uname[4]} 16181.61.0) {self.user_agent_suffix}'
-        elif os_uname[0] == 'Linux':
-            user_agent = f'Mozilla/5.0 (X11; Linux {os_uname[4]}) {self.user_agent_suffix}'
-        elif os_uname[0] == 'Darwin':
-            user_agent = f'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) {self.user_agent_suffix}'
+        if platform == 'smarttv':
+            system = 'SMART-TV; LINUX; Tizen 10.0'
+        elif platform == 'android':
+            # The android properties are only readable on android, elsewhere
+            # the fallbacks are used.
+            release = self.get_android_prop('ro.build.version.release', True) or '15'
+            model = self.get_android_prop('ro.product.model', True) or 'Pixel 9'
+            system = f'Linux; Android {release}; {model}'
+        elif platform == 'chromeos':
+            system = f'X11; CrOS {arch} 16181.61.0'
+        elif platform == 'linux':
+            system = f'X11; Linux {arch}'
+        elif platform == 'macos':
+            system = 'Macintosh; Intel Mac OS X 10_15_7'
         else:
-            user_agent = f'Mozilla/5.0 (Windows NT 10.0; Win64; x64) {self.user_agent_suffix}'
+            system = 'Windows NT 10.0; Win64; x64'
 
-        # self.user_agent = user_agent
-        return user_agent
+        browser = self.get_ua_browser()
+        if browser == 'firefox':
+            system = f'{system}; rv:{FIREFOX_VERSION}'
+
+        self.user_agent = f'Mozilla/5.0 ({system}) {USER_AGENT_BROWSERS[browser]}'
+        return self.user_agent
 
 
     def get_android_prop(self, key, exact_match=False):

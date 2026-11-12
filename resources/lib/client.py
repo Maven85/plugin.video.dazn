@@ -36,6 +36,7 @@ class Client:
         self.MAX_REGISTRABLE_DEVICES = self.plugin.get_setting('max_registrable_devices')
         self.ENTITLEMENT_ID = self.plugin.get_setting('entitlement_id')
         self.ENTITLEMENTS = self.plugin.get_setting('entitlements').split(',')
+        self.PLAYBACK_PLATFORM = self.plugin.get_setting('playback_platform')
         self.ERRORS = 0
         self.MONITOR = Monitor()
 
@@ -238,7 +239,7 @@ class Client:
             'DrmType': 'WIDEVINE',
             'Format': 'MPEG-DASH',
             'PlayerId': '@dazn/peng-html5-core/web/web',
-            'Platform': 'web',
+            'Platform': self.PLAYBACK_PLATFORM,
             'LanguageCode': self.LANGUAGE,
             'Model': 'unknown',
             'Secure': 'true',
