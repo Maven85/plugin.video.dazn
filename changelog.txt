@@ -1,3 +1,5 @@
+1.4.33+nexus.3
+- fix: add headers to service path requests
 1.4.33+nexus.2
 - fix: update service path handling
 1.4.33+nexus.1
