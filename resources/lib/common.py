@@ -546,7 +546,8 @@ class Common():
                     method = 'POST'
                 else:
                     method = 'GET'
-                res = pool.request(method, service_path)
+                headers = self.get_basic_request_headers().copy()
+                res = pool.request(method, service_path, headers=headers)
                 self.log(f"res for serivepath {service_path} is {res.status}")
                 if res.status == 404 or (res.status == 403 and self.get_dict_value(res.headers, 'content-type').startswith('application/json') == False):
                     index -= 1
