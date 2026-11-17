@@ -1,3 +1,5 @@
+1.4.34+nexus.1
+- feat: implement API version selection
 1.4.33+nexus.3
 - fix: add headers to service path requests
 1.4.33+nexus.2
