@@ -105,186 +105,6 @@
 						<heading>token</heading>
 					</control>
 				</setting>
-				<setting id="api_endpoint_rail" type="string" label="api_endpoint_rail" help="">
-					<level>0</level>
-					<default/>
-					<constraints>
-						<allowempty>true</allowempty>
-					</constraints>
-					<dependencies>
-						<dependency type="visible">
-							<condition on="property" name="InfoBool">false</condition>
-						</dependency>
-					</dependencies>
-					<control type="edit" format="string">
-						<heading>api_endpoint_rail</heading>
-					</control>
-				</setting>
-				<setting id="api_endpoint_rails" type="string" label="api_endpoint_rails" help="">
-					<level>0</level>
-					<default/>
-					<constraints>
-						<allowempty>true</allowempty>
-					</constraints>
-					<dependencies>
-						<dependency type="visible">
-							<condition on="property" name="InfoBool">false</condition>
-						</dependency>
-					</dependencies>
-					<control type="edit" format="string">
-						<heading>api_endpoint_rails</heading>
-					</control>
-				</setting>
-				<setting id="api_endpoint_epg" type="string" label="api_endpoint_epg" help="">
-					<level>0</level>
-					<default/>
-					<constraints>
-						<allowempty>true</allowempty>
-					</constraints>
-					<dependencies>
-						<dependency type="visible">
-							<condition on="property" name="InfoBool">false</condition>
-						</dependency>
-					</dependencies>
-					<control type="edit" format="string">
-						<heading>api_endpoint_epg</heading>
-					</control>
-				</setting>
-				<setting id="api_endpoint_event" type="string" label="api_endpoint_event" help="">
-					<level>0</level>
-					<default/>
-					<constraints>
-						<allowempty>true</allowempty>
-					</constraints>
-					<dependencies>
-						<dependency type="visible">
-							<condition on="property" name="InfoBool">false</condition>
-						</dependency>
-					</dependencies>
-					<control type="edit" format="string">
-						<heading>api_endpoint_event</heading>
-					</control>
-				</setting>
-				<setting id="api_endpoint_playback" type="string" label="api_endpoint_playback" help="">
-					<level>0</level>
-					<default/>
-					<constraints>
-						<allowempty>true</allowempty>
-					</constraints>
-					<dependencies>
-						<dependency type="visible">
-							<condition on="property" name="InfoBool">false</condition>
-						</dependency>
-					</dependencies>
-					<control type="edit" format="string">
-						<heading>api_endpoint_playback</heading>
-					</control>
-				</setting>
-				<setting id="api_endpoint_signin" type="string" label="api_endpoint_signin" help="">
-					<level>0</level>
-					<default/>
-					<constraints>
-						<allowempty>true</allowempty>
-					</constraints>
-					<dependencies>
-						<dependency type="visible">
-							<condition on="property" name="InfoBool">false</condition>
-						</dependency>
-					</dependencies>
-					<control type="edit" format="string">
-						<heading>api_endpoint_signin</heading>
-					</control>
-				</setting>
-				<setting id="api_endpoint_signout" type="string" label="api_endpoint_signout" help="">
-					<level>0</level>
-					<default/>
-					<constraints>
-						<allowempty>true</allowempty>
-					</constraints>
-					<dependencies>
-						<dependency type="visible">
-							<condition on="property" name="InfoBool">false</condition>
-						</dependency>
-					</dependencies>
-					<control type="edit" format="string">
-						<heading>api_endpoint_signout</heading>
-					</control>
-				</setting>
-				<setting id="api_endpoint_refresh_access_token" type="string" label="api_endpoint_refresh_access_token" help="">
-					<level>0</level>
-					<default/>
-					<constraints>
-						<allowempty>true</allowempty>
-					</constraints>
-					<dependencies>
-						<dependency type="visible">
-							<condition on="property" name="InfoBool">false</condition>
-						</dependency>
-					</dependencies>
-					<control type="edit" format="string">
-						<heading>api_endpoint_refresh_access_token</heading>
-					</control>
-				</setting>
-				<setting id="api_endpoint_userprofile" type="string" label="api_endpoint_userprofile" help="">
-					<level>0</level>
-					<default/>
-					<constraints>
-						<allowempty>true</allowempty>
-					</constraints>
-					<dependencies>
-						<dependency type="visible">
-							<condition on="property" name="InfoBool">false</condition>
-						</dependency>
-					</dependencies>
-					<control type="edit" format="string">
-						<heading>api_endpoint_userprofile</heading>
-					</control>
-				</setting>
-				<setting id="api_endpoint_resource_strings" type="string" label="api_endpoint_resource_strings" help="">
-					<level>0</level>
-					<default/>
-					<constraints>
-						<allowempty>true</allowempty>
-					</constraints>
-					<dependencies>
-						<dependency type="visible">
-							<condition on="property" name="InfoBool">false</condition>
-						</dependency>
-					</dependencies>
-					<control type="edit" format="string">
-						<heading>api_endpoint_resource_strings</heading>
-					</control>
-				</setting>
-				<setting id="api_endpoint_devices" type="string" label="api_endpoint_devices" help="">
-					<level>0</level>
-					<default/>
-					<constraints>
-						<allowempty>true</allowempty>
-					</constraints>
-					<dependencies>
-						<dependency type="visible">
-							<condition on="property" name="InfoBool">false</condition>
-						</dependency>
-					</dependencies>
-					<control type="edit" format="string">
-						<heading>api_endpoint_devices</heading>
-					</control>
-				</setting>
-				<setting id="api_endpoint_search" type="string" label="api_endpoint_search" help="">
-					<level>0</level>
-					<default/>
-					<constraints>
-						<allowempty>true</allowempty>
-					</constraints>
-					<dependencies>
-						<dependency type="visible">
-							<condition on="property" name="InfoBool">false</condition>
-						</dependency>
-					</dependencies>
-					<control type="edit" format="string">
-						<heading>api_endpoint_search</heading>
-					</control>
-				</setting>
 				<setting id="startup" type="boolean" label="startup" help="">
 					<level>0</level>
 					<default>true</default>
@@ -654,6 +474,351 @@
 					</dependencies>
 					<control type="list" format="string">
 						<heading>30037</heading>
+					</control>
+				</setting>
+			</group>
+		</category>
+		<category id="api" label="30051" help="">
+			<group id="1">
+				<setting id="api_manual" type="boolean" label="30055" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+				<setting 				id="api_endpoint_rail" type="string" label="Rail" help="">
+					<level>0</level>
+									<default>https://rail-router.discovery.indazn.com/eu/v11/Rail</default>
+									<dependencies>
+										<dependency type="visible">
+											<condition operator="is" setting="api_manual">true</condition>
+										</dependency>
+									</dependencies>
+									<control type="button" format="action">
+										<data>RunPlugin(plugin://plugin.video.dazn/?mode=api_version&amp;endpoint=rail)</data>
+										<close>true</close>
+					</control>
+				</setting>
+				<setting id="api_versions_rail" type="string" label="api_versions_rail" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>api_versions_rail</heading>
+					</control>
+				</setting>
+				<setting 				id="api_endpoint_rails" type="string" label="Rails" help="">
+					<level>0</level>
+									<default>https://rails.discovery.indazn.com/eu/v9/rails</default>
+									<dependencies>
+										<dependency type="visible">
+											<condition operator="is" setting="api_manual">true</condition>
+										</dependency>
+									</dependencies>
+									<control type="button" format="action">
+										<data>RunPlugin(plugin://plugin.video.dazn/?mode=api_version&amp;endpoint=rails)</data>
+										<close>true</close>
+					</control>
+				</setting>
+				<setting id="api_versions_rails" type="string" label="api_versions_rails" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>api_versions_rails</heading>
+					</control>
+				</setting>
+				<setting 				id="api_endpoint_epg" type="string" label="EpgWithDateRange" help="">
+					<level>0</level>
+									<default>https://epg.discovery.indazn.com/eu/v6/epgWithDatesRange</default>
+									<dependencies>
+										<dependency type="visible">
+											<condition operator="is" setting="api_manual">true</condition>
+										</dependency>
+									</dependencies>
+									<control type="button" format="action">
+										<data>RunPlugin(plugin://plugin.video.dazn/?mode=api_version&amp;endpoint=epg)</data>
+										<close>true</close>
+					</control>
+				</setting>
+				<setting id="api_versions_epg" type="string" label="api_versions_epg" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>api_versions_epg</heading>
+					</control>
+				</setting>
+				<setting 				id="api_endpoint_event" type="string" label="Event" help="">
+					<level>0</level>
+									<default>https://event.discovery.indazn.com/eu/v8/Event</default>
+									<dependencies>
+										<dependency type="visible">
+											<condition operator="is" setting="api_manual">true</condition>
+										</dependency>
+									</dependencies>
+									<control type="button" format="action">
+										<data>RunPlugin(plugin://plugin.video.dazn/?mode=api_version&amp;endpoint=event)</data>
+										<close>true</close>
+					</control>
+				</setting>
+				<setting id="api_versions_event" type="string" label="api_versions_event" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>api_versions_event</heading>
+					</control>
+				</setting>
+				<setting 				id="api_endpoint_playback" type="string" label="Playback" help="">
+					<level>0</level>
+									<default>https://api.playback.indazn.com/v5/Playback</default>
+									<dependencies>
+										<dependency type="visible">
+											<condition operator="is" setting="api_manual">true</condition>
+										</dependency>
+									</dependencies>
+									<control type="button" format="action">
+										<data>RunPlugin(plugin://plugin.video.dazn/?mode=api_version&amp;endpoint=playback)</data>
+										<close>true</close>
+					</control>
+				</setting>
+				<setting id="api_versions_playback" type="string" label="api_versions_playback" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>api_versions_playback</heading>
+					</control>
+				</setting>
+				<setting 				id="api_endpoint_signin" type="string" label="SignIn" help="">
+					<level>0</level>
+									<default>https://authentication-prod.ar.indazn.com/v5/SignIn</default>
+									<dependencies>
+										<dependency type="visible">
+											<condition operator="is" setting="api_manual">true</condition>
+										</dependency>
+									</dependencies>
+									<control type="button" format="action">
+										<data>RunPlugin(plugin://plugin.video.dazn/?mode=api_version&amp;endpoint=signin)</data>
+										<close>true</close>
+					</control>
+				</setting>
+				<setting id="api_versions_signin" type="string" label="api_versions_signin" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>api_versions_signin</heading>
+					</control>
+				</setting>
+				<setting 				id="api_endpoint_signout" type="string" label="SignOut" help="">
+					<level>0</level>
+									<default>https://ott-authz-bff-prod.ar.indazn.com/v1/SignOut</default>
+									<dependencies>
+										<dependency type="visible">
+											<condition operator="is" setting="api_manual">true</condition>
+										</dependency>
+									</dependencies>
+									<control type="button" format="action">
+										<data>RunPlugin(plugin://plugin.video.dazn/?mode=api_version&amp;endpoint=signout)</data>
+										<close>true</close>
+					</control>
+				</setting>
+				<setting id="api_versions_signout" type="string" label="api_versions_signout" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>api_versions_signout</heading>
+					</control>
+				</setting>
+				<setting 				id="api_endpoint_refresh_access_token" type="string" label="RefreshAccessToken" help="">
+					<level>0</level>
+									<default>https://ott-authz-bff-prod.ar.indazn.com/v5/RefreshAccessToken</default>
+									<dependencies>
+										<dependency type="visible">
+											<condition operator="is" setting="api_manual">true</condition>
+										</dependency>
+									</dependencies>
+									<control type="button" format="action">
+										<data>RunPlugin(plugin://plugin.video.dazn/?mode=api_version&amp;endpoint=refresh_access_token)</data>
+										<close>true</close>
+					</control>
+				</setting>
+				<setting id="api_versions_refresh_access_token" type="string" label="api_versions_refresh_access_token" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>api_versions_refresh_access_token</heading>
+					</control>
+				</setting>
+				<setting 				id="api_endpoint_userprofile" type="string" label="UserProfile" help="">
+					<level>0</level>
+									<default>https://user-profile.ar.indazn.com/v4/userprofile</default>
+									<dependencies>
+										<dependency type="visible">
+											<condition operator="is" setting="api_manual">true</condition>
+										</dependency>
+									</dependencies>
+									<control type="button" format="action">
+										<data>RunPlugin(plugin://plugin.video.dazn/?mode=api_version&amp;endpoint=userprofile)</data>
+										<close>true</close>
+					</control>
+				</setting>
+				<setting id="api_versions_userprofile" type="string" label="api_versions_userprofile" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>api_versions_userprofile</heading>
+					</control>
+				</setting>
+				<setting 				id="api_endpoint_resource_strings" type="string" label="ResourceStrings" help="">
+					<level>0</level>
+									<default>https://resource-strings.acc.indazn.com/v1/eu/live</default>
+									<dependencies>
+										<dependency type="visible">
+											<condition operator="is" setting="api_manual">true</condition>
+										</dependency>
+									</dependencies>
+									<control type="button" format="action">
+										<data>RunPlugin(plugin://plugin.video.dazn/?mode=api_version&amp;endpoint=resource_strings)</data>
+										<close>true</close>
+					</control>
+				</setting>
+				<setting id="api_versions_resource_strings" type="string" label="api_versions_resource_strings" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>api_versions_resource_strings</heading>
+					</control>
+				</setting>
+				<setting 				id="api_endpoint_devices" type="string" label="Devices" help="">
+					<level>0</level>
+									<default>https://my-account-prod.ar.indazn.com/v2/devices</default>
+									<dependencies>
+										<dependency type="visible">
+											<condition operator="is" setting="api_manual">true</condition>
+										</dependency>
+									</dependencies>
+									<control type="button" format="action">
+										<data>RunPlugin(plugin://plugin.video.dazn/?mode=api_version&amp;endpoint=devices)</data>
+										<close>true</close>
+					</control>
+				</setting>
+				<setting id="api_versions_devices" type="string" label="api_versions_devices" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>api_versions_devices</heading>
+					</control>
+				</setting>
+				<setting 				id="api_endpoint_search" type="string" label="SearchV2" help="">
+					<level>0</level>
+									<default>https://search-binge.discovery.indazn.com/v1/search</default>
+									<dependencies>
+										<dependency type="visible">
+											<condition operator="is" setting="api_manual">true</condition>
+										</dependency>
+									</dependencies>
+									<control type="button" format="action">
+										<data>RunPlugin(plugin://plugin.video.dazn/?mode=api_version&amp;endpoint=search)</data>
+										<close>true</close>
+					</control>
+				</setting>
+				<setting id="api_versions_search" type="string" label="api_versions_search" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>api_versions_search</heading>
 					</control>
 				</setting>
 			</group>

@@ -91,6 +91,10 @@ if __name__ == '__main__':
     args = dict(parse_qs(paramstring))
 
     mode = args.get('mode', ['rails'])[0]
+    if mode == 'api_version':
+        plugin.select_api_version(args.get('endpoint', [''])[0])
+        exit(0)
+
     if mode != 'logout' and (plugin.startup or not client.TOKEN):
         startup_data = client.initStartupData()
         endpoint_dict = plugin.init_api_endpoints(startup_data.get('ServiceDictionary'))

@@ -176,6 +176,22 @@ msgctxt "#30050"
 msgid "Warning: DAZN often blocks desktop platforms (Linux, macOS, Windows, Chrome OS) with a 403 error during playback. Smart TV with the Samsung TV Browser is recommended."
 msgstr "Attention : DAZN bloque souvent les plateformes de bureau (Linux, macOS, Windows, Chrome OS) avec une erreur 403 lors de la lecture. Smart TV avec le navigateur Samsung TV est recommandé."
 
+msgctxt "#30051"
+msgid "API versions"
+msgstr "Versions de l'API"
+
+msgctxt "#30052"
+msgid "Select API version"
+msgstr "Sélectionner la version de l'API"
+
+msgctxt "#30054"
+msgid "No API versions available yet. Please start the add-on once."
+msgstr "Aucune version de l'API n'est encore disponible. Veuillez démarrer l'add-on une fois."
+
+msgctxt "#30055"
+msgid "Select API endpoints manually"
+msgstr "Sélectionner manuellement les endpoints de l'API"
+
 msgctxt "#30214"
 msgid "Switch to Sport"
 msgstr "Passer au Sport"

@@ -79,6 +79,23 @@ USER_AGENT_CLIENT_HINT_PLATFORMS = {
     'windows': 'Windows'
 }
 
+# Service dictionary names of the API endpoints, the key is the setting that
+# holds the selected url. The urls on offer are cached in 'api_versions_*'.
+API_ENDPOINTS = {
+    'api_endpoint_rail': 'Rail',
+    'api_endpoint_rails': 'Rails',
+    'api_endpoint_epg': 'EpgWithDateRange',
+    'api_endpoint_event': 'Event',
+    'api_endpoint_playback': 'Playback',
+    'api_endpoint_signin': 'SignIn',
+    'api_endpoint_signout': 'SignOut',
+    'api_endpoint_refresh_access_token': 'RefreshAccessToken',
+    'api_endpoint_userprofile': 'UserProfile',
+    'api_endpoint_resource_strings': 'ResourceStrings',
+    'api_endpoint_devices': 'Devices',
+    'api_endpoint_search': 'SearchV2'
+}
+
 
 class Common():
 
@@ -510,6 +527,16 @@ class Common():
         return result[0] if len(result) > 0 else ''
 
 
+    def get_endpoint_service_path(self, endpoint, service_path):
+        if endpoint == 'UserProfile' and service_path.lower().endswith('/userprofile') == False:
+            service_path += 'userprofile' if service_path.endswith('/') else '/userprofile'
+        return service_path
+
+
+    def sort_endpoint_versions(self, versions):
+        return sorted(versions, key=lambda x: '{0:0>8}'.format(x).lower())
+
+
     def init_api_endpoints(self, service_dict):
         from ..modules.urllib3 import PoolManager
         # Not used as a context manager on purpose, that closed the connection
@@ -517,47 +544,60 @@ class Common():
         pool = PoolManager()
 
         endpoint_dict = dict()
-        endpoint_def_dict = dict(
-                        api_endpoint_rail='Rail',
-                        api_endpoint_rails='Rails',
-                        api_endpoint_epg='EpgWithDateRange',
-                        api_endpoint_event='Event',
-                        api_endpoint_playback='Playback',
-                        api_endpoint_signin='SignIn',
-                        api_endpoint_signout='SignOut',
-                        api_endpoint_refresh_access_token='RefreshAccessToken',
-                        api_endpoint_userprofile='UserProfile',
-                        api_endpoint_resource_strings='ResourceStrings',
-                        api_endpoint_devices='Devices',
-                        api_endpoint_search='SearchV2'
-                        )
-        for key, value in endpoint_def_dict.items():
-            endpoint_key_list = list(service_dict.get(value).get('Versions'))
-            endpoint_key_list.sort(key=lambda x: '{0:0>8}'.format(x).lower())
-            index = -1
-            service_path = None
-            while service_path is None:
-                last_key = endpoint_key_list[index]
-                service_path = service_dict.get(value).get('Versions').get(last_key).get('ServicePath')
-                if value == 'UserProfile' and service_path.lower().endswith('/userprofile') == False:
-                    service_path += 'userprofile' if service_path.endswith('/') else '/userprofile'
-                # if self.get_setting(key) != service_path:
-                if key in ['api_endpoint_signin', 'api_endpoint_signout', 'api_endpoint_refresh_access_token']:
-                    method = 'POST'
-                else:
-                    method = 'GET'
-                headers = self.get_basic_request_headers().copy()
-                res = pool.request(method, service_path, headers=headers)
-                self.log(f"res for serivepath {service_path} is {res.status}")
-                if res.status == 404 or (res.status == 403 and self.get_dict_value(res.headers, 'content-type').startswith('application/json') == False):
-                    index -= 1
-                    service_path = None
-            self.set_setting(key, service_path)
+        manual = self.get_setting('api_manual') == 'true'
+        for key, value in API_ENDPOINTS.items():
+            suffix = key[len('api_endpoint_'):]
+            versions = service_dict.get(value).get('Versions')
+            # Newest version last
+            service_paths = [self.get_endpoint_service_path(value, versions[k].get('ServicePath')) for k in self.sort_endpoint_versions(versions)]
+
+            # Cache the available urls, so they can be selected in the settings.
+            cached_service_paths = '|'.join(service_paths)
+            if self.get_setting(f'api_versions_{suffix}') != cached_service_paths:
+                self.set_setting(f'api_versions_{suffix}', cached_service_paths)
+
+            # In manual mode the url selected in the settings is kept as long as it is
+            # still offered, otherwise (or in automatic mode) the newest working one is probed.
+            service_path = self.get_setting(key) if manual else None
+            if service_path not in service_paths:
+                index = -1
+                service_path = None
+                while service_path is None:
+                    service_path = service_paths[index]
+                    if key in ['api_endpoint_signin', 'api_endpoint_signout', 'api_endpoint_refresh_access_token']:
+                        method = 'POST'
+                    else:
+                        method = 'GET'
+                    headers = self.get_basic_request_headers().copy()
+                    res = pool.request(method, service_path, headers=headers)
+                    if res.status == 404 or (res.status == 403 and self.get_dict_value(res.headers, 'content-type').startswith('application/json') == False):
+                        index -= 1
+                        service_path = None
+                self.set_setting(key, service_path)
             endpoint_dict.update({key: service_path})
             if key == 'api_endpoint_resource_strings':
                 self.resources = service_path
 
         return endpoint_dict
+
+
+    def select_api_version(self, suffix):
+        key = f'api_endpoint_{suffix}'
+        service_paths = [p for p in self.get_setting(f'api_versions_{suffix}').split('|') if p]
+        if key not in API_ENDPOINTS or not service_paths:
+            self.dialog_ok(self.get_string(30054))
+            return
+
+        # Newest version first
+        service_paths.reverse()
+        current = self.get_setting(key)
+        choice = self.get_dialog().select(f'{self.get_string(30052)}: {API_ENDPOINTS[key]}', service_paths, preselect=service_paths.index(current) if current in service_paths else -1)
+        if choice < 0:
+            return
+
+        self.set_setting(key, service_paths[choice])
+        # Resolve the endpoints again on the next start.
+        self.set_setting('startup', 'true')
 
 
     def set_videoinfo(self, listitem, infolabels):
