@@ -395,7 +395,7 @@
 			<group id="3" label="30035">
 				<setting id="ua_platform" type="string" label="30036" help="30050">
 					<level>0</level>
-					<default>windows</default>
+					<default>auto</default>
 					<constraints>
 						<options>
 							<option label="30038">auto</option>
